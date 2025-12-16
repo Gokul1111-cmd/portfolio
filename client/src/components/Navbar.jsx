@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Home,
   User,
@@ -58,6 +59,7 @@ const ThemeToggle = () => {
 };
 
 export const Navbar = () => {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("#hero");
   const [showNavbar, setShowNavbar] = useState(true);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
@@ -242,6 +244,21 @@ export const Navbar = () => {
           }
         >
           {isMusicPlaying ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+        </motion.button>
+
+        <motion.button
+          onClick={() => navigate("/login")}
+          className={cn(
+            "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
+            "text-primary hover:bg-primary/10 dark:hover:bg-primary/20",
+            "border border-gray-200 dark:border-gray-700 shadow-sm",
+            "flex items-center justify-center"
+          )}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          title="Admin Login"
+        >
+          <User className="w-5 h-5" />
         </motion.button>
       </motion.div>
 
