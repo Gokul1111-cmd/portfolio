@@ -7,39 +7,69 @@ export const HeroSection = () => {
   const isInView = useInView(ref, { once: true });
   const [currentCodeLine, setCurrentCodeLine] = useState(0);
   const [displayedCode, setDisplayedCode] = useState("");
+  const defaultHero = {
+    name: "Gokul A",
+    title: "Full-Stack Developer",
+    headline: "I'm Gokul A",
+    subheadline: "I build AI-powered web applications that solve real-world problems. Passionate about cybersecurity, cloud computing, and creating impactful digital solutions.",
+    availability: "Available Immediately for Full-Stack Developer roles",
+    primaryCtaText: "View Case Studies",
+    primaryCtaLink: "#projects",
+    secondaryCtaText: "View Projects",
+    secondaryCtaLink: "#projects",
+    resumeUrl: "/gokul-resume.pdf",
+    achievements: [
+      { number: "0", label: "Years Experience", suffix: "+" },
+      { number: "8", label: "Projects Completed", suffix: "+" },
+      { number: "0", label: "Happy Clients", suffix: "" },
+    ],
+    codeSnippets: [
+      "import { FullStackDeveloper } from 'gokul.dev';",
+      "",
+      "const developer = new FullStackDeveloper({",
+      "  name: 'Gokul A',",
+      "  stack: ['React', 'Spring Boot', 'Java', 'Flask'],",
+      "  focus: 'Building AI-powered web solutions',",
+      "  status: 'Open to new opportunities'",
+      "});",
+      "",
+      "await developer.launchPortfolio();",
+      "// Featured: E-commerce, IoT, AI/ML, Web Applications",
+      "",
+      "developer.connect();",
+      "console.log('🚀 Let's build something exceptional together!');",
+    ],
+  };
 
-  const codeSnippets = [
-    "import { FullStackDeveloper } from 'gokul.dev';",
-    "",
-    "const developer = new FullStackDeveloper({",
-    "  name: 'Gokul A',",
-    "  stack: ['React', 'Spring Boot', 'Java', 'Flask'],",
-    "  focus: 'Building AI-powered web solutions',",
-    "  status: 'Open to new opportunities'",
-    "});",
-    "",
-    "await developer.launchPortfolio();",
-    "// Featured: E-commerce, IoT, AI/ML, Web Applications",
-    "",
-    "developer.connect();",
-    "console.log('🚀 Let's build something exceptional together!');"
-  ];
-
-    const achievements = [
-    { number: "0", label: "Years Experience", suffix: "+" },
-    { number: "8", label: "Projects Completed", suffix: "+" },
-    { number: "0", label: "Happy Clients", suffix: "" },
-  ];
+  const [hero, setHero] = useState(defaultHero);
 
   useEffect(() => {
-    const currentLine = codeSnippets[currentCodeLine];
+    const fetchHero = async () => {
+      try {
+        const res = await fetch('/api/content?key=hero');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.data) {
+            setHero({ ...defaultHero, ...data.data });
+          }
+        }
+      } catch (error) {
+        console.error('Hero fetch failed', error);
+      }
+    };
+    fetchHero();
+  }, []);
+
+  useEffect(() => {
+    const snippets = hero.codeSnippets || defaultHero.codeSnippets;
+    const currentLine = snippets[currentCodeLine] || "";
     if (displayedCode.length < currentLine.length) {
       setTimeout(() => {
         setDisplayedCode(currentLine.slice(0, displayedCode.length + 1));
       }, 30);
     } else {
       setTimeout(() => {
-        if (currentCodeLine < codeSnippets.length - 1) {
+        if (currentCodeLine < snippets.length - 1) {
           setCurrentCodeLine(prev => prev + 1);
           setDisplayedCode("");
         } else {
@@ -50,11 +80,11 @@ export const HeroSection = () => {
         }
       }, 800);
     }
-  }, [displayedCode, currentCodeLine]);
+  }, [displayedCode, currentCodeLine, hero.codeSnippets]);
 
   const handleViewResume = () => {
     // Open resume in new tab
-    window.open('/gokul-resume.pdf', '_blank', 'noopener,noreferrer');
+    window.open(hero.resumeUrl || '/gokul-resume.pdf', '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -103,22 +133,21 @@ export const HeroSection = () => {
             </motion.div>
 
             <motion.h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight" variants={{ hidden: { y: 30, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.8 } } }}>
-              <span className="block text-foreground">I'm Gokul A</span>
+              <span className="block text-foreground">{hero.headline}</span>
               <motion.span className="block bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent mt-2" animate={{ backgroundPosition: ['0%', '100%', '0%'] }} transition={{ duration: 8, repeat: Infinity }} style={{ backgroundSize: '200% 100%' }}>
-                Full-Stack Developer
+                {hero.title}
               </motion.span>
             </motion.h1>
 
             <motion.p className="text-lg sm:text-xl text-muted-foreground mt-6 leading-relaxed max-w-2xl" variants={{ hidden: { y: 30, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.8 } } }}>
-              I build <span className="text-primary font-semibold">AI-powered web applications</span> that solve real-world problems. Passionate about cybersecurity, cloud computing, and creating impactful digital solutions.
+              {hero.subheadline}
             </motion.p>
 
             <motion.div className="grid grid-cols-2 sm:grid-cols-4 gap-4 my-8" variants={{ hidden: { y: 30, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.8 } } }}>
-              {achievements.map((achievement, index) => (
+              {(hero.achievements || []).map((achievement, index) => (
                 <div key={index} className="text-center p-4 rounded-xl bg-background/60 border border-border/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-300">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    {achievement.icon}
-                    <div className="text-2xl font-bold text-foreground">{achievement.number}</div>
+                    <div className="text-2xl font-bold text-foreground">{achievement.number}{achievement.suffix}</div>
                   </div>
                   <div className="text-xs text-muted-foreground">{achievement.label}</div>
                 </div>
@@ -126,15 +155,15 @@ export const HeroSection = () => {
             </motion.div>
 
             <motion.div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start" variants={{ hidden: { y: 30, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.8 } } }}>
-              <motion.a href="#projects" className="group relative overflow-hidden px-8 py-4 rounded-xl font-semibold bg-gradient-to-r from-primary to-purple-600 text-primary-foreground shadow-lg hover:shadow-xl text-sm flex items-center justify-center gap-3" whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
+              <motion.a href={hero.primaryCtaLink || "#projects"} className="group relative overflow-hidden px-8 py-4 rounded-xl font-semibold bg-gradient-to-r from-primary to-purple-600 text-primary-foreground shadow-lg hover:shadow-xl text-sm flex items-center justify-center gap-3" whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
                 <Code className="h-5 w-5" /> 
-                <span>View Case Studies</span>
+                <span>{hero.primaryCtaText}</span>
                 <TrendingUp className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </motion.a>
               
-              <motion.a href="#projects" className="group relative overflow-hidden px-8 py-4 rounded-xl font-semibold border border-primary/50 text-foreground hover:border-primary transition-all duration-300 bg-background/80 backdrop-blur-sm text-sm flex items-center justify-center gap-3" whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
+              <motion.a href={hero.secondaryCtaLink || "#projects"} className="group relative overflow-hidden px-8 py-4 rounded-xl font-semibold border border-primary/50 text-foreground hover:border-primary transition-all duration-300 bg-background/80 backdrop-blur-sm text-sm flex items-center justify-center gap-3" whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
                 <Mail className="h-4 w-4" /> 
-                <span>View Projects</span>
+                <span>{hero.secondaryCtaText}</span>
               </motion.a>
               
               <motion.button 
@@ -150,7 +179,7 @@ export const HeroSection = () => {
 
             <motion.div className="mt-6 text-center lg:text-left" variants={{ hidden: { y: 30, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.8 } } }}>
               <div className="text-sm text-muted-foreground">
-                🚀 <span className="text-primary font-semibold">Available Immediately</span> for Full-Stack Developer roles
+                🚀 <span className="text-primary font-semibold">{hero.availability}</span>
               </div>
             </motion.div>
           </div>
@@ -174,7 +203,7 @@ export const HeroSection = () => {
                 <div className="font-mono text-sm bg-primary/5 rounded-lg border border-primary/10 min-h-[280px] flex">
                   <div className="p-6 w-full">
                     <div className="grid grid-cols-1 gap-1 h-full content-start">
-                      {codeSnippets.map((line, index) => (
+                      {(hero.codeSnippets || defaultHero.codeSnippets).map((line, index) => (
                         <div 
                           key={index}
                           className={`

@@ -41,12 +41,25 @@ export const ProjectsSection = () => {
           const data = await res.json();
           // Ensure tags is an array if your DB stores it as JSON/Text, 
           // otherwise default to empty array if undefined
+          const toArray = (value, fallback) => {
+            if (Array.isArray(value)) return value;
+            if (typeof value === "string") {
+              return value
+                .split(",")
+                .map((item) => item.trim())
+                .filter(Boolean);
+            }
+            return fallback;
+          };
+
           const formattedData = data.map(p => ({
             ...p,
-            tags: p.tags || ["React", "Full Stack"], // Default tags if missing
-            highlights: p.highlights || ["Responsive Design", "Modern UI"], // Default highlights
+            tags: toArray(p.tags, ["React", "Full Stack"]),
+            highlights: toArray(p.highlights, ["Responsive Design", "Modern UI"]),
             status: p.status || "Live",
-            accentColor: p.accentColor || "from-blue-500 to-cyan-600"
+            accentColor: p.accentColor || "from-blue-500 to-cyan-600",
+            featured: Boolean(p.featured),
+            video: p.video || "",
           }));
           setProjects(formattedData);
         }
