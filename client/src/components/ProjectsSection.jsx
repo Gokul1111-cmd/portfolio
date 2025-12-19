@@ -1,6 +1,6 @@
 import { ArrowRight, Github, ChevronUp, Star, Code, Sparkles, Zap, Play, Eye, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const categoryColors = {
   "E-commerce": "from-purple-500/20 to-indigo-600/20 text-purple-600 border-purple-500/30",
@@ -26,11 +26,6 @@ export const ProjectsSection = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const videoRef = useRef(null);
   const sectionRef = useRef(null);
-  
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"]
-  });
 
   // --- NEW: Fetch Data on Mount ---
   useEffect(() => {
@@ -198,8 +193,8 @@ export const ProjectsSection = () => {
             </motion.div>
 
             {/* Projects Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-              <AnimatePresence mode="wait">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 relative">
+              <AnimatePresence mode="popLayout">
                 {displayedProjects.map((project, index) => (
                   <motion.div
                     key={project.id}
@@ -463,13 +458,13 @@ export const ProjectsSection = () => {
       </div>
 
       {/* Video Modal */}
-      <AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {selectedVideo && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 relative"
             onClick={handleCloseVideo}
           >
             <motion.div

@@ -1,9 +1,9 @@
+/* eslint-env node */
 import express from "express";
-import dotenv from "dotenv";
 import projectsHandler from "./api/projects.js";
 import contentHandler from "./api/content.js";
-
-dotenv.config();
+import skillsHandler from "./api/skills.js";
+import testimonialsHandler from "./api/testimonials.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -15,6 +15,8 @@ const route = (handler) => async (req, res) => handler(req, res);
 
 app.all("/api/projects", route(projectsHandler));
 app.all("/api/content", route(contentHandler));
+app.all("/api/skills", route(skillsHandler));
+app.all("/api/testimonials", route(testimonialsHandler));
 
 app.get("/api/health", (_req, res) => {
   res.status(200).json({ ok: true });

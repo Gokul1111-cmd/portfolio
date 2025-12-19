@@ -1,31 +1,31 @@
-import pool from './db.js';
+import { adminDb } from './firebase-admin.js';
 
-// Simple key-value content store: key TEXT primary key, data JSONB
+// Simple key-value content store using Firestore Admin SDK
 export default async function handler(req, res) {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS site_content (
-        key TEXT PRIMARY KEY,
-        data JSONB NOT NULL,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-  } catch (err) {
-    console.error('content table creation error:', err);
-  }
-
   const { key } = req.query || {};
 
   if (req.method === 'GET') {
     try {
       if (key) {
-        const { rows } = await pool.query('SELECT data FROM site_content WHERE key = $1', [key]);
-        const row = rows[0];
-        return res.status(200).json(row ? row : {});
+        // Get specific content by key
+        const docSnap = await adminDb.collection('content').doc(key).get();
+        
+        if (docSnap.exists) {
+          return res.status(200).json({ data: docSnap.data() });
+        } else {
+          return res.status(200).json({});
+        }
       }
-      const { rows } = await pool.query('SELECT key, data FROM site_content');
+      
+      // Get all content
+      const snapshot = await adminDb.collection('content').get();
+      const rows = snapshot.docs.map(doc => ({
+        key: doc.id,
+        data: doc.data()
+      }));
       return res.status(200).json(rows);
     } catch (error) {
+      console.error('GET content error:', error);
       return res.status(500).json({ error: error.message });
     }
   }
@@ -36,15 +36,15 @@ export default async function handler(req, res) {
     if (!data) return res.status(400).json({ error: 'data is required' });
 
     try {
-      const { rows } = await pool.query(
-        `INSERT INTO site_content (key, data, updated_at)
-         VALUES ($1, $2, CURRENT_TIMESTAMP)
-         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP
-         RETURNING key, data, updated_at`,
-        [key, data]
-      );
-      return res.status(200).json(rows[0]);
+      await adminDb.collection('content').doc(key).set(data, { merge: true });
+      
+      return res.status(200).json({ 
+        key, 
+        data, 
+        updated_at: new Date().toISOString() 
+      });
     } catch (error) {
+      console.error('PUT content error:', error);
       return res.status(500).json({ error: error.message });
     }
   }

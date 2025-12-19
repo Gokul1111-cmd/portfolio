@@ -7,37 +7,35 @@ import { Quote, Star, ChevronLeft, ChevronRight } from "lucide-react";
 export const TestimonialSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(3);
+  const [testimonials, setTestimonials] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
 
-  const testimonials = [
-    {
-      id: 1,
-      name: "Alex Johnson",
-      role: "Product Director at TechCorp",
-      content: `Working with Gokul was seamless from day one. Not only did they deliver a full-stack solution ahead of schedule, but they also communicated clearly throughout the project. It's rare to find a developer who understands both the tech and the business side so well`,
-      rating: 5,
-      image: "/testimonials/alex-johnson.png"
-    },
-    {
-      id: 2,
-      name: "Maria Chen",
-      role: "Senior UX Designer at DesignHub",
-      content: `I've reviewed hundreds of portfolios, and his work is truly exceptional. Tway the animations guide attention while maintaining performance is masterful. The gradient elements add depth without overwhelming.`,
-      rating: 5,
-      image: "/testimonials/maria-chen.png"
-    },
-    {
-      id: 3,
-      name: "David Wilson",
-      role: "CTO at Startup Ventures",
-      content: `From wireframes to deployment, Gokul owned the entire stack with confidence and creativity. The final product is fast, reliable, and looks incredible. I wouldn't hesitate to work with them again.`,
-      rating: 5,
-      image: "/testimonials/David Wilson.png"
-    },
-  ];
-
   useEffect(() => {
+    const fetchTestimonials = async () => {
+      setIsLoading(true);
+      setError("");
+      try {
+        const res = await fetch('/api/testimonials');
+        if (!res.ok) throw new Error('Failed to fetch testimonials');
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setTestimonials(data);
+          setCurrentIndex(0);
+        }
+      } catch (err) {
+        console.error('Testimonials fetch failed', err);
+        setTestimonials([]);
+        setError('Unable to load testimonials right now.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+
     const handleResize = () => {
       if (window.innerWidth < 640) {
         setItemsPerPage(1);
@@ -54,13 +52,15 @@ export const TestimonialSection = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const totalPages = Math.ceil(testimonials.length / itemsPerPage);
+  const totalPages = testimonials.length ? Math.ceil(testimonials.length / itemsPerPage) : 0;
 
   const nextTestimonial = () => {
+    if (!totalPages) return;
     setCurrentIndex((prev) => (prev + 1) % totalPages);
   };
 
   const prevTestimonial = () => {
+    if (!totalPages) return;
     setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages);
   };
 
@@ -68,11 +68,6 @@ export const TestimonialSection = () => {
     currentIndex * itemsPerPage,
     (currentIndex + 1) * itemsPerPage
   );
-
-  // Fill empty slots on last page if needed
-  while (visibleTestimonials.length < itemsPerPage) {
-    visibleTestimonials.push(testimonials[visibleTestimonials.length]);
-  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -167,13 +162,29 @@ export const TestimonialSection = () => {
             >
               What Clients Will Say About Working with Me.
             </motion.p>
+            <motion.div
+              className="flex justify-center mt-4"
+              variants={itemVariants}
+            >
+              <a
+                href="/testimonial-submit"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary/90 transition"
+              >
+                Share your testimonial
+              </a>
+            </motion.div>
+            {isLoading && <motion.p className="text-sm text-muted-foreground mt-3" variants={itemVariants}>Loading testimonials...</motion.p>}
+            {error && !isLoading && <motion.p className="text-sm text-destructive mt-3" variants={itemVariants}>{error}</motion.p>}
           </motion.div>
 
           <div className="relative">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {!isLoading && testimonials.length === 0 && (
+                <div className="col-span-full text-center text-muted-foreground">No testimonials yet. Check back soon.</div>
+              )}
               {visibleTestimonials.map((testimonial) => (
                 <motion.div
-                  key={testimonial.id}
+                  key={testimonial.id || testimonial.name}
                   className="bg-background/80 backdrop-blur-sm border rounded-xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-all h-full flex flex-col group"
                   variants={itemVariants}
                   whileHover={{ y: -5 }}

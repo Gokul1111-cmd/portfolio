@@ -36,19 +36,25 @@ const WelcomeScreen = ({ onWelcomeComplete }) => {
   ];
 
   useEffect(() => {
-    const phase1 = setTimeout(() => setPhase(1), 800);
-    const phase2 = setTimeout(() => setPhase(2), 1600);
-    const phase3 = setTimeout(() => setPhase(3), 2400);
+    let exitTimer;
+    const phase1 = setTimeout(() => setPhase(1), 500);
+    const phase2 = setTimeout(() => setPhase(2), 1100);
+    const phase3 = setTimeout(() => setPhase(3), 1700);
     const complete = setTimeout(() => {
       setExitAnimation(true);
-      setTimeout(onWelcomeComplete, 1000);
-    }, 5000);
+      exitTimer = setTimeout(onWelcomeComplete, 500);
+    }, 3200);
+    const failSafe = setTimeout(() => {
+      onWelcomeComplete();
+    }, 8000);
 
     return () => {
       clearTimeout(phase1);
       clearTimeout(phase2);
       clearTimeout(phase3);
       clearTimeout(complete);
+      clearTimeout(failSafe);
+      if (exitTimer) clearTimeout(exitTimer);
     };
   }, [onWelcomeComplete]);
 
@@ -268,6 +274,14 @@ const WelcomeScreen = ({ onWelcomeComplete }) => {
                 >
                   Loading my best work for you...
                 </motion.p>
+                <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={onWelcomeComplete}
+                    className="px-4 py-2 text-xs sm:text-sm rounded-full border border-border bg-background/80 hover:bg-background transition-colors"
+                  >
+                    Skip intro
+                  </button>
+                </div>
               </motion.div>
             )}
           </motion.div>

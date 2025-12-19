@@ -6,6 +6,19 @@ export const AboutSection = () => {
   const [activeTab, setActiveTab] = useState('personal');
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [counter, setCounter] = useState(0);
+  const [aboutContent, setAboutContent] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const defaultAboutContent = {
+    bio: "I'm Gokul A, a Computer Science Engineering student passionate about AI, cloud computing, and full-stack development. I love transforming ideas into impactful digital solutions that blend creativity, logic, and real-world value.",
+    experience: "Fresh graduate with hands-on experience building 7+ projects using modern technologies. I specialize in full-stack development, AI integration, and creating scalable web applications with a focus on cybersecurity.",
+    education: "B.E. in Computer Science and Engineering. Continuously learning through projects, certifications, and research in AI and cloud computing.",
+    personalSummary: "I believe technology should be built with purpose — not just to work, but to make an impact. My approach focuses on writing clean, scalable code, designing efficient system architectures, and continuously learning new technologies that enhance performance and user experience.",
+    achievements: [],
+    techStack: [],
+    features: [],
+  };
 
     const achievements = [
     { number: "8+", label: "Projects", icon: "🚀" },
@@ -30,9 +43,9 @@ export const AboutSection = () => {
   ];
 
   const tabContent = {
-    personal: "I'm Gokul A, a Computer Science Engineering student passionate about AI, cloud computing, and full-stack development. I love transforming ideas into impactful digital solutions that blend creativity, logic, and real-world value.",
-    professional: "Fresh graduate with hands-on experience building 7+ projects using modern technologies. I specialize in full-stack development, AI integration, and creating scalable web applications with a focus on cybersecurity.",
-    approach: "I believe technology should be built with purpose — not just to work, but to make an impact. My approach focuses on writing clean, scalable code, designing efficient system architectures, and continuously learning new technologies that enhance performance and user experience."
+    personal: aboutContent.bio || defaultAboutContent.bio,
+    professional: aboutContent.experience || defaultAboutContent.experience,
+    approach: aboutContent.personalSummary || defaultAboutContent.personalSummary
   };
 
   useEffect(() => {
@@ -44,6 +57,31 @@ export const AboutSection = () => {
   useEffect(() => {
     const interval = setInterval(() => setCounter(prev => (prev + 1) % 4), 2000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchAbout = async () => {
+      setIsLoading(true);
+      setError('');
+      try {
+        const res = await fetch('/api/content?key=about');
+        if (!res.ok) throw new Error('Failed to fetch about');
+        const data = await res.json();
+        if (data && data.data) {
+          setAboutContent({ ...defaultAboutContent, ...data.data });
+        } else {
+          setAboutContent(defaultAboutContent);
+        }
+      } catch (err) {
+        console.error('About fetch failed', err);
+        setAboutContent(defaultAboutContent);
+        setError('Unable to load latest About content. Showing defaults.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAbout();
   }, []);
 
   // Programmatic download function
@@ -84,6 +122,8 @@ export const AboutSection = () => {
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Building digital experiences that combine <span className="text-primary font-semibold">innovation</span>, <span className="text-primary font-semibold">performance</span>, and <span className="text-primary font-semibold">elegance</span>
           </p>
+          {isLoading && <p className="text-sm text-muted-foreground mt-3">Loading latest About content...</p>}
+          {error && !isLoading && <p className="text-sm text-destructive mt-3">{error}</p>}
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 md:gap-12">
@@ -114,7 +154,7 @@ export const AboutSection = () => {
                     <h2 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Gokul A</h2>
                     <p className="text-primary text-base sm:text-lg font-semibold mb-3 sm:mb-4">Full Stack Developer</p>
                     <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                      {achievements.map((achievement, index) => (
+                      {(aboutContent.achievements && aboutContent.achievements.length ? aboutContent.achievements : achievements).map((achievement, index) => (
                         <div key={index} className={`p-2 sm:p-3 rounded-xl bg-background/50 border border-border transition-all duration-300 hover:scale-105 hover:border-primary/30 ${counter === index ? 'bg-primary/10 border-primary/50' : ''}`}>
                           <div className="flex items-center gap-2 justify-center md:justify-start">
                             {achievement.icon}
@@ -166,7 +206,7 @@ export const AboutSection = () => {
                 <Code className="h-4 sm:h-6 w-4 sm:w-6 text-primary" />Tech Stack Overview
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                {techStack.map((stack, index) => (
+                {(aboutContent.techStack && aboutContent.techStack.length ? aboutContent.techStack : techStack).map((stack, index) => (
                   <div key={index} className="bg-background/50 border border-border rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:border-primary/30 hover:scale-105 group">
                     <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                       <div className="p-1 sm:p-2 bg-primary/10 rounded-lg text-primary group-hover:scale-110 transition-transform duration-300"><Code className="h-3 sm:h-4 w-3 sm:w-4" /></div>
@@ -222,13 +262,20 @@ export const AboutSection = () => {
             <div className="bg-card/50 border border-border rounded-3xl p-4 sm:p-6 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:shadow-3xl hover:border-primary/40 hover:bg-card/60">
               <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2"><Star className="h-4 sm:h-5 w-4 sm:w-5 text-primary" />Why Choose Me</h3>
               <div className="space-y-2 sm:space-y-3">
-                {features.map((feature, index) => (
+                {(aboutContent.features && aboutContent.features.length ? aboutContent.features : features).map((feature, index) => (
                   <div key={index} className="flex items-center gap-2 sm:gap-3 p-1 sm:p-2 rounded-lg transition-all duration-300 hover:bg-background/50 hover:scale-105">
                     <div className="w-2 h-2 bg-primary rounded-full animate-pulse" /><span className="text-xs sm:text-sm text-muted-foreground hover:text-foreground">{feature}</span>
                   </div>
                 ))}
               </div>
             </div>
+
+            {aboutContent.education && (
+              <div className="bg-card/60 border border-border rounded-3xl p-4 sm:p-6 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:shadow-3xl hover:border-primary/40 hover:bg-card-70">
+                <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2"><Star className="h-4 sm:h-5 w-4 sm:w-5 text-primary" />Education</h3>
+                <p className="text-sm sm:text-base text-muted-foreground">{aboutContent.education}</p>
+              </div>
+            )}
 
             {/* Availability */}
             <div className="bg-card/60 border border-border rounded-3xl p-4 sm:p-6 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:shadow-3xl hover:border-primary/40 hover:bg-card-70">

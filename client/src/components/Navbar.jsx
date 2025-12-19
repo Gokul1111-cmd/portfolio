@@ -20,14 +20,6 @@ import {
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { name: "Home", href: "#hero", icon: Home },
-  { name: "About", href: "#about", icon: User },
-  { name: "Skills", href: "#skills", icon: Code },
-  { name: "Projects", href: "#projects", icon: Briefcase },
-  { name: "Blog", href: "https://blogni.vercel.app", icon: BookOpen },
-];
-
 const ThemeToggle = () => {
   const [theme, setTheme] = useState("light");
 
@@ -64,10 +56,51 @@ export const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(true);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isAudioReady, setIsAudioReady] = useState(false);
+  const [navItems, setNavItems] = useState([
+    { name: "Home", href: "#hero", icon: Home },
+    { name: "About", href: "#about", icon: User },
+    { name: "Skills", href: "#skills", icon: Code },
+    { name: "Projects", href: "#projects", icon: Briefcase },
+    { name: "Blog", href: "https://blogni.vercel.app", icon: BookOpen },
+  ]);
   const lastScrollYRef = useRef(0);
   const audioRef = useRef(null);
 
   const musicUrl = "/music.mp3";
+
+  // Icon mapping for nav items
+  const iconMap = {
+    "Home": Home,
+    "About": User,
+    "Skills": Code,
+    "Projects": Briefcase,
+    "Blog": BookOpen,
+    "Contact": Mail,
+  };
+
+  // Fetch site settings for nav links
+  useEffect(() => {
+    const fetchNavSettings = async () => {
+      try {
+        const res = await fetch("/api/content?key=site");
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.data?.navLinks && Array.isArray(data.data.navLinks) && data.data.navLinks.length) {
+            const fetchedNavItems = data.data.navLinks.map((link) => ({
+              name: link.name,
+              href: link.href,
+              icon: iconMap[link.name] || Home, // Use mapped icon or default to Home
+            }));
+            setNavItems(fetchedNavItems);
+          }
+        }
+      } catch (error) {
+        console.error("Navbar settings fetch failed", error);
+      }
+    };
+
+    fetchNavSettings();
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

@@ -11,16 +11,49 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const ContactSection = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [contactData, setContactData] = useState({
+    email: 'gokulanbalagan1112@gmail.com',
+    phone: '+91 8754740118',
+    location: 'Coimbatore, Tamil Nadu, India',
+    linkedin: 'https://www.linkedin.com/in/gokulanbalagan1112/',
+    twitter: '#',
+    github: 'https://github.com/Gokul1111-cmd',
+    instagram: '#',
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
+
+  useEffect(() => {
+    const fetchContact = async () => {
+      setIsLoading(true);
+      setError('');
+      try {
+        const res = await fetch('/api/content?key=contact');
+        if (!res.ok) throw new Error('Failed to fetch contact details');
+        const data = await res.json();
+        if (data && data.data) {
+          setContactData((prev) => ({ ...prev, ...data.data }));
+        }
+      } catch (err) {
+        console.error('Contact fetch failed', err);
+        setError('Unable to load contact details. Showing defaults.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchContact();
+  }, []);
   
   const validateForm = () => {
     if (!formData.name.trim()) {
@@ -115,6 +148,8 @@ export const ContactSection = () => {
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             Have a project in mind or just want to say hi? My inbox is always open.
           </p>
+          {isLoading && <p className="text-sm text-muted-foreground mt-3">Loading contact details...</p>}
+          {error && !isLoading && <p className="text-sm text-destructive mt-3">{error}</p>}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12">
@@ -133,10 +168,10 @@ export const ContactSection = () => {
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground">Email</p>
                   <a
-                    href="mailto:gokulanbalagan1112@gmail.com"
+                    href={`mailto:${contactData.email}`}
                     className="text-sm sm:text-base font-medium hover:text-primary transition-colors"
                   >
-                    gokulanbalagan1112@gmail.com
+                    {contactData.email}
                   </a>
                 </div>
               </div>
@@ -148,10 +183,10 @@ export const ContactSection = () => {
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground">Phone</p>
                   <a
-                    href="tel:+918754740118"
+                    href={`tel:${contactData.phone}`}
                     className="text-sm sm:text-base font-medium hover:text-primary transition-colors"
                   >
-                    +91 8754740118
+                    {contactData.phone}
                   </a>
                 </div>
               </div>
@@ -163,7 +198,7 @@ export const ContactSection = () => {
                 <div>
                   <p className="text-xs sm:text-sm text-muted-foreground">Location</p>
                   <span className="text-sm sm:text-base font-medium">
-                    Coimbatore, Tamil Nadu, India
+                    {contactData.location}
                   </span>
                 </div>
               </div>
@@ -176,22 +211,22 @@ export const ContactSection = () => {
                   {
                     icon: Linkedin,
                     label: "LinkedIn",
-                    url: "https://www.linkedin.com/in/gokulanbalagan1112/",
+                    url: contactData.linkedin,
                   },
                   {
                     icon: Twitter,
                     label: "Twitter",
-                    url: "#",
+                    url: contactData.twitter,
                   },
                   {
                     icon: Github,
                     label: "GitHub",
-                    url: "https://github.com/Gokul1111-cmd",
+                    url: contactData.github,
                   },
                   {
                     icon: Instagram,
                     label: "Instagram",
-                    url: "#",
+                    url: contactData.instagram,
                   },
                 ].map((social, index) => (
                   <a

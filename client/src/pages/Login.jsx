@@ -40,6 +40,7 @@ export const Login = () => {
             <input
               type="password"
               placeholder="Enter Access Code"
+              autoComplete="current-password"
               className="w-full px-4 py-3 rounded-lg bg-background/50 border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

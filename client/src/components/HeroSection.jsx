@@ -7,6 +7,8 @@ export const HeroSection = () => {
   const isInView = useInView(ref, { once: true });
   const [currentCodeLine, setCurrentCodeLine] = useState(0);
   const [displayedCode, setDisplayedCode] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
   const defaultHero = {
     name: "Gokul A",
     title: "Full-Stack Developer",
@@ -18,6 +20,7 @@ export const HeroSection = () => {
     secondaryCtaText: "View Projects",
     secondaryCtaLink: "#projects",
     resumeUrl: "/gokul-resume.pdf",
+    profileImage: "/profile-logo.png",
     achievements: [
       { number: "0", label: "Years Experience", suffix: "+" },
       { number: "8", label: "Projects Completed", suffix: "+" },
@@ -45,16 +48,23 @@ export const HeroSection = () => {
 
   useEffect(() => {
     const fetchHero = async () => {
+      setIsLoading(true);
+      setError("");
       try {
         const res = await fetch('/api/content?key=hero');
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.data) {
-            setHero({ ...defaultHero, ...data.data });
-          }
+        if (!res.ok) throw new Error('Failed to fetch hero content');
+        const data = await res.json();
+        if (data && data.data) {
+          setHero({ ...defaultHero, ...data.data });
+        } else {
+          setHero(defaultHero);
         }
       } catch (error) {
         console.error('Hero fetch failed', error);
+        setHero(defaultHero);
+        setError('Unable to load latest hero content. Showing defaults.');
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchHero();
@@ -143,6 +153,17 @@ export const HeroSection = () => {
               {hero.subheadline}
             </motion.p>
 
+            {isLoading && (
+              <motion.p className="text-sm text-muted-foreground mt-3" variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5 } } }}>
+                Loading latest hero content...
+              </motion.p>
+            )}
+            {error && !isLoading && (
+              <motion.p className="text-sm text-destructive mt-3" variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5 } } }}>
+                {error}
+              </motion.p>
+            )}
+
             <motion.div className="grid grid-cols-2 sm:grid-cols-4 gap-4 my-8" variants={{ hidden: { y: 30, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.8 } } }}>
               {(hero.achievements || []).map((achievement, index) => (
                 <div key={index} className="text-center p-4 rounded-xl bg-background/60 border border-border/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-300">
@@ -187,6 +208,22 @@ export const HeroSection = () => {
           <motion.div className="flex-1 flex justify-center lg:justify-end w-full" variants={{ hidden: { y: 30, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.8 } } }}>
             <div className="relative w-full max-w-md">
               <motion.div className="bg-background/90 border border-border rounded-2xl p-8 backdrop-blur-sm shadow-2xl w-full group hover:shadow-3xl transition-all duration-500" whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+                {hero.profileImage && (
+                  <motion.div
+                    className="absolute -top-8 left-8 w-16 h-16 rounded-full border-4 border-background shadow-xl overflow-hidden bg-primary/10"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                    <img
+                      src={hero.profileImage}
+                      alt={hero.name || "Profile"}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                  </motion.div>
+                )}
                 
                 <div className="flex items-center gap-4 mb-6">
                   <div className="flex gap-2">

@@ -1,0 +1,37 @@
+{
+  "content": {
+    "hero": {
+      "name": "Gokul A",
+      "title": "Full-Stack Developer",
+      "headline": "I'm Gokul A",
+      "subheadline": "I build AI-powered web applications that solve real-world problems.",
+      "availability": "Available Immediately for Full-Stack Developer roles",
+      "primaryCtaText": "View Case Studies",
+      "primaryCtaLink": "#projects",
+      "secondaryCtaText": "View Projects",
+      "secondaryCtaLink": "#projects",
+      "resumeUrl": "/gokul-resume.pdf",
+      "achievements": [
+        { "number": "0", "label": "Years Experience", "suffix": "+" },
+        { "number": "8", "label": "Projects Completed", "suffix": "+" },
+        { "number": "0", "label": "Happy Clients", "suffix": "" }
+      ],
+      "codeSnippets": [
+        "import { FullStackDeveloper } from 'gokul.dev';",
+        "",
+        "const developer = new FullStackDeveloper({",
+        "  name: 'Gokul A',",
+        "  stack: ['React', 'Spring Boot', 'Java', 'Flask'],",
+        "  focus: 'Building AI-powered web solutions',",
+        "  status: 'Open to new opportunities'",
+        "});",
+        "",
+        "await developer.launchPortfolio();",
+        "// Featured: E-commerce, IoT, AI/ML, Web Applications",
+        "",
+        "developer.connect();",
+        "console.log('🚀 Let's build something exceptional together!');"
+      ]
+    }
+  }
+}

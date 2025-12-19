@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Import your images
@@ -25,7 +25,27 @@ import clearkIcon from "@/assets/icons/cleark.png";
 import SQLIcon from "@/assets/icons/sql.png";
 import MySQLIcon from "@/assets/icons/mysql.png";
 
-const skills = [
+const normalizeSkillKey = (skill) => `${(skill?.name || '').trim().toLowerCase()}|${(skill?.category || '').trim().toLowerCase()}`;
+
+const dedupeSkills = (list = []) => {
+  const seen = new Set();
+  return list.filter((skill) => {
+    const key = normalizeSkillKey(skill);
+    if (!key.trim()) return false;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
+const clampIconSize = (value) => {
+  const num = Number.isFinite(value) ? value : 100;
+  if (num < 50) return 50;
+  if (num > 200) return 200;
+  return num;
+};
+
+const defaultSkills = [
   // Frontend
   { name: "HTML5", level: 90, category: "frontend", icon: "html" },
   { name: "CSS3", level: 80, category: "frontend", icon: "css" },
@@ -50,12 +70,17 @@ const skills = [
   { name: "VS Code", level: 90, category: "tools", icon: "vscode" },
 ];
 
-const categories = [
-  { id: "all", label: "All Skills", color: "bg-gradient-to-r from-purple-500 to-pink-500" },
-  { id: "frontend", label: "Frontend", color: "bg-gradient-to-r from-blue-500 to-cyan-500" },
-  { id: "backend", label: "Backend", color: "bg-gradient-to-r from-green-500 to-emerald-500" },
-  { id: "tools", label: "Tools", color: "bg-gradient-to-r from-orange-500 to-yellow-500" },
-];
+const categoryColors = {
+  all: "bg-gradient-to-r from-purple-500 to-pink-500",
+  frontend: "bg-gradient-to-r from-blue-500 to-cyan-500",
+  backend: "bg-gradient-to-r from-green-500 to-emerald-500",
+  tools: "bg-gradient-to-r from-orange-500 to-yellow-500",
+  cloud: "bg-gradient-to-r from-sky-500 to-blue-600",
+  devops: "bg-gradient-to-r from-amber-500 to-orange-600",
+  mobile: "bg-gradient-to-r from-indigo-500 to-purple-600",
+  design: "bg-gradient-to-r from-rose-500 to-pink-500",
+  other: "bg-gradient-to-r from-slate-600 to-slate-800",
+};
 
 const iconImages = {
   html: htmlIcon,
@@ -82,6 +107,30 @@ const iconImages = {
   mysql: MySQLIcon,
 };
 
+const resolveIcon = (skill) => {
+  const rawIcon = skill?.icon || '';
+  const iconValue = (rawIcon || skill?.category || '').toLowerCase();
+  
+  console.log(`[resolveIcon] ${skill?.name}:`, {
+    rawIcon: rawIcon ? rawIcon.substring(0, 50) + '...' : 'empty',
+    iconValue,
+    isURL: rawIcon && (rawIcon.startsWith('http') || rawIcon.startsWith('/')),
+    isDataURL: rawIcon && rawIcon.startsWith('data:')
+  });
+  
+  if (rawIcon && (rawIcon.startsWith('http') || rawIcon.startsWith('/') || rawIcon.startsWith('data:'))) {
+    console.log(`✓ Returning URL/data for ${skill?.name}`);
+    return rawIcon;
+  }
+  const mapped = iconImages[iconValue];
+  if (mapped) {
+    console.log(`✓ Returning mapped icon for ${skill?.name}: ${iconValue}`);
+  } else {
+    console.log(`✗ No icon found for ${skill?.name}, iconValue: ${iconValue}`);
+  }
+  return mapped;
+};
+
 const SkillBar = ({ level }) => (
   <div className="w-full h-3 bg-secondary/20 rounded-full overflow-hidden">
     <motion.div
@@ -98,6 +147,10 @@ const SkillBar = ({ level }) => (
 );
 
 const InfiniteScrollSkills = ({ skills }) => {
+  if (!skills.length) {
+    return <div className="text-center text-muted-foreground">No skills to display yet.</div>;
+  }
+
   const duplicatedSkills = [...skills, ...skills, ...skills];
   
   return (
@@ -109,8 +162,29 @@ const InfiniteScrollSkills = ({ skills }) => {
       >
         {duplicatedSkills.map((skill, index) => (
           <div key={`${skill.name}-${index}`} className="flex-shrink-0 flex flex-col items-center gap-2">
-            <div className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-              <img src={iconImages[skill.icon]} alt={skill.name} className="w-8 h-8 object-contain" />
+            <div className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform overflow-hidden">
+              {resolveIcon(skill) ? (
+                <img
+                  src={resolveIcon(skill)}
+                  alt={skill.name}
+                  className="w-full h-full object-cover"
+                  style={{ 
+                    transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
+                    objectFit: 'contain'
+                  }}
+                  onError={(e) => {
+                    console.error(`Failed to load image for ${skill.name}:`, resolveIcon(skill), e);
+                    e.target.style.display = 'none';
+                    const parent = e.target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<span class="text-lg font-semibold text-primary">${skill.name?.charAt(0) || '?'}</span>`;
+                    }
+                  }}
+                  onLoad={() => console.log(`✓ Image loaded for ${skill.name}:`, resolveIcon(skill))}
+                />
+              ) : (
+                <span className="text-lg font-semibold text-primary">{skill.name?.charAt(0) || '?'}</span>
+              )}
             </div>
             <span className="text-sm font-medium text-center">{skill.name}</span>
           </div>
@@ -124,8 +198,29 @@ const InfiniteScrollSkills = ({ skills }) => {
       >
         {[...duplicatedSkills].reverse().map((skill, index) => (
           <div key={`${skill.name}-reverse-${index}`} className="flex-shrink-0 flex flex-col items-center gap-2">
-            <div className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-              <img src={iconImages[skill.icon]} alt={skill.name} className="w-8 h-8 object-contain" />
+            <div className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform overflow-hidden">
+              {resolveIcon(skill) ? (
+                <img
+                  src={resolveIcon(skill)}
+                  alt={skill.name}
+                  className="w-full h-full object-cover"
+                  style={{ 
+                    transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
+                    objectFit: 'contain'
+                  }}
+                  onError={(e) => {
+                    console.error(`Failed to load image for ${skill.name}:`, resolveIcon(skill), e);
+                    e.target.style.display = 'none';
+                    const parent = e.target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<span class="text-lg font-semibold text-primary">${skill.name?.charAt(0) || '?'}</span>`;
+                    }
+                  }}
+                  onLoad={() => console.log(`✓ Image loaded for ${skill.name}:`, resolveIcon(skill))}
+                />
+              ) : (
+                <span className="text-lg font-semibold text-primary">{skill.name?.charAt(0) || '?'}</span>
+              )}
             </div>
             <span className="text-sm font-medium text-center">{skill.name}</span>
           </div>
@@ -137,12 +232,66 @@ const InfiniteScrollSkills = ({ skills }) => {
 
 export const SkillsSection = () => {
   const [activeCategory, setActiveCategory] = useState("all");
-  const filteredSkills = skills.filter(skill => 
-    activeCategory === "all" || skill.category === activeCategory
+  const [skills, setSkills] = useState(defaultSkills);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      setIsLoading(true);
+      setError("");
+      try {
+        const res = await fetch(`/api/skills?t=${Date.now()}`);
+        if (!res.ok) throw new Error('Failed to fetch skills');
+        const data = await res.json();
+        console.log('Fetched skills from Firebase:', data);
+        console.log('First 3 skills detailed:', data.slice(0, 3).map(s => ({
+          name: s.name,
+          icon: s.icon,
+          iconSize: s.iconSize,
+          category: s.category
+        })));
+        if (Array.isArray(data) && data.length) {
+          const deduped = dedupeSkills(data);
+          console.log('Deduped skills:', deduped);
+          console.log('First skill full data:', deduped[0]);
+          setSkills(deduped);
+        } else {
+          console.log('No skills found, using defaults');
+          setSkills(defaultSkills);
+        }
+      } catch (err) {
+        console.error('Skills fetch failed', err);
+        setSkills(defaultSkills);
+        setError('Unable to load latest skills. Showing defaults.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSkills();
+  }, []);
+
+  const uniqueSkills = useMemo(() => dedupeSkills(skills), [skills]);
+
+  const categories = useMemo(() => {
+    const unique = new Set((uniqueSkills || []).map((skill) => (skill.category ? skill.category.toLowerCase() : 'other')));
+    const ordered = ['all', ...Array.from(unique)];
+    const toLabel = (id) => id === 'all' ? 'All Skills' : `${id.charAt(0).toUpperCase()}${id.slice(1)}`;
+
+    return ordered.map((id) => ({
+      id,
+      label: toLabel(id),
+      color: categoryColors[id] || categoryColors.other,
+    }));
+  }, [skills]);
+
+  const filteredSkills = uniqueSkills.filter(skill => 
+    activeCategory === "all" || (skill.category || 'other') === activeCategory
   );
 
   return (
-    <section id="skills" className="py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background">
+    <section id="skills" className="relative py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background">
       <div className="container mx-auto max-w-6xl">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -155,6 +304,8 @@ export const SkillsSection = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
             Technologies I've mastered and my proficiency levels
           </p>
+          {isLoading && <p className="text-sm text-muted-foreground mt-3">Loading skills...</p>}
+          {error && !isLoading && <p className="text-sm text-destructive mt-3">{error}</p>}
         </motion.div>
 
         <div className="flex flex-wrap justify-center gap-3 mb-16">
@@ -176,13 +327,16 @@ export const SkillsSection = () => {
         </div>
 
         {activeCategory === "all" ? (
-          <InfiniteScrollSkills skills={skills} />
+          <InfiniteScrollSkills skills={uniqueSkills} />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredSkills.length === 0 && (
+              <div className="col-span-full text-center text-muted-foreground">No skills found in this category.</div>
+            )}
             <AnimatePresence mode="popLayout">
               {filteredSkills.map((skill) => (
                 <motion.div
-                  key={skill.name}
+                  key={skill.id || skill.name}
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -190,8 +344,29 @@ export const SkillsSection = () => {
                   className="bg-card p-6 rounded-2xl border border-border/30 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-lg group"
                 >
                   <div className="flex items-start gap-4 mb-5">
-                    <div className="w-12 h-12 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center">
-                      <img src={iconImages[skill.icon]} alt={skill.name} className="w-6 h-6 object-contain" />
+                    <div className="w-12 h-12 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {resolveIcon(skill) ? (
+                        <img
+                          src={resolveIcon(skill)}
+                          alt={skill.name}
+                          className="w-full h-full object-cover"
+                          style={{ 
+                            transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
+                            objectFit: 'contain'
+                          }}
+                          onError={(e) => {
+                            console.error(`Failed to load image for ${skill.name}:`, resolveIcon(skill));
+                            e.target.style.display = 'none';
+                            const parent = e.target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `<span class="text-base font-semibold text-primary">${skill.name?.charAt(0) || '?'}</span>`;
+                            }
+                          }}
+                          onLoad={() => console.log(`✓ Grid image loaded for ${skill.name}`)}
+                        />
+                      ) : (
+                        <span className="text-base font-semibold text-primary">{skill.name?.charAt(0) || '?'}</span>
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between items-center mb-2">
