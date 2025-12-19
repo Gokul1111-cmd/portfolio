@@ -12,21 +12,34 @@ const __dirname = path.dirname(__filename);
 const initializeAdmin = () => {
   if (admin.apps.length === 0) {
     try {
-      // Try to load service account key from local file (development)
-      const serviceAccountPath = path.join(__dirname, '..', 'firebase-service-account.json');
-      
-      if (fs.existsSync(serviceAccountPath)) {
-        const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+      // 1) Prefer env-based credentials (works on Vercel)
+      const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+      const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+      const projectId = process.env.FIREBASE_PROJECT_ID || 'gokul-portfolio-23143';
+
+      if (clientEmail && privateKey) {
         admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
+          credential: admin.credential.cert({
+            clientEmail,
+            privateKey: privateKey.replace(/\\n/g, '\n'),
+            projectId,
+          }),
         });
-        console.log('✅ Initialized Admin SDK with service account key');
+        console.log('✅ Initialized Admin SDK with env credentials');
       } else {
-        // For production (Vercel), use Application Default Credentials
-        admin.initializeApp({
-          projectId: process.env.FIREBASE_PROJECT_ID || 'gokul-portfolio-23143',
-        });
-        console.log('✅ Initialized Admin SDK with Application Default Credentials');
+        // 2) Local dev fallback to service-account file
+        const serviceAccountPath = path.join(__dirname, '..', 'firebase-service-account.json');
+        if (fs.existsSync(serviceAccountPath)) {
+          const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+          });
+          console.log('✅ Initialized Admin SDK with service account key');
+        } else {
+          // 3) Last resort: Application Default Credentials (often missing on Vercel)
+          admin.initializeApp({ projectId });
+          console.log('⚠️ Initialized Admin SDK with Application Default Credentials');
+        }
       }
     } catch (error) {
       console.error('Failed to initialize Firebase Admin:', error.message);
