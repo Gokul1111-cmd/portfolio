@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Star, Send, Quote, ShieldCheck, Sparkles, Upload, User, Briefcase } from "lucide-react";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { StarBackground } from "@/components/StarBackground";
+import { storage } from "@/lib/firebaseClient";
 
 const relationshipOptions = [
   "Client",
@@ -81,19 +83,38 @@ export const TestimonialSubmit = () => {
   const [status, setStatus] = useState(null);
   const [imageDragActive, setImageDragActive] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
-  const handleImageFile = (file) => {
+  const handleImageFile = async (file) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      alert("Please choose an image file");
+      setStatus({ type: "error", msg: "Please choose an image file." });
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const result = ev.target?.result;
-      if (typeof result === "string") setFormData((p) => ({ ...p, image: result }));
-    };
-    reader.readAsDataURL(file);
+
+    const sizeMb = file.size / (1024 * 1024);
+    if (sizeMb > 15) {
+      setStatus({ type: "error", msg: "Max image size is 15 MB." });
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      setStatus({ type: "info", msg: "Uploading image to Firebase Storage..." });
+
+      const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${file.name}`;
+      const storageRef = ref(storage, `testimonials/${uniqueName}`);
+      await uploadBytes(storageRef, file);
+      const downloadUrl = await getDownloadURL(storageRef);
+
+      setFormData((p) => ({ ...p, image: downloadUrl }));
+      setStatus({ type: "success", msg: "Image uploaded. Ready to submit." });
+    } catch (error) {
+      console.error("Image upload failed", error);
+      setStatus({ type: "error", msg: "Image upload failed. Please try again." });
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const getDropZoneProps = (setActive, fileHandler) => ({
@@ -123,6 +144,11 @@ export const TestimonialSubmit = () => {
 
     if (!formData.name.trim() || !formData.content.trim() || !formData.image.trim()) {
       setStatus({ type: "error", msg: "Name, testimonial, and profile photo are required." });
+      return;
+    }
+
+    if (uploadingImage) {
+      setStatus({ type: "info", msg: "Please wait for the image upload to finish." });
       return;
     }
 
@@ -316,15 +342,16 @@ export const TestimonialSubmit = () => {
                       value={formData.image}
                       onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                       className="w-full p-3 sm:h-12 rounded-lg bg-background border border-border focus:border-primary outline-none"
-                      placeholder="Image URL"
+                      placeholder="Image URL (auto-filled after upload)"
                     />
                     <label className="w-full sm:w-auto sm:h-12 inline-flex items-center justify-center gap-2 px-4 py-3 text-xs font-semibold border border-border rounded-lg bg-background cursor-pointer hover:border-primary text-center">
-                      <Upload size={14} /> Upload
+                      <Upload size={14} /> {uploadingImage ? "Uploading..." : "Upload"}
                       <input
                         type="file"
                         accept="image/*"
                         className="hidden"
                         onChange={(e) => handleImageFile(e.target.files?.[0])}
+                        disabled={uploadingImage}
                       />
                     </label>
                   </div>
@@ -340,18 +367,27 @@ export const TestimonialSubmit = () => {
               autoComplete="off"
             />
 
-              {status && status.type === "error" && (
-                <div className="p-3 rounded-lg border text-sm border-destructive/40 bg-destructive/10 text-destructive">
+              {status && (
+                <div
+                  className={`p-3 rounded-lg border text-sm ${
+                    status.type === "error"
+                      ? "border-destructive/40 bg-destructive/10 text-destructive"
+                      : status.type === "success"
+                        ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-500"
+                        : "border-primary/30 bg-primary/5 text-primary"
+                  }`}
+                >
                   {status.msg}
                 </div>
               )}
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || uploadingImage}
                 className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
               >
-                <Send size={16} /> {submitting ? "Sending..." : "Share Testimonial"}
+                <Send size={16} />
+                {submitting ? "Sending..." : uploadingImage ? "Wait for upload" : "Share Testimonial"}
               </button>
             </motion.form>
           </div>
