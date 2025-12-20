@@ -8,7 +8,8 @@ import testimonialsHandler from "./api/testimonials.js";
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(express.json());
+// Allow larger payloads for base64 testimonial images (up to 15 MB)
+app.use(express.json({ limit: "15mb" }));
 
 // Tiny wrapper so our serverless-style handlers work with express
 const route = (handler) => async (req, res) => handler(req, res);

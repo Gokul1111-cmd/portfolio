@@ -61,7 +61,6 @@ export const Navbar = () => {
     { name: "About", href: "#about", icon: User },
     { name: "Skills", href: "#skills", icon: Code },
     { name: "Projects", href: "#projects", icon: Briefcase },
-    { name: "Blog", href: "https://blogni.vercel.app", icon: BookOpen },
   ]);
   const lastScrollYRef = useRef(0);
   const audioRef = useRef(null);
@@ -74,7 +73,6 @@ export const Navbar = () => {
     "About": User,
     "Skills": Code,
     "Projects": Briefcase,
-    "Blog": BookOpen,
     "Contact": Mail,
   };
 
