@@ -15,14 +15,14 @@ const relationshipOptions = [
 ];
 
 const roleOptions = [
-  "Client / Stakeholder",
+  "Client",
   "Software Engineer",
   "Frontend Developer",
   "Backend Developer",
   "Full-stack Developer",
   "UI/UX Designer",
   "Graphic Designer",
-  "Data / AI",
+  "Data / AI Engineer",
   "QA / Tester",
   "Intern / Entry-level Engineer",
   "Student / Graduate",
