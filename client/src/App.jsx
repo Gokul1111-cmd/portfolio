@@ -25,21 +25,22 @@ function App() {
       disableTransitionOnChange
     >
       <Toaster />
-      {!welcomeComplete ? (
+      {/* Mount the app immediately; show Welcome as an overlay */}
+      <BrowserRouter>
+        <Routes>
+          <Route index element={<Home />} />
+          {/* NEW ROUTES */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/testimonial-submit" element={<TestimonialSubmit />} />
+          
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Analytics />
+      </BrowserRouter>
+
+      {!welcomeComplete && (
         <WelcomeScreen onWelcomeComplete={handleWelcomeComplete} />
-      ) : (
-        <BrowserRouter>
-          <Routes>
-            <Route index element={<Home />} />
-            {/* NEW ROUTES */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/testimonial-submit" element={<TestimonialSubmit />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Analytics />
-        </BrowserRouter>
       )}
     </ThemeProvider>
   );
