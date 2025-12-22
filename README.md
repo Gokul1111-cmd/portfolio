@@ -8,7 +8,7 @@ A fast, modern, and responsive developer portfolio website built using **React**
 
 - ⚛️ React (with Vite for fast dev/build)
 - 💨 Tailwind CSS (utility-first styling)
-- 🔧 JavaScript (ES6+)
+- 🔧 JavaScript (ES6+) 
 - 💡 Optional: Framer Motion for animations
 
 ## 📸 Screenshots
