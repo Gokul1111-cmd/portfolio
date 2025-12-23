@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Sparkles } from 'lucide-react';
+import { CheckCircle2, Sparkles, GraduationCap, Briefcase, Building2, ArrowRight } from 'lucide-react';
 
 const defaultApproachContent = {
   title: "My Approach",
@@ -11,6 +11,70 @@ const defaultApproachContent = {
     { number: 3, title: "Development", description: "Clean, scalable code implementation" },
     { number: 4, title: "Testing", description: "Rigorous QA and performance optimization" },
     { number: 5, title: "Deployment", description: "Smooth launch and continuous monitoring" }
+  ],
+  careerTitle: "Career Path",
+  careerIntro: "A quick look at how I grew from school to Infosys, building skills and impact along the way.",
+  careerTimeline: [
+    {
+      period: "School",
+      range: "2019 - 2021",
+      title: "Biology Major but Passion for Tech",
+      subtitle: "Explored programming through self-learning",
+      highlights: ["Self-taught HTML, CSS basics", "Built simple websites", "Explored various programming languages"],
+      tech: ["HTML"],
+      result: "Laid the foundation for a tech career",
+      icon: "graduation"
+    },
+    {
+      period: "Diploma",
+      range: "2021 - 2022",
+      title: "ERP Tally",
+      subtitle: "ERP systems and business applications",
+      highlights: ["Learned Tally ERP", "Understood business processes", "Developed small business apps"],
+      tech: ["Tally ERP", "Basic SQL", "VBScript"],
+      result: "Gained practical IT skills for business",
+      icon: "graduation"
+    },
+    {
+      period: "College",
+      range: "2022 - 2026 (present)",
+      title: "Computer Science Engineering",
+      subtitle: "Projects, internships, and hackathons",
+      highlights: ["Built 7+ projects across web, AI", "Led team mini-projects, Full - stack projects", "Learned Spring Boot, React"],
+      tech: ["React", "Java", "Spring Boot", "SQL"],
+      result: "Preparing for professional software development",
+      icon: "college"
+    },
+    {
+      period: "Internship",
+      range: "2023",
+      title: "Python Bootcamp Intern",
+      subtitle: "python development and best practices",
+      highlights: ["Developed projects using Python", "Learned coding standards"],
+      tech: ["Python"],
+      result: "Enhanced coding skills and discipline",
+      icon: "work"
+    },
+    {
+      period: "Internship",
+      range: "2024",
+      title: "Cloud computing Intern",
+      subtitle: "cloud services and solutions",
+      highlights: ["Gained hands-on experience with AWS"],
+      tech: ["AWS", "Azure", "Python", "NoteBook"],
+      result: "Gained Hands on experience on cloud infra",
+      icon: "work"
+    },
+    {
+      period: "Infosys",
+      range: "2026",
+      title: "Systems Engineer",
+      subtitle: "Going to work on real-world enterprise solutions",
+      highlights: ["Joining Infosys as Systems Engineer", "Excited to apply skills in a corporate environment", "Looking forward to continuous learning and growth"],
+      tech: ["To be determined"],
+      result: "Starting professional software engineering career",
+      icon: "work"
+    }
   ]
 };
 
@@ -18,8 +82,12 @@ export const MyApproach = () => {
   const [approachContent, setApproachContent] = useState(defaultApproachContent);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [viewMode, setViewMode] = useState('career');
 
   useEffect(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('approach_view') : null;
+    if (saved === 'approach' || saved === 'career') setViewMode(saved);
+
     const fetchApproach = async () => {
       setIsLoading(true);
       setError('');
@@ -31,7 +99,10 @@ export const MyApproach = () => {
           setApproachContent({
             title: data.data.title || defaultApproachContent.title,
             description: data.data.description || defaultApproachContent.description,
-            steps: Array.isArray(data.data.steps) && data.data.steps.length ? data.data.steps : defaultApproachContent.steps
+            steps: Array.isArray(data.data.steps) && data.data.steps.length ? data.data.steps : defaultApproachContent.steps,
+            careerTitle: data.data.careerTitle || defaultApproachContent.careerTitle,
+            careerIntro: data.data.careerIntro || defaultApproachContent.careerIntro,
+            careerTimeline: Array.isArray(data.data.careerTimeline) && data.data.careerTimeline.length ? data.data.careerTimeline : defaultApproachContent.careerTimeline
           });
         } else {
           setApproachContent(defaultApproachContent);
@@ -56,6 +127,23 @@ export const MyApproach = () => {
     );
   }
 
+  const handleViewChange = (mode) => {
+    setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('approach_view', mode);
+    }
+  };
+
+  const timeline = Array.isArray(approachContent.careerTimeline) && approachContent.careerTimeline.length
+    ? approachContent.careerTimeline
+    : defaultApproachContent.careerTimeline;
+
+  const renderTimelineIcon = (icon) => {
+    if (icon === 'graduation') return <GraduationCap className="text-primary" size={20} />;
+    if (icon === 'college') return <Building2 className="text-primary" size={20} />;
+    return <Briefcase className="text-primary" size={20} />;
+  };
+
   return (
     <section id="approach" className="relative py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background overflow-hidden">
       <div className="container mx-auto max-w-6xl">
@@ -72,65 +160,135 @@ export const MyApproach = () => {
             {approachContent.description}
           </p>
           {error && <p className="text-sm text-destructive mt-3">{error}</p>}
+
+          {/* Toggle */}
+          <div className="mt-6 inline-flex bg-card border border-border rounded-full p-1 shadow-sm">
+            <button
+              onClick={() => handleViewChange('approach')}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                viewMode === 'approach' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Development Approach
+            </button>
+            <button
+              onClick={() => handleViewChange('career')}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                viewMode === 'career' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Career Path
+            </button>
+          </div>
         </motion.div>
 
-        {/* Steps */}
-        <div className="relative">
-          {/* Vertical Line */}
-          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/20 via-primary/50 to-primary/20 transform -translate-x-1/2" />
+        {viewMode === 'approach' ? (
+          <div className="relative">
+            <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/20 via-primary/50 to-primary/20 transform -translate-x-1/2" />
 
-          <div className="space-y-8 md:space-y-12">
-            <AnimatePresence>
-              {(approachContent.steps || []).map((step, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`flex gap-6 md:gap-12 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                >
-                  {/* Step Content */}
-                  <div className="flex-1">
-                    <motion.div
-                      className="bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-lg"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0">
-                          <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10 border border-primary/30">
-                            <span className="text-lg font-bold text-primary">{step.number}</span>
+            <div className="space-y-8 md:space-y-12">
+              <AnimatePresence>
+                {(approachContent.steps || []).map((step, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`flex gap-6 md:gap-12 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+                  >
+                    <div className="flex-1">
+                      <motion.div
+                        className="bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-lg"
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0">
+                            <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10 border border-primary/30">
+                              <span className="text-lg font-bold text-primary">{step.number}</span>
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-bold text-foreground mb-2">{step.title}</h3>
+                            <p className="text-muted-foreground">{step.description}</p>
                           </div>
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold text-foreground mb-2">{step.title}</h3>
-                          <p className="text-muted-foreground">{step.description}</p>
+                      </motion.div>
+                    </div>
+
+                    <div className="hidden md:flex items-center justify-center flex-shrink-0">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        transition={{ delay: index * 0.1 + 0.2 }}
+                        className="relative"
+                      >
+                        <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
+                        <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-card border-2 border-primary shadow-lg">
+                          <CheckCircle2 size={24} className="text-primary" />
+                        </div>
+                      </motion.div>
+                    </div>
+
+                    <div className="hidden md:block flex-1" />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            <div className="text-center max-w-3xl mx-auto text-muted-foreground">
+              <p>{approachContent.careerIntro || defaultApproachContent.careerIntro}</p>
+            </div>
+            <div className="relative">
+              <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-border" />
+              <div className="space-y-8">
+                {timeline.map((item, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.08 }}
+                    className={`flex flex-col md:flex-row md:items-stretch gap-4 md:gap-8 ${idx % 2 === 0 ? '' : 'md:flex-row-reverse'}`}
+                  >
+                    <div className="md:w-1/2 bg-card border border-border rounded-2xl p-6 shadow-sm">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+                          {renderTimelineIcon(item.icon)}
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase tracking-wide text-primary font-semibold">{item.period}</p>
+                          <p className="text-sm text-muted-foreground">{item.range}</p>
                         </div>
                       </div>
-                    </motion.div>
-                  </div>
-
-                  {/* Circle Indicator */}
-                  <div className="hidden md:flex items-center justify-center flex-shrink-0">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      whileInView={{ scale: 1 }}
-                      transition={{ delay: index * 0.1 + 0.2 }}
-                      className="relative"
-                    >
-                      <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
-                      <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-card border-2 border-primary shadow-lg">
-                        <CheckCircle2 size={24} className="text-primary" />
+                      <h3 className="text-xl font-bold text-foreground">{item.title}</h3>
+                      {item.subtitle && <p className="text-sm text-muted-foreground mt-1">{item.subtitle}</p>}
+                      <div className="mt-4 space-y-2 text-sm text-muted-foreground">
+                        {(item.highlights || []).map((point, i) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <ArrowRight className="h-4 w-4 text-primary mt-0.5" />
+                            <span>{point}</span>
+                          </div>
+                        ))}
                       </div>
-                    </motion.div>
-                  </div>
-
-                  {/* Empty space */}
-                  <div className="hidden md:block flex-1" />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {(item.tech || []).map((tag, i) => (
+                          <span key={i} className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">{tag}</span>
+                        ))}
+                      </div>
+                      {item.result && <p className="mt-4 text-sm font-semibold text-foreground">Result: {item.result}</p>}
+                    </div>
+                    <div className="hidden md:flex md:w-1/2 items-center justify-center">
+                      <div className="relative h-full flex items-center justify-center">
+                        <div className="h-4 w-4 rounded-full bg-primary shadow-lg" />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* CTA Section */}
         <motion.div 

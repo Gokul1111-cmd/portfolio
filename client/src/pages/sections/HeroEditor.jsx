@@ -7,6 +7,7 @@ export const HeroEditor = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [resumeDragActive, setResumeDragActive] = useState(false);
   const [profileDragActive, setProfileDragActive] = useState(false);
+  const [dragIndex, setDragIndex] = useState(null);
 
   const defaultHero = {
     name: "Gokul A",
@@ -141,6 +142,32 @@ export const HeroEditor = () => {
     next.splice(index, 1);
     setHeroData({ ...heroData, codeSnippets: next });
   };
+
+  const addCodeSnippetAfter = (index) => {
+    const next = [...(heroData.codeSnippets || [])];
+    next.splice(index + 1, 0, "");
+    setHeroData({ ...heroData, codeSnippets: next });
+  };
+
+  const handleDragStart = (index) => {
+    setDragIndex(index);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    // Visual cue could be added with CSS if needed
+  };
+
+  const handleDrop = (index) => {
+    if (dragIndex === null || dragIndex === index) return;
+    const next = [...(heroData.codeSnippets || [])];
+    const [moved] = next.splice(dragIndex, 1);
+    next.splice(index, 0, moved);
+    setHeroData({ ...heroData, codeSnippets: next });
+    setDragIndex(null);
+  };
+
+  const handleDragEnd = () => setDragIndex(null);
 
   if (isLoading) return <div className="p-8">Loading...</div>;
 
@@ -291,7 +318,15 @@ export const HeroEditor = () => {
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {(heroData.codeSnippets || []).map((snippet, idx) => (
-                <div key={idx} className="flex gap-2 items-center">
+                <div
+                  key={idx}
+                  className="flex gap-2 items-center"
+                  draggable
+                  onDragStart={() => handleDragStart(idx)}
+                  onDragOver={(e) => handleDragOver(e, idx)}
+                  onDrop={() => handleDrop(idx)}
+                  onDragEnd={handleDragEnd}
+                >
                   <input
                     type="text"
                     className="flex-1 p-2 rounded-md bg-background border border-border outline-none focus:border-primary font-mono text-sm"
@@ -305,6 +340,14 @@ export const HeroEditor = () => {
                     className="text-xs text-destructive px-2 hover:bg-destructive/10 rounded"
                   >
                     ✕
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addCodeSnippetAfter(idx)}
+                    className="text-xs text-primary px-2 hover:bg-primary/10 rounded"
+                    title="Add line below"
+                  >
+                    +
                   </button>
                 </div>
               ))}

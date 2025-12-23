@@ -23,10 +23,12 @@ export const Footer = () => {
       { label: "GitHub", href: "https://github.com/Gokul1111-cmd" },
     ],
     footerQuickLinks: [
-      { name: "Home", href: "#home" },
+      { name: "Home", href: "#hero" },
       { name: "About", href: "#about" },
       { name: "Skills", href: "#skills" },
+      { name: "My Approach", href: "#approach" },
       { name: "Projects", href: "#projects" },
+      { name: "Contact", href: "#contact" },
     ],
     contactInfo: { email: "gokulanbalagan1112@gmail.com", phone: "+91 8754740118", location: "Coimbatore, Tamil Nadu, India" },
     footerPolicyLinks: [

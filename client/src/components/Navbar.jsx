@@ -61,6 +61,7 @@ export const Navbar = () => {
     { name: "About", href: "#about", icon: User },
     { name: "Skills", href: "#skills", icon: Code },
     { name: "Projects", href: "#projects", icon: Briefcase },
+    { name: "Contact", href: "#contact", icon: Mail },
   ]);
   const lastScrollYRef = useRef(0);
   const audioRef = useRef(null);

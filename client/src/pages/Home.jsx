@@ -3,8 +3,10 @@ import { StarBackground } from "@/components/StarBackground";
 import { HeroSection } from "../components/HeroSection";
 import { AboutSection } from "../components/AboutSection";
 import { SkillsSection } from "../components/SkillsSection";
+import { MyApproach } from "../components/MyApproach";
 import { ProjectsSection } from "../components/ProjectsSection";
 import { TestimonialSection } from "../components/Testimonial";
+import { ContactSection } from "../components/ContactSection";
 import { Footer } from "../components/Footer";
 
 export const Home = () => {
@@ -21,8 +23,10 @@ export const Home = () => {
         <HeroSection />
         <AboutSection />
         <SkillsSection />
+        <MyApproach />
         <ProjectsSection />
         <TestimonialSection />
+        <ContactSection />
       </main>
 
       {/* Footer */}

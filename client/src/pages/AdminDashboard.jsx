@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, LogOut, Sparkles, Users, Code2, Zap, MessageSquare, Mail, Settings, ChevronRight } from "lucide-react";
+import { LayoutDashboard, LogOut, Sparkles, Users, Code2, Zap, MessageSquare, Mail, Settings, ChevronRight, Milestone } from "lucide-react";
 
 // Import section editor components
 import { HeroEditor } from "./sections/HeroEditor";
@@ -12,6 +12,7 @@ import { ApproachEditor } from "./sections/ApproachEditor";
 import { TestimonialsEditor } from "./sections/TestimonialsEditor";
 import { ContactEditor } from "./sections/ContactEditor";
 import { SiteSettingsEditor } from "./sections/SiteSettingsEditor";
+import { TimelineEditor } from "./sections/TimelineEditor";
 
 const navigationItems = [
   { id: "hero", label: "Hero", icon: Sparkles },
@@ -19,6 +20,7 @@ const navigationItems = [
   { id: "about", label: "About", icon: Users },
   { id: "skills", label: "Skills", icon: Zap },
   { id: "approach", label: "My Approach", icon: LayoutDashboard },
+  { id: "career", label: "Career Timeline", icon: Milestone },
   { id: "testimonials", label: "Testimonials", icon: MessageSquare },
   { id: "contact", label: "Contact", icon: Mail },
   { id: "site", label: "Site Settings", icon: Settings },
@@ -30,6 +32,7 @@ const sectionComponents = {
   about: AboutEditor,
   skills: SkillsEditor,
   approach: ApproachEditor,
+  career: TimelineEditor,
   testimonials: TestimonialsEditor,
   contact: ContactEditor,
   site: SiteSettingsEditor,
