@@ -58,18 +58,9 @@ const checkAndShowSummary = () => {
 };
 
 const staticUrl = (name, version) => {
-  // Use API proxy to avoid CORS issues in development
-  const isDev =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
-  if (isDev) {
-    const v = version ? `&v=${version}` : "";
-    return `/api/storage-proxy?name=${name}${v}`;
-  }
-  // Production: direct Storage URL
-  const path = encodeURIComponent(`static-sync/${name}.json`);
+  // Always use API proxy to avoid CORS issues
   const v = version ? `&v=${version}` : "";
-  return `${base}/${path}?alt=media${v}`;
+  return `/api/storage-proxy?name=${name}${v}`;
 };
 
 export const fetchStaticOrLive = async ({ name, liveUrl, fallbackEmpty }) => {
