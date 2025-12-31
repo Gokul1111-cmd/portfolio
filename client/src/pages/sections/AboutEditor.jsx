@@ -29,12 +29,26 @@ export const AboutEditor = () => {
             experience: data.data.experience || "",
             education: data.data.education || "",
             personalSummary: data.data.personalSummary || "",
-            achievements: Array.isArray(data.data.achievements) ? data.data.achievements : [],
-            techStack: Array.isArray(data.data.techStack) ? data.data.techStack : [],
-            features: Array.isArray(data.data.features) ? data.data.features : [],
+            achievements: Array.isArray(data.data.achievements)
+              ? data.data.achievements
+              : [],
+            techStack: Array.isArray(data.data.techStack)
+              ? data.data.techStack
+              : [],
+            features: Array.isArray(data.data.features)
+              ? data.data.features
+              : [],
           });
         } else {
-          setAboutData({ bio: "", experience: "", education: "", personalSummary: "", achievements: [], techStack: [], features: [] });
+          setAboutData({
+            bio: "",
+            experience: "",
+            education: "",
+            personalSummary: "",
+            achievements: [],
+            techStack: [],
+            features: [],
+          });
         }
       }
     } catch (error) {
@@ -65,7 +79,10 @@ export const AboutEditor = () => {
   };
 
   const addAchievement = () => {
-    const next = [...(aboutData.achievements || []), { number: "", suffix: "", label: "", icon: "" }];
+    const next = [
+      ...(aboutData.achievements || []),
+      { number: "", suffix: "", label: "", icon: "" },
+    ];
     setAboutData({ ...aboutData, achievements: next });
   };
 
@@ -79,7 +96,10 @@ export const AboutEditor = () => {
     const next = [...(aboutData.techStack || [])];
     if (!next[index]) next[index] = { category: "", items: [] };
     if (field === "items") {
-      next[index].items = value.split(",").map((s) => s.trim()).filter(Boolean);
+      next[index].items = value
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
     } else {
       next[index][field] = value;
     }
@@ -128,47 +148,71 @@ export const AboutEditor = () => {
       <div className="bg-card border border-border rounded-xl p-8 shadow-lg max-w-4xl">
         <form onSubmit={handleSave} className="space-y-6">
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Bio</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Bio
+            </label>
             <textarea
               rows={4}
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={aboutData.bio || ""}
-              onChange={(e) => setAboutData({ ...aboutData, bio: e.target.value })}
+              onChange={(e) =>
+                setAboutData({ ...aboutData, bio: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Experience</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Experience
+            </label>
             <textarea
               rows={4}
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={aboutData.experience || ""}
-              onChange={(e) => setAboutData({ ...aboutData, experience: e.target.value })}
+              onChange={(e) =>
+                setAboutData({ ...aboutData, experience: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Education</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Education
+            </label>
             <textarea
               rows={3}
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={aboutData.education || ""}
-              onChange={(e) => setAboutData({ ...aboutData, education: e.target.value })}
+              onChange={(e) =>
+                setAboutData({ ...aboutData, education: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Personal Summary</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Personal Summary
+            </label>
             <textarea
               rows={3}
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={aboutData.personalSummary || ""}
-              onChange={(e) => setAboutData({ ...aboutData, personalSummary: e.target.value })}
+              onChange={(e) =>
+                setAboutData({ ...aboutData, personalSummary: e.target.value })
+              }
             />
           </div>
 
           {/* Achievements */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-muted-foreground">Achievements</label>
-              <button type="button" onClick={addAchievement} className="text-xs text-primary hover:underline">Add</button>
+              <label className="text-xs font-medium text-muted-foreground">
+                Achievements
+              </label>
+              <button
+                type="button"
+                onClick={addAchievement}
+                className="text-xs text-primary hover:underline"
+              >
+                Add
+              </button>
             </div>
             <div className="space-y-3">
               {(aboutData.achievements || []).map((item, idx) => (
@@ -177,28 +221,42 @@ export const AboutEditor = () => {
                     className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                     placeholder="Number"
                     value={item.number || ""}
-                    onChange={(e) => updateAchievement(idx, "number", e.target.value)}
+                    onChange={(e) =>
+                      updateAchievement(idx, "number", e.target.value)
+                    }
                   />
                   <input
                     className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                     placeholder="Suffix"
                     value={item.suffix || ""}
-                    onChange={(e) => updateAchievement(idx, "suffix", e.target.value)}
+                    onChange={(e) =>
+                      updateAchievement(idx, "suffix", e.target.value)
+                    }
                   />
                   <input
                     className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                     placeholder="Label"
                     value={item.label || ""}
-                    onChange={(e) => updateAchievement(idx, "label", e.target.value)}
+                    onChange={(e) =>
+                      updateAchievement(idx, "label", e.target.value)
+                    }
                   />
                   <div className="flex gap-2">
                     <input
                       className="flex-1 p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                       placeholder="Icon (emoji)"
                       value={item.icon || ""}
-                      onChange={(e) => updateAchievement(idx, "icon", e.target.value)}
+                      onChange={(e) =>
+                        updateAchievement(idx, "icon", e.target.value)
+                      }
                     />
-                    <button type="button" onClick={() => removeAchievement(idx)} className="text-xs text-destructive px-2">✕</button>
+                    <button
+                      type="button"
+                      onClick={() => removeAchievement(idx)}
+                      className="text-xs text-destructive px-2"
+                    >
+                      ✕
+                    </button>
                   </div>
                 </div>
               ))}
@@ -208,8 +266,16 @@ export const AboutEditor = () => {
           {/* Tech Stack */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-muted-foreground">Tech Stack (cards)</label>
-              <button type="button" onClick={addTechStack} className="text-xs text-primary hover:underline">Add</button>
+              <label className="text-xs font-medium text-muted-foreground">
+                Tech Stack (cards)
+              </label>
+              <button
+                type="button"
+                onClick={addTechStack}
+                className="text-xs text-primary hover:underline"
+              >
+                Add
+              </button>
             </div>
             <div className="space-y-3">
               {(aboutData.techStack || []).map((item, idx) => (
@@ -218,17 +284,27 @@ export const AboutEditor = () => {
                     className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                     placeholder="Category (e.g., Frontend)"
                     value={item.category || ""}
-                    onChange={(e) => updateTechStack(idx, "category", e.target.value)}
+                    onChange={(e) =>
+                      updateTechStack(idx, "category", e.target.value)
+                    }
                   />
                   <textarea
                     rows={2}
                     className="col-span-2 p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                     placeholder="Items comma-separated (React, HTML, CSS)"
                     value={(item.items || []).join(", ")}
-                    onChange={(e) => updateTechStack(idx, "items", e.target.value)}
+                    onChange={(e) =>
+                      updateTechStack(idx, "items", e.target.value)
+                    }
                   />
                   <div className="col-span-3 flex justify-end">
-                    <button type="button" onClick={() => removeTechStack(idx)} className="text-xs text-destructive px-2">Remove</button>
+                    <button
+                      type="button"
+                      onClick={() => removeTechStack(idx)}
+                      className="text-xs text-destructive px-2"
+                    >
+                      Remove
+                    </button>
                   </div>
                 </div>
               ))}
@@ -238,8 +314,16 @@ export const AboutEditor = () => {
           {/* Why Choose Me */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-muted-foreground">Why Choose Me (features)</label>
-              <button type="button" onClick={addFeature} className="text-xs text-primary hover:underline">Add</button>
+              <label className="text-xs font-medium text-muted-foreground">
+                Why Choose Me (features)
+              </label>
+              <button
+                type="button"
+                onClick={addFeature}
+                className="text-xs text-primary hover:underline"
+              >
+                Add
+              </button>
             </div>
             <div className="space-y-2">
               {(aboutData.features || []).map((feature, idx) => (
@@ -250,7 +334,13 @@ export const AboutEditor = () => {
                     value={feature || ""}
                     onChange={(e) => updateFeature(idx, e.target.value)}
                   />
-                  <button type="button" onClick={() => removeFeature(idx)} className="text-xs text-destructive px-2">✕</button>
+                  <button
+                    type="button"
+                    onClick={() => removeFeature(idx)}
+                    className="text-xs text-destructive px-2"
+                  >
+                    ✕
+                  </button>
                 </div>
               ))}
             </div>

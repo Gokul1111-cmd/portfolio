@@ -1,108 +1,169 @@
-import React, { useState, useEffect } from 'react';
-import { Briefcase, Code, User, Download, Calendar, Sparkles, Target, Github, Linkedin, Twitter, Mail, Star } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from "react";
+import {
+  Code,
+  User,
+  Download,
+  Sparkles,
+  Github,
+  Linkedin,
+  Twitter,
+  Mail,
+  Star,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { fetchStaticOrLive } from "../lib/staticData";
 
 export const AboutSection = () => {
-  const [activeTab, setActiveTab] = useState('personal');
+  const [activeTab, setActiveTab] = useState("personal");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [counter, setCounter] = useState(0);
   const [aboutContent, setAboutContent] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const defaultAboutContent = {
     bio: "I'm Gokul A, a Computer Science Engineering student passionate about AI, cloud computing, and full-stack development. I love transforming ideas into impactful digital solutions that blend creativity, logic, and real-world value.",
-    experience: "Fresh graduate with hands-on experience building 7+ projects using modern technologies. I specialize in full-stack development, AI integration, and creating scalable web applications with a focus on cybersecurity.",
-    education: "B.E. in Computer Science and Engineering. Continuously learning through projects, certifications, and research in AI and cloud computing.",
-    personalSummary: "I believe technology should be built with purpose — not just to work, but to make an impact. My approach focuses on writing clean, scalable code, designing efficient system architectures, and continuously learning new technologies that enhance performance and user experience.",
+    experience:
+      "Fresh graduate with hands-on experience building 7+ projects using modern technologies. I specialize in full-stack development, AI integration, and creating scalable web applications with a focus on cybersecurity.",
+    education:
+      "B.E. in Computer Science and Engineering. Continuously learning through projects, certifications, and research in AI and cloud computing.",
+    personalSummary:
+      "I believe technology should be built with purpose — not just to work, but to make an impact. My approach focuses on writing clean, scalable code, designing efficient system architectures, and continuously learning new technologies that enhance performance and user experience.",
     achievements: [],
     techStack: [],
     features: [],
   };
 
-    const achievements = [
+  const achievements = [
     { number: "8+", label: "Projects", icon: "🚀" },
     { number: "0", label: "Years Exp", icon: "💼" },
     { number: "Fresh Graduate", label: "Status", icon: "🎓" },
-    { number: "100%", label: "Motivated", icon: "⚡" }
+    { number: "100%", label: "Motivated", icon: "⚡" },
   ];
 
   const techStack = [
-    { category: "Frontend", items: ["React", "HTML", "CSS", "JavaScript", "Tailwind CSS"] },
-    { category: "Backend", items: ["Spring Boot", "Flask", "Java", "SQL", "API"] },
-    { category: "Tools", items: ["Git", "Docker", "Firebase", "MongoDB", "MySQL"] }
+    {
+      category: "Frontend",
+      items: ["React", "HTML", "CSS", "JavaScript", "Tailwind CSS"],
+    },
+    {
+      category: "Backend",
+      items: ["Spring Boot", "Flask", "Java", "SQL", "API"],
+    },
+    {
+      category: "Tools",
+      items: ["Git", "Docker", "Firebase", "MongoDB", "MySQL"],
+    },
   ];
 
-  const features = ["AI & Cloud expertise", "Clean, scalable code", "Cybersecurity focused", "Full-stack development", "Quick learner", "Problem solver"];
+  const features = [
+    "AI & Cloud expertise",
+    "Clean, scalable code",
+    "Cybersecurity focused",
+    "Full-stack development",
+    "Quick learner",
+    "Problem solver",
+  ];
 
   const socialLinks = [
-    { icon: <Github className="h-5 w-5" />, href: "https://github.com/Gokul1111-cmd" },
-    { icon: <Linkedin className="h-5 w-5" />, href: "https://www.linkedin.com/in/gokulanbalagan1112/" },
+    {
+      icon: <Github className="h-5 w-5" />,
+      href: "https://github.com/Gokul1111-cmd",
+    },
+    {
+      icon: <Linkedin className="h-5 w-5" />,
+      href: "https://www.linkedin.com/in/gokulanbalagan1112/",
+    },
     { icon: <Twitter className="h-5 w-5" />, href: "#" },
-    { icon: <Mail className="h-5 w-5" />, href: "mailto:gokulanbalagan1112@gmail.com" }
+    {
+      icon: <Mail className="h-5 w-5" />,
+      href: "mailto:gokulanbalagan1112@gmail.com",
+    },
   ];
 
   const tabContent = {
     personal: aboutContent.bio || defaultAboutContent.bio,
     professional: aboutContent.experience || defaultAboutContent.experience,
-    approach: aboutContent.personalSummary || defaultAboutContent.personalSummary
+    approach:
+      aboutContent.personalSummary || defaultAboutContent.personalSummary,
   };
 
   useEffect(() => {
-    const handleMouseMove = (e) => setMousePosition({ x: e.clientX, y: e.clientY });
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    const handleMouseMove = (e) =>
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => setCounter(prev => (prev + 1) % 4), 2000);
+    const interval = setInterval(
+      () => setCounter((prev) => (prev + 1) % 4),
+      2000,
+    );
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     const fetchAbout = async () => {
       setIsLoading(true);
-      setError('');
+      setError("");
       try {
-        const res = await fetch('/api/content?key=about');
-        if (!res.ok) throw new Error('Failed to fetch about');
-        const data = await res.json();
-        if (data && data.data) {
-          setAboutContent({ ...defaultAboutContent, ...data.data });
-        } else {
-          setAboutContent(defaultAboutContent);
-        }
+        const payload = await fetchStaticOrLive({
+          name: "content",
+          liveUrl: "/api/content?key=about",
+          fallbackEmpty: defaultAboutContent,
+        });
+        const resolved = payload?.about || payload?.data || payload;
+        setAboutContent({ ...defaultAboutContent, ...(resolved || {}) });
       } catch (err) {
-        console.error('About fetch failed', err);
+        console.error("About fetch failed", err);
         setAboutContent(defaultAboutContent);
-        setError('Unable to load latest About content. Showing defaults.');
+        setError("Unable to load latest About content. Showing defaults.");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchAbout();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Programmatic download function
   const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = '/gokul-resume.pdf'; // Must be in public folder
-    link.download = 'Gokul-Anbalagan-Resume.pdf';
+    const link = document.createElement("a");
+    link.href = "/gokul-resume.pdf"; // Must be in public folder
+    link.download = "Gokul-Anbalagan-Resume.pdf";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   return (
-    <section id="about" className="relative py-16 md:py-28 px-4 sm:px-6 lg:px-12 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
+    <section
+      id="about"
+      className="relative py-16 md:py-28 px-4 sm:px-6 lg:px-12 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden"
+    >
       {/* Background Shapes */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute w-72 sm:w-96 h-72 sm:h-96 bg-primary/5 rounded-full blur-3xl transition-all duration-1000 ease-out" style={{ transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)` }} />
-        <div className="absolute w-60 sm:w-80 h-60 sm:h-80 bg-secondary/5 rounded-full blur-3xl transition-all duration-1500 ease-out" style={{ transform: `translate(${mousePosition.x * -0.03}px, ${mousePosition.y * -0.03}px)` }} />
+        <div
+          className="absolute w-72 sm:w-96 h-72 sm:h-96 bg-primary/5 rounded-full blur-3xl transition-all duration-1000 ease-out"
+          style={{
+            transform: `translate(${mousePosition.x * 0.02}px, ${mousePosition.y * 0.02}px)`,
+          }}
+        />
+        <div
+          className="absolute w-60 sm:w-80 h-60 sm:h-80 bg-secondary/5 rounded-full blur-3xl transition-all duration-1500 ease-out"
+          style={{
+            transform: `translate(${mousePosition.x * -0.03}px, ${mousePosition.y * -0.03}px)`,
+          }}
+        />
         <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:64px_64px]" />
-        <div className="absolute top-16 right-8 sm:top-20 sm:right-20 animate-float"><div className="w-6 sm:w-8 h-6 sm:h-8 bg-primary/20 rounded-lg rotate-45" /></div>
-        <div className="absolute bottom-32 left-8 sm:bottom-40 sm:left-20 animate-float animation-delay-2000"><div className="w-5 sm:w-6 h-5 sm:h-6 bg-secondary/20 rounded-full" /></div>
+        <div className="absolute top-16 right-8 sm:top-20 sm:right-20 animate-float">
+          <div className="w-6 sm:w-8 h-6 sm:h-8 bg-primary/20 rounded-lg rotate-45" />
+        </div>
+        <div className="absolute bottom-32 left-8 sm:bottom-40 sm:left-20 animate-float animation-delay-2000">
+          <div className="w-5 sm:w-6 h-5 sm:h-6 bg-secondary/20 rounded-full" />
+        </div>
       </div>
 
       <div className="container mx-auto max-w-7xl relative">
@@ -113,17 +174,32 @@ export const AboutSection = () => {
               <Sparkles className="h-4 sm:h-5 w-4 sm:w-5 text-primary animate-pulse" />
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-ping" />
             </div>
-            <span className="text-sm sm:text-base font-semibold text-primary tracking-wide">ABOUT ME</span>
+            <span className="text-sm sm:text-base font-semibold text-primary tracking-wide">
+              ABOUT ME
+            </span>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6">
-            <span className="bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">Transforming</span>
-            <span className="block text-primary animate-pulse">Ideas Into Reality</span>
+            <span className="bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+              Transforming
+            </span>
+            <span className="block text-primary animate-pulse">
+              Ideas Into Reality
+            </span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Building digital experiences that combine <span className="text-primary font-semibold">innovation</span>, <span className="text-primary font-semibold">performance</span>, and <span className="text-primary font-semibold">elegance</span>
+            Building digital experiences that combine{" "}
+            <span className="text-primary font-semibold">innovation</span>,{" "}
+            <span className="text-primary font-semibold">performance</span>, and{" "}
+            <span className="text-primary font-semibold">elegance</span>
           </p>
-          {isLoading && <p className="text-sm text-muted-foreground mt-3">Loading latest About content...</p>}
-          {error && !isLoading && <p className="text-sm text-destructive mt-3">{error}</p>}
+          {isLoading && (
+            <p className="text-sm text-muted-foreground mt-3">
+              Loading latest About content...
+            </p>
+          )}
+          {error && !isLoading && (
+            <p className="text-sm text-destructive mt-3">{error}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 md:gap-12">
@@ -142,7 +218,11 @@ export const AboutSection = () => {
                   {/* Profile Image */}
                   <div className="relative flex-shrink-0">
                     <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-4 border-primary/20 shadow-2xl transition-all duration-500 group-hover:border-primary/40 group-hover:scale-105 md:group-hover:scale-110 relative">
-                      <img src="/profile-logo.png" alt="Gokul A" className="w-full h-full object-cover" />
+                      <img
+                        src="/profile-logo.png"
+                        alt="Gokul A"
+                        className="w-full h-full object-cover"
+                      />
                       <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full border-4 border-background flex items-center justify-center">
                         <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse" />
                       </div>
@@ -151,16 +231,32 @@ export const AboutSection = () => {
 
                   {/* Achievements */}
                   <div className="flex-1 text-center md:text-left">
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Gokul A</h2>
-                    <p className="text-primary text-base sm:text-lg font-semibold mb-3 sm:mb-4">Full Stack Developer</p>
+                    <h2 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">
+                      Gokul A
+                    </h2>
+                    <p className="text-primary text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+                      Full Stack Developer
+                    </p>
                     <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                      {(aboutContent.achievements && aboutContent.achievements.length ? aboutContent.achievements : achievements).map((achievement, index) => (
-                        <div key={index} className={`p-2 sm:p-3 rounded-xl bg-background/50 border border-border transition-all duration-300 hover:scale-105 hover:border-primary/30 ${counter === index ? 'bg-primary/10 border-primary/50' : ''}`}>
+                      {(aboutContent.achievements &&
+                      aboutContent.achievements.length
+                        ? aboutContent.achievements
+                        : achievements
+                      ).map((achievement, index) => (
+                        <div
+                          key={index}
+                          className={`p-2 sm:p-3 rounded-xl bg-background/50 border border-border transition-all duration-300 hover:scale-105 hover:border-primary/30 ${counter === index ? "bg-primary/10 border-primary/50" : ""}`}
+                        >
                           <div className="flex items-center gap-2 justify-center md:justify-start">
                             {achievement.icon}
                             <div>
-                              <div className="font-bold text-sm sm:text-lg">{achievement.number}{achievement.suffix}</div>
-                              <div className="text-[10px] sm:text-xs text-muted-foreground">{achievement.label}</div>
+                              <div className="font-bold text-sm sm:text-lg">
+                                {achievement.number}
+                                {achievement.suffix}
+                              </div>
+                              <div className="text-[10px] sm:text-xs text-muted-foreground">
+                                {achievement.label}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -171,11 +267,11 @@ export const AboutSection = () => {
 
                 {/* Tabs */}
                 <div className="flex flex-col sm:flex-row border-b border-border mb-4 sm:mb-6">
-                  {['personal', 'professional', 'approach'].map(tab => (
+                  {["personal", "professional", "approach"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base font-medium transition-all duration-300 ${activeTab === tab ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                      className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 text-sm sm:text-base font-medium transition-all duration-300 ${activeTab === tab ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}
                     >
                       {tab.charAt(0).toUpperCase() + tab.slice(1)}
                     </button>
@@ -203,19 +299,34 @@ export const AboutSection = () => {
             {/* Tech Stack */}
             <div className="bg-card/50 border border-border rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:shadow-3xl hover:border-primary/40 hover:bg-card/60">
               <h3 className="text-lg sm:text-2xl font-bold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
-                <Code className="h-4 sm:h-6 w-4 sm:w-6 text-primary" />Tech Stack Overview
+                <Code className="h-4 sm:h-6 w-4 sm:w-6 text-primary" />
+                Tech Stack Overview
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                {(aboutContent.techStack && aboutContent.techStack.length ? aboutContent.techStack : techStack).map((stack, index) => (
-                  <div key={index} className="bg-background/50 border border-border rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:border-primary/30 hover:scale-105 group">
+                {(aboutContent.techStack && aboutContent.techStack.length
+                  ? aboutContent.techStack
+                  : techStack
+                ).map((stack, index) => (
+                  <div
+                    key={index}
+                    className="bg-background/50 border border-border rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:border-primary/30 hover:scale-105 group"
+                  >
                     <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                      <div className="p-1 sm:p-2 bg-primary/10 rounded-lg text-primary group-hover:scale-110 transition-transform duration-300"><Code className="h-3 sm:h-4 w-3 sm:w-4" /></div>
-                      <h4 className="font-semibold text-sm sm:text-lg">{stack.category}</h4>
+                      <div className="p-1 sm:p-2 bg-primary/10 rounded-lg text-primary group-hover:scale-110 transition-transform duration-300">
+                        <Code className="h-3 sm:h-4 w-3 sm:w-4" />
+                      </div>
+                      <h4 className="font-semibold text-sm sm:text-lg">
+                        {stack.category}
+                      </h4>
                     </div>
                     <div className="space-y-1 sm:space-y-2">
                       {stack.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors duration-300">
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />{item}
+                        <div
+                          key={itemIndex}
+                          className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                        >
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+                          {item}
                         </div>
                       ))}
                     </div>
@@ -229,10 +340,20 @@ export const AboutSection = () => {
           <div className="space-y-6 sm:space-y-8">
             {/* Work Together */}
             <div className="bg-card/50 border border-border rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:shadow-3xl hover:border-primary/40 hover:bg-card/60">
-              <h3 className="text-lg sm:text-2xl font-bold mb-4 sm:mb-6 text-center">Let's Work Together</h3>
+              <h3 className="text-lg sm:text-2xl font-bold mb-4 sm:mb-6 text-center">
+                Let&apos;s Work Together
+              </h3>
               <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
-                <a href="https://www.linkedin.com/in/gokulanbalagan1112/" target="_blank" rel="noopener noreferrer" className="flex-1 block w-full p-3 sm:p-4 bg-primary text-primary-foreground rounded-xl text-center font-semibold transition-all duration-300 hover:bg-primary/90 hover:scale-105 hover:shadow-lg group">
-                  <div className="flex items-center justify-center gap-2 sm:gap-3"><User className="h-4 sm:h-5 w-4 sm:w-5 group-hover:scale-110 transition-transform duration-300" />Connect on LinkedIn</div>
+                <a
+                  href="https://www.linkedin.com/in/gokulanbalagan1112/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 block w-full p-3 sm:p-4 bg-primary text-primary-foreground rounded-xl text-center font-semibold transition-all duration-300 hover:bg-primary/90 hover:scale-105 hover:shadow-lg group"
+                >
+                  <div className="flex items-center justify-center gap-2 sm:gap-3">
+                    <User className="h-4 sm:h-5 w-4 sm:w-5 group-hover:scale-110 transition-transform duration-300" />
+                    Connect on LinkedIn
+                  </div>
                 </a>
 
                 {/* Download Button */}
@@ -249,10 +370,18 @@ export const AboutSection = () => {
 
               {/* Social Links */}
               <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-background/50 rounded-xl border border-border">
-                <h4 className="font-semibold mb-2 text-center text-sm sm:text-base">Quick Connect</h4>
+                <h4 className="font-semibold mb-2 text-center text-sm sm:text-base">
+                  Quick Connect
+                </h4>
                 <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
                   {socialLinks.map((social, index) => (
-                    <a key={index} href={social.href} className="p-2 bg-background rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 hover:scale-110">{social.icon}</a>
+                    <a
+                      key={index}
+                      href={social.href}
+                      className="p-2 bg-background rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 hover:scale-110"
+                    >
+                      {social.icon}
+                    </a>
                   ))}
                 </div>
               </div>
@@ -260,11 +389,23 @@ export const AboutSection = () => {
 
             {/* Why Choose Me */}
             <div className="bg-card/50 border border-border rounded-3xl p-4 sm:p-6 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:shadow-3xl hover:border-primary/40 hover:bg-card/60">
-              <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2"><Star className="h-4 sm:h-5 w-4 sm:w-5 text-primary" />Why Choose Me</h3>
+              <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
+                <Star className="h-4 sm:h-5 w-4 sm:w-5 text-primary" />
+                Why Choose Me
+              </h3>
               <div className="space-y-2 sm:space-y-3">
-                {(aboutContent.features && aboutContent.features.length ? aboutContent.features : features).map((feature, index) => (
-                  <div key={index} className="flex items-center gap-2 sm:gap-3 p-1 sm:p-2 rounded-lg transition-all duration-300 hover:bg-background/50 hover:scale-105">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" /><span className="text-xs sm:text-sm text-muted-foreground hover:text-foreground">{feature}</span>
+                {(aboutContent.features && aboutContent.features.length
+                  ? aboutContent.features
+                  : features
+                ).map((feature, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 sm:gap-3 p-1 sm:p-2 rounded-lg transition-all duration-300 hover:bg-background/50 hover:scale-105"
+                  >
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                    <span className="text-xs sm:text-sm text-muted-foreground hover:text-foreground">
+                      {feature}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -272,8 +413,13 @@ export const AboutSection = () => {
 
             {aboutContent.education && (
               <div className="bg-card/60 border border-border rounded-3xl p-4 sm:p-6 backdrop-blur-xl shadow-2xl transition-all duration-500 hover:shadow-3xl hover:border-primary/40 hover:bg-card-70">
-                <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2"><Star className="h-4 sm:h-5 w-4 sm:w-5 text-primary" />Education</h3>
-                <p className="text-sm sm:text-base text-muted-foreground">{aboutContent.education}</p>
+                <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
+                  <Star className="h-4 sm:h-5 w-4 sm:w-5 text-primary" />
+                  Education
+                </h3>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  {aboutContent.education}
+                </p>
               </div>
             )}
 
@@ -285,7 +431,9 @@ export const AboutSection = () => {
                     <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full animate-pulse" />
                     <div className="absolute inset-0 w-2 sm:w-3 h-2 sm:h-3 bg-green-500 rounded-full animate-ping" />
                   </div>
-                  <span className="font-semibold text-xs sm:text-sm">Available</span>
+                  <span className="font-semibold text-xs sm:text-sm">
+                    Available
+                  </span>
                 </div>
                 <span className="text-xs sm:text-sm text-muted-foreground bg-green-500/10 text-green-600 px-2 py-1 rounded-lg">
                   For new projects

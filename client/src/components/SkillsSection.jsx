@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import PropTypes from "prop-types";
+import { fetchStaticOrLive } from "../lib/staticData";
 
 // Import your images
 import htmlIcon from "@/assets/icons/html.png";
@@ -25,7 +27,8 @@ import clearkIcon from "@/assets/icons/cleark.png";
 import SQLIcon from "@/assets/icons/sql.png";
 import MySQLIcon from "@/assets/icons/mysql.png";
 
-const normalizeSkillKey = (skill) => `${(skill?.name || '').trim().toLowerCase()}|${(skill?.category || '').trim().toLowerCase()}`;
+const normalizeSkillKey = (skill) =>
+  `${(skill?.name || "").trim().toLowerCase()}|${(skill?.category || "").trim().toLowerCase()}`;
 
 const dedupeSkills = (list = []) => {
   const seen = new Set();
@@ -108,25 +111,20 @@ const iconImages = {
 };
 
 const resolveIcon = (skill) => {
-  const rawIcon = skill?.icon || '';
-  const iconValue = (rawIcon || skill?.category || '').toLowerCase();
-  
-  console.log(`[resolveIcon] ${skill?.name}:`, {
-    rawIcon: rawIcon ? rawIcon.substring(0, 50) + '...' : 'empty',
-    iconValue,
-    isURL: rawIcon && (rawIcon.startsWith('http') || rawIcon.startsWith('/')),
-    isDataURL: rawIcon && rawIcon.startsWith('data:')
-  });
-  
-  if (rawIcon && (rawIcon.startsWith('http') || rawIcon.startsWith('/') || rawIcon.startsWith('data:'))) {
-    console.log(`✓ Returning URL/data for ${skill?.name}`);
+  const rawIcon = skill?.icon || "";
+  const iconValue = (rawIcon || skill?.category || "").toLowerCase();
+
+  if (
+    rawIcon &&
+    (rawIcon.startsWith("http") ||
+      rawIcon.startsWith("/") ||
+      rawIcon.startsWith("data:"))
+  ) {
     return rawIcon;
   }
   const mapped = iconImages[iconValue];
-  if (mapped) {
-    console.log(`✓ Returning mapped icon for ${skill?.name}: ${iconValue}`);
-  } else {
-    console.log(`✗ No icon found for ${skill?.name}, iconValue: ${iconValue}`);
+  if (!mapped) {
+    console.warn(`No icon found for skill: ${skill?.name} (${iconValue})`);
   }
   return mapped;
 };
@@ -138,21 +136,31 @@ const SkillBar = ({ level }) => (
       animate={{ width: `${level}%` }}
       transition={{ duration: 1.5, delay: 0.2 }}
       className={`h-full rounded-full ${
-        level > 75 ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 
-        level > 50 ? 'bg-gradient-to-r from-yellow-400 to-amber-500' : 
-        'bg-gradient-to-r from-red-400 to-pink-500'
+        level > 75
+          ? "bg-gradient-to-r from-green-400 to-emerald-500"
+          : level > 50
+            ? "bg-gradient-to-r from-yellow-400 to-amber-500"
+            : "bg-gradient-to-r from-red-400 to-pink-500"
       }`}
     />
   </div>
 );
 
+SkillBar.propTypes = {
+  level: PropTypes.number.isRequired,
+};
+
 const InfiniteScrollSkills = ({ skills }) => {
   if (!skills.length) {
-    return <div className="text-center text-muted-foreground">No skills to display yet.</div>;
+    return (
+      <div className="text-center text-muted-foreground">
+        No skills to display yet.
+      </div>
+    );
   }
 
   const duplicatedSkills = [...skills, ...skills, ...skills];
-  
+
   return (
     <div className="overflow-hidden py-8">
       <motion.div
@@ -161,73 +169,104 @@ const InfiniteScrollSkills = ({ skills }) => {
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
       >
         {duplicatedSkills.map((skill, index) => (
-          <div key={`${skill.name}-${index}`} className="flex-shrink-0 flex flex-col items-center gap-2">
+          <div
+            key={`${skill.name}-${index}`}
+            className="flex-shrink-0 flex flex-col items-center gap-2"
+          >
             <div className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform overflow-hidden">
               {resolveIcon(skill) ? (
                 <img
                   src={resolveIcon(skill)}
                   alt={skill.name}
                   className="w-full h-full object-cover"
-                  style={{ 
+                  style={{
                     transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
-                    objectFit: 'contain'
+                    objectFit: "contain",
                   }}
                   onError={(e) => {
-                    console.error(`Failed to load image for ${skill.name}:`, resolveIcon(skill), e);
-                    e.target.style.display = 'none';
+                    console.error(
+                      `Failed to load image for ${skill.name}:`,
+                      resolveIcon(skill),
+                      e,
+                    );
+                    e.target.style.display = "none";
                     const parent = e.target.parentElement;
                     if (parent) {
-                      parent.innerHTML = `<span class="text-lg font-semibold text-primary">${skill.name?.charAt(0) || '?'}</span>`;
+                      parent.innerHTML = `<span class="text-lg font-semibold text-primary">${skill.name?.charAt(0) || "?"}</span>`;
                     }
                   }}
-                  onLoad={() => console.log(`✓ Image loaded for ${skill.name}:`, resolveIcon(skill))}
                 />
               ) : (
-                <span className="text-lg font-semibold text-primary">{skill.name?.charAt(0) || '?'}</span>
+                <span className="text-lg font-semibold text-primary">
+                  {skill.name?.charAt(0) || "?"}
+                </span>
               )}
             </div>
-            <span className="text-sm font-medium text-center">{skill.name}</span>
+            <span className="text-sm font-medium text-center">
+              {skill.name}
+            </span>
           </div>
         ))}
       </motion.div>
-      
+
       <motion.div
         className="flex gap-8"
         animate={{ x: ["-100%", "0%"] }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
       >
         {[...duplicatedSkills].reverse().map((skill, index) => (
-          <div key={`${skill.name}-reverse-${index}`} className="flex-shrink-0 flex flex-col items-center gap-2">
+          <div
+            key={`${skill.name}-reverse-${index}`}
+            className="flex-shrink-0 flex flex-col items-center gap-2"
+          >
             <div className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform overflow-hidden">
               {resolveIcon(skill) ? (
                 <img
                   src={resolveIcon(skill)}
                   alt={skill.name}
                   className="w-full h-full object-cover"
-                  style={{ 
+                  style={{
                     transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
-                    objectFit: 'contain'
+                    objectFit: "contain",
                   }}
                   onError={(e) => {
-                    console.error(`Failed to load image for ${skill.name}:`, resolveIcon(skill), e);
-                    e.target.style.display = 'none';
+                    console.error(
+                      `Failed to load image for ${skill.name}:`,
+                      resolveIcon(skill),
+                      e,
+                    );
+                    e.target.style.display = "none";
                     const parent = e.target.parentElement;
                     if (parent) {
-                      parent.innerHTML = `<span class="text-lg font-semibold text-primary">${skill.name?.charAt(0) || '?'}</span>`;
+                      parent.innerHTML = `<span class="text-lg font-semibold text-primary">${skill.name?.charAt(0) || "?"}</span>`;
                     }
                   }}
-                  onLoad={() => console.log(`✓ Image loaded for ${skill.name}:`, resolveIcon(skill))}
                 />
               ) : (
-                <span className="text-lg font-semibold text-primary">{skill.name?.charAt(0) || '?'}</span>
+                <span className="text-lg font-semibold text-primary">
+                  {skill.name?.charAt(0) || "?"}
+                </span>
               )}
             </div>
-            <span className="text-sm font-medium text-center">{skill.name}</span>
+            <span className="text-sm font-medium text-center">
+              {skill.name}
+            </span>
           </div>
         ))}
       </motion.div>
     </div>
   );
+};
+
+InfiniteScrollSkills.propTypes = {
+  skills: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      icon: PropTypes.string,
+      iconSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      category: PropTypes.string,
+    }),
+  ),
 };
 
 export const SkillsSection = () => {
@@ -241,29 +280,27 @@ export const SkillsSection = () => {
       setIsLoading(true);
       setError("");
       try {
-        const res = await fetch(`/api/skills?t=${Date.now()}`);
-        if (!res.ok) throw new Error('Failed to fetch skills');
-        const data = await res.json();
-        console.log('Fetched skills from Firebase:', data);
-        console.log('First 3 skills detailed:', data.slice(0, 3).map(s => ({
-          name: s.name,
-          icon: s.icon,
-          iconSize: s.iconSize,
-          category: s.category
-        })));
-        if (Array.isArray(data) && data.length) {
+        const payload = await fetchStaticOrLive({
+          name: "skills",
+          liveUrl: `/api/skills?t=${Date.now()}`,
+          fallbackEmpty: defaultSkills,
+        });
+        const data = Array.isArray(payload?.items)
+          ? payload.items
+          : Array.isArray(payload)
+            ? payload
+            : [];
+        console.log(`Skills loaded: ${data.length} total`);
+        if (data.length) {
           const deduped = dedupeSkills(data);
-          console.log('Deduped skills:', deduped);
-          console.log('First skill full data:', deduped[0]);
           setSkills(deduped);
         } else {
-          console.log('No skills found, using defaults');
           setSkills(defaultSkills);
         }
       } catch (err) {
-        console.error('Skills fetch failed', err);
+        console.error("Skills fetch failed", err);
         setSkills(defaultSkills);
-        setError('Unable to load latest skills. Showing defaults.');
+        setError("Unable to load latest skills. Showing defaults.");
       } finally {
         setIsLoading(false);
       }
@@ -275,25 +312,37 @@ export const SkillsSection = () => {
   const uniqueSkills = useMemo(() => dedupeSkills(skills), [skills]);
 
   const categories = useMemo(() => {
-    const unique = new Set((uniqueSkills || []).map((skill) => (skill.category ? skill.category.toLowerCase() : 'other')));
-    const ordered = ['all', ...Array.from(unique)];
-    const toLabel = (id) => id === 'all' ? 'All Skills' : `${id.charAt(0).toUpperCase()}${id.slice(1)}`;
+    const unique = new Set(
+      (uniqueSkills || []).map((skill) =>
+        skill.category ? skill.category.toLowerCase() : "other",
+      ),
+    );
+    const ordered = ["all", ...Array.from(unique)];
+    const toLabel = (id) =>
+      id === "all"
+        ? "All Skills"
+        : `${id.charAt(0).toUpperCase()}${id.slice(1)}`;
 
     return ordered.map((id) => ({
       id,
       label: toLabel(id),
       color: categoryColors[id] || categoryColors.other,
     }));
-  }, [skills]);
+  }, [uniqueSkills]);
 
-  const filteredSkills = uniqueSkills.filter(skill => 
-    activeCategory === "all" || (skill.category || 'other') === activeCategory
+  const filteredSkills = uniqueSkills.filter(
+    (skill) =>
+      activeCategory === "all" ||
+      (skill.category || "other") === activeCategory,
   );
 
   return (
-    <section id="skills" className="relative py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background">
+    <section
+      id="skills"
+      className="relative py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background"
+    >
       <div className="container mx-auto max-w-6xl">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
@@ -302,10 +351,16 @@ export const SkillsSection = () => {
             My Skills
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Technologies I've mastered and my proficiency levels
+            Technologies I&apos;ve mastered and my proficiency levels
           </p>
-          {isLoading && <p className="text-sm text-muted-foreground mt-3">Loading skills...</p>}
-          {error && !isLoading && <p className="text-sm text-destructive mt-3">{error}</p>}
+          {isLoading && (
+            <p className="text-sm text-muted-foreground mt-3">
+              Loading skills...
+            </p>
+          )}
+          {error && !isLoading && (
+            <p className="text-sm text-destructive mt-3">{error}</p>
+          )}
         </motion.div>
 
         <div className="flex flex-wrap justify-center gap-3 mb-16">
@@ -331,7 +386,9 @@ export const SkillsSection = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredSkills.length === 0 && (
-              <div className="col-span-full text-center text-muted-foreground">No skills found in this category.</div>
+              <div className="col-span-full text-center text-muted-foreground">
+                No skills found in this category.
+              </div>
             )}
             <AnimatePresence mode="popLayout">
               {filteredSkills.map((skill) => (
@@ -350,22 +407,26 @@ export const SkillsSection = () => {
                           src={resolveIcon(skill)}
                           alt={skill.name}
                           className="w-full h-full object-cover"
-                          style={{ 
+                          style={{
                             transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
-                            objectFit: 'contain'
+                            objectFit: "contain",
                           }}
                           onError={(e) => {
-                            console.error(`Failed to load image for ${skill.name}:`, resolveIcon(skill));
-                            e.target.style.display = 'none';
+                            console.error(
+                              `Failed to load image for ${skill.name}:`,
+                              resolveIcon(skill),
+                            );
+                            e.target.style.display = "none";
                             const parent = e.target.parentElement;
                             if (parent) {
-                              parent.innerHTML = `<span class="text-base font-semibold text-primary">${skill.name?.charAt(0) || '?'}</span>`;
+                              parent.innerHTML = `<span class="text-base font-semibold text-primary">${skill.name?.charAt(0) || "?"}</span>`;
                             }
                           }}
-                          onLoad={() => console.log(`✓ Grid image loaded for ${skill.name}`)}
                         />
                       ) : (
-                        <span className="text-base font-semibold text-primary">{skill.name?.charAt(0) || '?'}</span>
+                        <span className="text-base font-semibold text-primary">
+                          {skill.name?.charAt(0) || "?"}
+                        </span>
                       )}
                     </div>
                     <div className="flex-1">
@@ -373,11 +434,15 @@ export const SkillsSection = () => {
                         <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
                           {skill.name}
                         </h3>
-                        <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-                          skill.level > 75 ? 'bg-emerald-500/10 text-emerald-500' : 
-                          skill.level > 50 ? 'bg-amber-500/10 text-amber-500' : 
-                          'bg-pink-500/10 text-pink-500'
-                        }`}>
+                        <span
+                          className={`text-sm font-medium px-2 py-1 rounded-full ${
+                            skill.level > 75
+                              ? "bg-emerald-500/10 text-emerald-500"
+                              : skill.level > 50
+                                ? "bg-amber-500/10 text-amber-500"
+                                : "bg-pink-500/10 text-pink-500"
+                          }`}
+                        >
                           {skill.level}%
                         </span>
                       </div>

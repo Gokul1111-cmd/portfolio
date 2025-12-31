@@ -41,6 +41,7 @@ export const HeroEditor = () => {
 
   useEffect(() => {
     fetchHero();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchHero = async () => {
@@ -48,7 +49,9 @@ export const HeroEditor = () => {
       const res = await fetch("/api/content?key=hero");
       if (res.ok) {
         const data = await res.json();
-        setHeroData(data?.data ? { ...defaultHero, ...data.data } : defaultHero);
+        setHeroData(
+          data?.data ? { ...defaultHero, ...data.data } : defaultHero,
+        );
       } else {
         setHeroData(defaultHero);
       }
@@ -87,7 +90,8 @@ export const HeroEditor = () => {
     const reader = new FileReader();
     reader.onload = (ev) => {
       const result = ev.target?.result;
-      if (typeof result === "string") setHeroData((p) => ({ ...p, resumeUrl: result }));
+      if (typeof result === "string")
+        setHeroData((p) => ({ ...p, resumeUrl: result }));
     };
     reader.readAsDataURL(file);
   };
@@ -101,7 +105,8 @@ export const HeroEditor = () => {
     const reader = new FileReader();
     reader.onload = (ev) => {
       const result = ev.target?.result;
-      if (typeof result === "string") setHeroData((p) => ({ ...p, profileImage: result }));
+      if (typeof result === "string")
+        setHeroData((p) => ({ ...p, profileImage: result }));
     };
     reader.readAsDataURL(file);
   };
@@ -153,7 +158,7 @@ export const HeroEditor = () => {
     setDragIndex(index);
   };
 
-  const handleDragOver = (e, index) => {
+  const handleDragOver = (e) => {
     e.preventDefault();
     // Visual cue could be added with CSS if needed
   };
@@ -185,84 +190,124 @@ export const HeroEditor = () => {
           {/* Main Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Name</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Name
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.name || ""}
-                onChange={(e) => setHeroData({ ...heroData, name: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, name: e.target.value })
+                }
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Title</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Title
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.title || ""}
-                onChange={(e) => setHeroData({ ...heroData, title: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, title: e.target.value })
+                }
               />
             </div>
             <div className="md:col-span-2">
-              <label className="text-xs font-medium text-muted-foreground">Headline</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Headline
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.headline || ""}
-                onChange={(e) => setHeroData({ ...heroData, headline: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, headline: e.target.value })
+                }
               />
             </div>
             <div className="md:col-span-2">
-              <label className="text-xs font-medium text-muted-foreground">Subheadline</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Subheadline
+              </label>
               <textarea
                 rows={2}
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.subheadline || ""}
-                onChange={(e) => setHeroData({ ...heroData, subheadline: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, subheadline: e.target.value })
+                }
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Primary CTA Text</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Primary CTA Text
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.primaryCtaText || ""}
-                onChange={(e) => setHeroData({ ...heroData, primaryCtaText: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, primaryCtaText: e.target.value })
+                }
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Primary CTA Link</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Primary CTA Link
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.primaryCtaLink || ""}
-                onChange={(e) => setHeroData({ ...heroData, primaryCtaLink: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, primaryCtaLink: e.target.value })
+                }
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Secondary CTA Text</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Secondary CTA Text
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.secondaryCtaText || ""}
-                onChange={(e) => setHeroData({ ...heroData, secondaryCtaText: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, secondaryCtaText: e.target.value })
+                }
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Secondary CTA Link</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Secondary CTA Link
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.secondaryCtaLink || ""}
-                onChange={(e) => setHeroData({ ...heroData, secondaryCtaLink: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, secondaryCtaLink: e.target.value })
+                }
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Availability</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Availability
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.availability || ""}
-                onChange={(e) => setHeroData({ ...heroData, availability: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, availability: e.target.value })
+                }
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Resume URL</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Resume URL
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 value={heroData.resumeUrl || ""}
-                onChange={(e) => setHeroData({ ...heroData, resumeUrl: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, resumeUrl: e.target.value })
+                }
               />
               <div
                 {...getDropZoneProps(setResumeDragActive, handleResumeFile)}
@@ -276,21 +321,32 @@ export const HeroEditor = () => {
                     className="hidden"
                     onChange={(e) => handleResumeFile(e.target.files?.[0])}
                   />
-                  <span className="text-primary font-medium">click to browse</span>
+                  <span className="text-primary font-medium">
+                    click to browse
+                  </span>
                 </label>
-                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">PDF only • Stored as data URL for preview/download</p>
+                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">
+                  PDF only • Stored as data URL for preview/download
+                </p>
               </div>
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Profile Image</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Profile Image
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border focus:border-primary outline-none"
                 placeholder="Image URL or upload below"
                 value={heroData.profileImage || ""}
-                onChange={(e) => setHeroData({ ...heroData, profileImage: e.target.value })}
+                onChange={(e) =>
+                  setHeroData({ ...heroData, profileImage: e.target.value })
+                }
               />
               <div
-                {...getDropZoneProps(setProfileDragActive, handleProfileImageFile)}
+                {...getDropZoneProps(
+                  setProfileDragActive,
+                  handleProfileImageFile,
+                )}
                 className={dropZoneClass(profileDragActive)}
               >
                 <label className="flex flex-col items-center justify-center text-xs text-muted-foreground gap-2 cursor-pointer">
@@ -299,11 +355,17 @@ export const HeroEditor = () => {
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => handleProfileImageFile(e.target.files?.[0])}
+                    onChange={(e) =>
+                      handleProfileImageFile(e.target.files?.[0])
+                    }
                   />
-                  <span className="text-primary font-medium">click to browse</span>
+                  <span className="text-primary font-medium">
+                    click to browse
+                  </span>
                 </label>
-                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">JPEG/PNG • Stored as data URL for instant preview</p>
+                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">
+                  JPEG/PNG • Stored as data URL for instant preview
+                </p>
               </div>
             </div>
           </div>
@@ -312,7 +374,11 @@ export const HeroEditor = () => {
           <div className="border-t border-border pt-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">Code Snippet (Portfolio.js)</h3>
-              <button type="button" onClick={addCodeSnippet} className="text-xs text-primary hover:underline flex items-center gap-1">
+              <button
+                type="button"
+                onClick={addCodeSnippet}
+                className="text-xs text-primary hover:underline flex items-center gap-1"
+              >
                 <Plus size={14} /> Add Line
               </button>
             </div>

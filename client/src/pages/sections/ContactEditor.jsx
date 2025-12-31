@@ -52,51 +52,75 @@ export const ContactEditor = () => {
       <div className="bg-card border border-border rounded-xl p-8 shadow-lg max-w-4xl">
         <form onSubmit={handleSave} className="space-y-6">
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Email</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Email
+            </label>
             <input
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={contactData.email || ""}
-              onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
+              onChange={(e) =>
+                setContactData({ ...contactData, email: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Phone</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Phone
+            </label>
             <input
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={contactData.phone || ""}
-              onChange={(e) => setContactData({ ...contactData, phone: e.target.value })}
+              onChange={(e) =>
+                setContactData({ ...contactData, phone: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Location</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Location
+            </label>
             <input
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={contactData.location || ""}
-              onChange={(e) => setContactData({ ...contactData, location: e.target.value })}
+              onChange={(e) =>
+                setContactData({ ...contactData, location: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">LinkedIn URL</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              LinkedIn URL
+            </label>
             <input
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={contactData.linkedin || ""}
-              onChange={(e) => setContactData({ ...contactData, linkedin: e.target.value })}
+              onChange={(e) =>
+                setContactData({ ...contactData, linkedin: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">GitHub URL</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              GitHub URL
+            </label>
             <input
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={contactData.github || ""}
-              onChange={(e) => setContactData({ ...contactData, github: e.target.value })}
+              onChange={(e) =>
+                setContactData({ ...contactData, github: e.target.value })
+              }
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Twitter URL</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              Twitter URL
+            </label>
             <input
               className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               value={contactData.twitter || ""}
-              onChange={(e) => setContactData({ ...contactData, twitter: e.target.value })}
+              onChange={(e) =>
+                setContactData({ ...contactData, twitter: e.target.value })
+              }
             />
           </div>
           <div className="flex justify-end">

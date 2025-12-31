@@ -1,6 +1,53 @@
+/* eslint-disable react/prop-types */
 import { motion } from "framer-motion";
-import { Save, Settings, Plus, Trash2, Linkedin, Instagram, Youtube, Github, Mail, Phone, MapPin, ArrowUp } from "lucide-react";
-import { useState, useEffect } from "react";
+import {
+  Save,
+  Settings,
+  Linkedin,
+  Instagram,
+  Youtube,
+  Github,
+  Mail,
+  Phone,
+} from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+
+const defaultSiteSettings = {
+  brandName: "Gokul A",
+  brandBio:
+    "Full-stack developer passionate about AI, cloud computing, and building impactful digital solutions.",
+  navLinks: [
+    { name: "Home", href: "#hero" },
+    { name: "About", href: "#about" },
+    { name: "Skills", href: "#skills" },
+    { name: "Projects", href: "#projects" },
+    { name: "Contact", href: "#contact" },
+  ],
+  footerSocialLinks: [
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/gokulanbalagan1112/",
+    },
+    { label: "GitHub", href: "https://github.com/Gokul1111-cmd" },
+  ],
+  footerQuickLinks: [
+    { name: "Home", href: "#hero" },
+    { name: "About", href: "#about" },
+    { name: "Skills", href: "#skills" },
+    { name: "Projects", href: "#projects" },
+  ],
+  footerPolicyLinks: [
+    { name: "Privacy", href: "#" },
+    { name: "Terms", href: "#" },
+    { name: "Cookies", href: "#" },
+  ],
+  contactInfo: {
+    email: "gokulanbalagan1112@gmail.com",
+    phone: "+91 8754740118",
+    location: "Coimbatore, Tamil Nadu, India",
+  },
+  copyrightText: "© 2024 Gokul A. All rights reserved.",
+};
 
 // Live Footer Preview Component
 const FooterPreview = ({ siteData }) => {
@@ -11,34 +58,50 @@ const FooterPreview = ({ siteData }) => {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <h3 className="text-sm font-bold mb-4 text-muted-foreground">Footer Preview</h3>
-      
+      <h3 className="text-sm font-bold mb-4 text-muted-foreground">
+        Footer Preview
+      </h3>
+
       {/* Simplified Footer Preview */}
       <div className="bg-background/80 rounded-lg p-4 text-xs space-y-4 border border-border/50">
         {/* Brand Section */}
         <div className="space-y-2 pb-4 border-b border-border/30">
-          <p className="font-bold text-sm">{siteData.brandName || "Brand Name"}</p>
-          <p className="text-muted-foreground text-xs line-clamp-2">{siteData.brandBio || "Brand bio appears here..."}</p>
-          
+          <p className="font-bold text-sm">
+            {siteData.brandName || "Brand Name"}
+          </p>
+          <p className="text-muted-foreground text-xs line-clamp-2">
+            {siteData.brandBio || "Brand bio appears here..."}
+          </p>
+
           {/* Social Links */}
           <div className="flex gap-2 pt-2">
-            {(siteData.footerSocialLinks || []).slice(0, 4).map((social, idx) => (
-              <div key={idx} className="text-muted-foreground hover:text-primary transition-colors">
-                {social.label === "LinkedIn" && <Linkedin size={14} />}
-                {social.label === "Instagram" && <Instagram size={14} />}
-                {social.label === "YouTube" && <Youtube size={14} />}
-                {social.label === "GitHub" && <Github size={14} />}
-              </div>
-            ))}
+            {(siteData.footerSocialLinks || [])
+              .slice(0, 4)
+              .map((social, idx) => (
+                <div
+                  key={idx}
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {social.label === "LinkedIn" && <Linkedin size={14} />}
+                  {social.label === "Instagram" && <Instagram size={14} />}
+                  {social.label === "YouTube" && <Youtube size={14} />}
+                  {social.label === "GitHub" && <Github size={14} />}
+                </div>
+              ))}
           </div>
         </div>
 
         {/* Navigation Section */}
         <div className="pb-3 border-b border-border/30">
-          <p className="font-bold text-xs uppercase mb-2 text-muted-foreground">Navigation</p>
+          <p className="font-bold text-xs uppercase mb-2 text-muted-foreground">
+            Navigation
+          </p>
           <ul className="space-y-1">
             {(siteData.footerQuickLinks || []).slice(0, 3).map((link, idx) => (
-              <li key={idx} className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">
+              <li
+                key={idx}
+                className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 {link.name || "Link"}
               </li>
             ))}
@@ -47,16 +110,20 @@ const FooterPreview = ({ siteData }) => {
 
         {/* Contact Section */}
         <div className="pb-3 border-b border-border/30">
-          <p className="font-bold text-xs uppercase mb-2 text-muted-foreground">Contact</p>
+          <p className="font-bold text-xs uppercase mb-2 text-muted-foreground">
+            Contact
+          </p>
           <ul className="space-y-1">
             {siteData.contactInfo?.email && (
               <li className="text-muted-foreground flex items-center gap-1">
-                <Mail size={12} className="flex-shrink-0" /> {siteData.contactInfo.email}
+                <Mail size={12} className="flex-shrink-0" />{" "}
+                {siteData.contactInfo.email}
               </li>
             )}
             {siteData.contactInfo?.phone && (
               <li className="text-muted-foreground flex items-center gap-1">
-                <Phone size={12} className="flex-shrink-0" /> {siteData.contactInfo.phone}
+                <Phone size={12} className="flex-shrink-0" />{" "}
+                {siteData.contactInfo.phone}
               </li>
             )}
           </ul>
@@ -64,10 +131,14 @@ const FooterPreview = ({ siteData }) => {
 
         {/* Bottom Section */}
         <div className="pt-3 border-t border-border/30 text-muted-foreground">
-          <p className="text-xs mb-2">{siteData.copyrightText || "© YEAR. All rights reserved."}</p>
+          <p className="text-xs mb-2">
+            {siteData.copyrightText || "© YEAR. All rights reserved."}
+          </p>
           <div className="flex gap-2 text-xs">
             {(siteData.footerPolicyLinks || []).slice(0, 2).map((link, idx) => (
-              <span key={idx} className="hover:text-primary cursor-pointer">{link.name}</span>
+              <span key={idx} className="hover:text-primary cursor-pointer">
+                {link.name}
+              </span>
             ))}
           </div>
         </div>
@@ -77,48 +148,11 @@ const FooterPreview = ({ siteData }) => {
 };
 
 export const SiteSettingsEditor = () => {
-  const defaultSiteSettings = {
-    brandName: "Gokul A",
-    brandBio: "Full-stack developer passionate about AI, cloud computing, and building impactful digital solutions.",
-    navLinks: [
-      { name: "Home", href: "#hero" },
-      { name: "About", href: "#about" },
-      { name: "Skills", href: "#skills" },
-      { name: "Projects", href: "#projects" },
-      { name: "Contact", href: "#contact" },
-    ],
-    footerSocialLinks: [
-      { label: "LinkedIn", href: "https://www.linkedin.com/in/gokulanbalagan1112/" },
-      { label: "GitHub", href: "https://github.com/Gokul1111-cmd" },
-    ],
-    footerQuickLinks: [
-      { name: "Home", href: "#hero" },
-      { name: "About", href: "#about" },
-      { name: "Skills", href: "#skills" },
-      { name: "Projects", href: "#projects" },
-    ],
-    footerPolicyLinks: [
-      { name: "Privacy", href: "#" },
-      { name: "Terms", href: "#" },
-      { name: "Cookies", href: "#" },
-    ],
-    contactInfo: { 
-      email: "gokulanbalagan1112@gmail.com", 
-      phone: "+91 8754740118", 
-      location: "Coimbatore, Tamil Nadu, India" 
-    },
-    copyrightText: "© 2024 Gokul A. All rights reserved.",
-  };
-
   const [siteData, setSiteData] = useState(defaultSiteSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchSiteSettings();
-  }, []);
-
-  const fetchSiteSettings = async () => {
+  const fetchSiteSettings = useCallback(async () => {
     try {
       const res = await fetch("/api/content?key=site");
       if (res.ok) {
@@ -138,7 +172,11 @@ export const SiteSettingsEditor = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchSiteSettings();
+  }, [fetchSiteSettings]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -186,7 +224,10 @@ export const SiteSettingsEditor = () => {
   };
 
   const addSocialLink = () => {
-    const next = [...(siteData.footerSocialLinks || []), { label: "", href: "" }];
+    const next = [
+      ...(siteData.footerSocialLinks || []),
+      { label: "", href: "" },
+    ];
     setSiteData({ ...siteData, footerSocialLinks: next });
   };
 
@@ -220,7 +261,10 @@ export const SiteSettingsEditor = () => {
   };
 
   const addPolicyLink = () => {
-    const next = [...(siteData.footerPolicyLinks || []), { name: "", href: "" }];
+    const next = [
+      ...(siteData.footerPolicyLinks || []),
+      { name: "", href: "" },
+    ];
     setSiteData({ ...siteData, footerPolicyLinks: next });
   };
 
@@ -230,7 +274,8 @@ export const SiteSettingsEditor = () => {
     setSiteData({ ...siteData, footerPolicyLinks: next });
   };
 
-  if (isLoading) return <div className="p-8 text-center">Loading site settings...</div>;
+  if (isLoading)
+    return <div className="p-8 text-center">Loading site settings...</div>;
 
   return (
     <motion.div
@@ -263,21 +308,29 @@ export const SiteSettingsEditor = () => {
                 <h3 className="text-lg font-bold mb-4">Brand Settings</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground">Brand Name</label>
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Brand Name
+                    </label>
                     <input
                       className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                       placeholder="e.g., Gokul A"
                       value={siteData.brandName || ""}
-                      onChange={(e) => setSiteData({ ...siteData, brandName: e.target.value })}
+                      onChange={(e) =>
+                        setSiteData({ ...siteData, brandName: e.target.value })
+                      }
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground">Brand Bio</label>
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Brand Bio
+                    </label>
                     <textarea
                       rows={2}
                       className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                       value={siteData.brandBio || ""}
-                      onChange={(e) => setSiteData({ ...siteData, brandBio: e.target.value })}
+                      onChange={(e) =>
+                        setSiteData({ ...siteData, brandBio: e.target.value })
+                      }
                     />
                   </div>
                 </div>
@@ -287,24 +340,43 @@ export const SiteSettingsEditor = () => {
               <div className="border-b border-border pb-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold">Navigation Links</h3>
-                  <button type="button" onClick={addNavLink} className="text-xs text-primary hover:underline">Add Link</button>
+                  <button
+                    type="button"
+                    onClick={addNavLink}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Add Link
+                  </button>
                 </div>
                 <div className="space-y-3">
                   {(siteData.navLinks || []).map((link, idx) => (
-                    <div key={idx} className="grid grid-cols-3 gap-2 items-center">
+                    <div
+                      key={idx}
+                      className="grid grid-cols-3 gap-2 items-center"
+                    >
                       <input
                         className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                         placeholder="Link name"
                         value={link.name || ""}
-                        onChange={(e) => updateNavLink(idx, "name", e.target.value)}
+                        onChange={(e) =>
+                          updateNavLink(idx, "name", e.target.value)
+                        }
                       />
                       <input
                         className="col-span-2 p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                         placeholder="URL or anchor"
                         value={link.href || ""}
-                        onChange={(e) => updateNavLink(idx, "href", e.target.value)}
+                        onChange={(e) =>
+                          updateNavLink(idx, "href", e.target.value)
+                        }
                       />
-                      <button type="button" onClick={() => removeNavLink(idx)} className="text-xs text-destructive">Remove</button>
+                      <button
+                        type="button"
+                        onClick={() => removeNavLink(idx)}
+                        className="text-xs text-destructive"
+                      >
+                        Remove
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -314,24 +386,43 @@ export const SiteSettingsEditor = () => {
               <div className="border-b border-border pb-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold">Footer Social Links</h3>
-                  <button type="button" onClick={addSocialLink} className="text-xs text-primary hover:underline">Add</button>
+                  <button
+                    type="button"
+                    onClick={addSocialLink}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Add
+                  </button>
                 </div>
                 <div className="space-y-3">
                   {(siteData.footerSocialLinks || []).map((link, idx) => (
-                    <div key={idx} className="grid grid-cols-3 gap-2 items-center">
+                    <div
+                      key={idx}
+                      className="grid grid-cols-3 gap-2 items-center"
+                    >
                       <input
                         className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                         placeholder="Platform (LinkedIn, GitHub, etc)"
                         value={link.label || ""}
-                        onChange={(e) => updateSocialLink(idx, "label", e.target.value)}
+                        onChange={(e) =>
+                          updateSocialLink(idx, "label", e.target.value)
+                        }
                       />
                       <input
                         className="col-span-2 p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                         placeholder="URL"
                         value={link.href || ""}
-                        onChange={(e) => updateSocialLink(idx, "href", e.target.value)}
+                        onChange={(e) =>
+                          updateSocialLink(idx, "href", e.target.value)
+                        }
                       />
-                      <button type="button" onClick={() => removeSocialLink(idx)} className="text-xs text-destructive">Remove</button>
+                      <button
+                        type="button"
+                        onClick={() => removeSocialLink(idx)}
+                        className="text-xs text-destructive"
+                      >
+                        Remove
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -341,24 +432,43 @@ export const SiteSettingsEditor = () => {
               <div className="border-b border-border pb-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold">Footer Quick Links</h3>
-                  <button type="button" onClick={addQuickLink} className="text-xs text-primary hover:underline">Add</button>
+                  <button
+                    type="button"
+                    onClick={addQuickLink}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Add
+                  </button>
                 </div>
                 <div className="space-y-3">
                   {(siteData.footerQuickLinks || []).map((link, idx) => (
-                    <div key={idx} className="grid grid-cols-3 gap-2 items-center">
+                    <div
+                      key={idx}
+                      className="grid grid-cols-3 gap-2 items-center"
+                    >
                       <input
                         className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                         placeholder="Link name"
                         value={link.name || ""}
-                        onChange={(e) => updateQuickLink(idx, "name", e.target.value)}
+                        onChange={(e) =>
+                          updateQuickLink(idx, "name", e.target.value)
+                        }
                       />
                       <input
                         className="col-span-2 p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                         placeholder="URL or anchor"
                         value={link.href || ""}
-                        onChange={(e) => updateQuickLink(idx, "href", e.target.value)}
+                        onChange={(e) =>
+                          updateQuickLink(idx, "href", e.target.value)
+                        }
                       />
-                      <button type="button" onClick={() => removeQuickLink(idx)} className="text-xs text-destructive">Remove</button>
+                      <button
+                        type="button"
+                        onClick={() => removeQuickLink(idx)}
+                        className="text-xs text-destructive"
+                      >
+                        Remove
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -369,27 +479,57 @@ export const SiteSettingsEditor = () => {
                 <h3 className="text-lg font-bold mb-4">Contact Info</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground">Email</label>
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Email
+                    </label>
                     <input
                       className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                       value={siteData.contactInfo?.email || ""}
-                      onChange={(e) => setSiteData({ ...siteData, contactInfo: { ...siteData.contactInfo, email: e.target.value } })}
+                      onChange={(e) =>
+                        setSiteData({
+                          ...siteData,
+                          contactInfo: {
+                            ...siteData.contactInfo,
+                            email: e.target.value,
+                          },
+                        })
+                      }
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground">Phone</label>
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Phone
+                    </label>
                     <input
                       className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                       value={siteData.contactInfo?.phone || ""}
-                      onChange={(e) => setSiteData({ ...siteData, contactInfo: { ...siteData.contactInfo, phone: e.target.value } })}
+                      onChange={(e) =>
+                        setSiteData({
+                          ...siteData,
+                          contactInfo: {
+                            ...siteData.contactInfo,
+                            phone: e.target.value,
+                          },
+                        })
+                      }
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground">Location</label>
+                    <label className="text-xs font-medium text-muted-foreground">
+                      Location
+                    </label>
                     <input
                       className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                       value={siteData.contactInfo?.location || ""}
-                      onChange={(e) => setSiteData({ ...siteData, contactInfo: { ...siteData.contactInfo, location: e.target.value } })}
+                      onChange={(e) =>
+                        setSiteData({
+                          ...siteData,
+                          contactInfo: {
+                            ...siteData.contactInfo,
+                            location: e.target.value,
+                          },
+                        })
+                      }
                     />
                   </div>
                 </div>
@@ -399,24 +539,43 @@ export const SiteSettingsEditor = () => {
               <div className="border-b border-border pb-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold">Footer Policy Links</h3>
-                  <button type="button" onClick={addPolicyLink} className="text-xs text-primary hover:underline">Add</button>
+                  <button
+                    type="button"
+                    onClick={addPolicyLink}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Add
+                  </button>
                 </div>
                 <div className="space-y-3">
                   {(siteData.footerPolicyLinks || []).map((link, idx) => (
-                    <div key={idx} className="grid grid-cols-3 gap-2 items-center">
+                    <div
+                      key={idx}
+                      className="grid grid-cols-3 gap-2 items-center"
+                    >
                       <input
                         className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                         placeholder="Link name (Privacy, Terms, etc)"
                         value={link.name || ""}
-                        onChange={(e) => updatePolicyLink(idx, "name", e.target.value)}
+                        onChange={(e) =>
+                          updatePolicyLink(idx, "name", e.target.value)
+                        }
                       />
                       <input
                         className="col-span-2 p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                         placeholder="URL"
                         value={link.href || ""}
-                        onChange={(e) => updatePolicyLink(idx, "href", e.target.value)}
+                        onChange={(e) =>
+                          updatePolicyLink(idx, "href", e.target.value)
+                        }
                       />
-                      <button type="button" onClick={() => removePolicyLink(idx)} className="text-xs text-destructive">Remove</button>
+                      <button
+                        type="button"
+                        onClick={() => removePolicyLink(idx)}
+                        className="text-xs text-destructive"
+                      >
+                        Remove
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -425,12 +584,19 @@ export const SiteSettingsEditor = () => {
               {/* Other Settings */}
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Copyright Text</label>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Copyright Text
+                  </label>
                   <input
                     className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                     placeholder="e.g., © YEAR Your Name. All rights reserved."
                     value={siteData.copyrightText || ""}
-                    onChange={(e) => setSiteData({ ...siteData, copyrightText: e.target.value })}
+                    onChange={(e) =>
+                      setSiteData({
+                        ...siteData,
+                        copyrightText: e.target.value,
+                      })
+                    }
                   />
                 </div>
               </div>

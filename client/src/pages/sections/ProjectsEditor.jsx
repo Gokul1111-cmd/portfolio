@@ -1,5 +1,18 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Save, Plus, Trash2, Pencil, X, Code2, ChevronLeft, ChevronRight, Eye, Github, Star, Play } from "lucide-react";
+import {
+  Save,
+  Plus,
+  Trash2,
+  Pencil,
+  X,
+  Code2,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Github,
+  Star,
+} from "lucide-react";
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 
 const accentByCategory = {
@@ -14,25 +27,45 @@ const accentByCategory = {
 };
 
 const categoryColors = {
-  "E-commerce": "from-purple-500/20 to-indigo-600/20 text-purple-600 border-purple-500/30",
-  "Web Application": "from-blue-500/20 to-cyan-600/20 text-blue-600 border-blue-500/30",
-  "Restaurant Management": "from-amber-500/20 to-orange-600/20 text-amber-600 border-amber-500/30",
-  "Food Tech": "from-rose-500/20 to-pink-600/20 text-rose-600 border-rose-500/30",
-  "Food & Recipe": "from-violet-500/20 to-purple-600/20 text-violet-600 border-violet-500/30",
-  "IoT Application": "from-orange-500/20 to-red-600/20 text-orange-600 border-orange-500/30",
-  "Web Design": "from-emerald-500/20 to-teal-600/20 text-emerald-600 border-emerald-500/30",
-  "Project Management": "from-green-500/20 to-emerald-600/20 text-green-600 border-green-500/30",
+  "E-commerce":
+    "from-purple-500/20 to-indigo-600/20 text-purple-600 border-purple-500/30",
+  "Web Application":
+    "from-blue-500/20 to-cyan-600/20 text-blue-600 border-blue-500/30",
+  "Restaurant Management":
+    "from-amber-500/20 to-orange-600/20 text-amber-600 border-amber-500/30",
+  "Food Tech":
+    "from-rose-500/20 to-pink-600/20 text-rose-600 border-rose-500/30",
+  "Food & Recipe":
+    "from-violet-500/20 to-purple-600/20 text-violet-600 border-violet-500/30",
+  "IoT Application":
+    "from-orange-500/20 to-red-600/20 text-orange-600 border-orange-500/30",
+  "Web Design":
+    "from-emerald-500/20 to-teal-600/20 text-emerald-600 border-emerald-500/30",
+  "Project Management":
+    "from-green-500/20 to-emerald-600/20 text-green-600 border-green-500/30",
 };
 
 // Live Preview Component - Shows exactly how the project will appear on portfolio
 const ProjectCardPreview = ({ project }) => {
-  const tagsArray = typeof project.tags === 'string' 
-    ? project.tags.split(',').map(t => t.trim()).filter(Boolean)
-    : (Array.isArray(project.tags) ? project.tags : []);
-  
-  const highlightsArray = typeof project.highlights === 'string'
-    ? project.highlights.split(',').map(h => h.trim()).filter(Boolean)
-    : (Array.isArray(project.highlights) ? project.highlights : []);
+  const tagsArray =
+    typeof project.tags === "string"
+      ? project.tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : Array.isArray(project.tags)
+        ? project.tags
+        : [];
+
+  const highlightsArray =
+    typeof project.highlights === "string"
+      ? project.highlights
+          .split(",")
+          .map((h) => h.trim())
+          .filter(Boolean)
+      : Array.isArray(project.highlights)
+        ? project.highlights
+        : [];
 
   return (
     <div className="sticky top-6">
@@ -40,31 +73,38 @@ const ProjectCardPreview = ({ project }) => {
         <Eye size={16} />
         <span>Live Preview</span>
       </div>
-      
+
       <div className="group relative bg-background border border-border rounded-2xl overflow-hidden shadow-lg">
         {/* Image Section */}
         <div className="relative h-48 overflow-hidden bg-muted">
           <img
-            src={project.image || "/placeholder.png"} 
+            src={project.image || "/placeholder.png"}
             alt={project.title || "Preview"}
             className="w-full h-full object-cover"
-            onError={(e) => { e.target.src = "https://placehold.co/600x400/1e293b/FFF?text=Project+Image"; }}
+            onError={(e) => {
+              e.target.src =
+                "https://placehold.co/600x400/1e293b/FFF?text=Project+Image";
+            }}
           />
-          
+
           {/* Status Badge */}
           <div className="absolute top-3 right-3">
-            <div className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
-              project.status === "Live" 
-                ? "bg-emerald-500/20 text-emerald-600 border border-emerald-500/30"
-                : "bg-amber-500/20 text-amber-600 border border-amber-500/30"
-            }`}>
+            <div
+              className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
+                project.status === "Live"
+                  ? "bg-emerald-500/20 text-emerald-600 border border-emerald-500/30"
+                  : "bg-amber-500/20 text-amber-600 border border-amber-500/30"
+              }`}
+            >
               {project.status || "In Development"}
             </div>
           </div>
 
           {/* Category Badge */}
           <div className="absolute top-3 left-3">
-            <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${categoryColors[project.category] || "border-gray-500 text-gray-500"}`}>
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${categoryColors[project.category] || "border-gray-500 text-gray-500"}`}
+            >
               {project.category || "Web Application"}
             </span>
           </div>
@@ -78,7 +118,7 @@ const ProjectCardPreview = ({ project }) => {
             </h3>
             {project.featured && (
               <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/20 text-amber-600 text-xs font-medium border border-amber-500/30">
-                <Star size={11} className="fill-amber-500" /> 
+                <Star size={11} className="fill-amber-500" />
                 Featured
               </div>
             )}
@@ -116,20 +156,26 @@ const ProjectCardPreview = ({ project }) => {
 
           {/* Action Buttons */}
           <div className="flex gap-2.5 pt-3 border-t border-border">
-            <div className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium ${
-              (!project.demoUrl || project.demoUrl === "#")
-                ? "bg-muted text-muted-foreground border border-border"
-                : "bg-primary text-primary-foreground"
-            }`}>
+            <div
+              className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium ${
+                !project.demoUrl || project.demoUrl === "#"
+                  ? "bg-muted text-muted-foreground border border-border"
+                  : "bg-primary text-primary-foreground"
+              }`}
+            >
               <Eye size={15} />
-              {(!project.demoUrl || project.demoUrl === "#") ? "Coming Soon" : "Live Demo"}
+              {!project.demoUrl || project.demoUrl === "#"
+                ? "Coming Soon"
+                : "Live Demo"}
             </div>
-            
-            <div className={`inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium border ${
-              (!project.githubUrl || project.githubUrl === "#")
-                ? "bg-muted text-muted-foreground border-border"
-                : "bg-background text-foreground border-border"
-            }`}>
+
+            <div
+              className={`inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium border ${
+                !project.githubUrl || project.githubUrl === "#"
+                  ? "bg-muted text-muted-foreground border-border"
+                  : "bg-background text-foreground border-border"
+              }`}
+            >
               <Github size={15} />
               Code
             </div>
@@ -137,7 +183,9 @@ const ProjectCardPreview = ({ project }) => {
         </div>
 
         {/* Accent Border */}
-        <div className={`h-1 bg-gradient-to-r ${accentByCategory[project.category] || "from-primary to-primary/50"}`} />
+        <div
+          className={`h-1 bg-gradient-to-r ${accentByCategory[project.category] || "from-primary to-primary/50"}`}
+        />
       </div>
     </div>
   );
@@ -253,8 +301,12 @@ export const ProjectsEditor = () => {
       githubUrl: project.githubUrl || "",
       video: project.video || "",
       status: project.status || "Live",
-      tags: Array.isArray(project.tags) ? project.tags.join(", ") : project.tags || "",
-      highlights: Array.isArray(project.highlights) ? project.highlights.join(", ") : project.highlights || "",
+      tags: Array.isArray(project.tags)
+        ? project.tags.join(", ")
+        : project.tags || "",
+      highlights: Array.isArray(project.highlights)
+        ? project.highlights.join(", ")
+        : project.highlights || "",
       featured: project.featured || false,
     });
   };
@@ -268,7 +320,8 @@ export const ProjectsEditor = () => {
     const reader = new FileReader();
     reader.onload = (ev) => {
       const result = ev.target?.result;
-      if (typeof result === "string") setNewSkill((p) => ({ ...p, image: result }));
+      if (typeof result === "string")
+        setNewSkill((p) => ({ ...p, image: result }));
     };
     reader.readAsDataURL(file);
   };
@@ -282,7 +335,8 @@ export const ProjectsEditor = () => {
     const reader = new FileReader();
     reader.onload = (ev) => {
       const result = ev.target?.result;
-      if (typeof result === "string") setNewSkill((p) => ({ ...p, video: result }));
+      if (typeof result === "string")
+        setNewSkill((p) => ({ ...p, video: result }));
     };
     reader.readAsDataURL(file);
   };
@@ -337,7 +391,11 @@ export const ProjectsEditor = () => {
 
       if (res.ok) {
         const updatedProject = await res.json();
-        setProjects(projects.map((p) => (p.id === editingProject.id ? updatedProject : p)));
+        setProjects(
+          projects.map((p) =>
+            p.id === editingProject.id ? updatedProject : p,
+          ),
+        );
         cancelEdit();
         alert("Project updated!");
       }
@@ -408,12 +466,17 @@ export const ProjectsEditor = () => {
               )}
             </div>
 
-            <form onSubmit={editingProject ? handleUpdate : handleAdd} className="space-y-4 text-sm max-h-[70vh] overflow-y-auto pr-2">
+            <form
+              onSubmit={editingProject ? handleUpdate : handleAdd}
+              className="space-y-4 text-sm max-h-[70vh] overflow-y-auto pr-2"
+            >
               <input
                 placeholder="Title"
                 required
                 value={newSkill.title}
-                onChange={(e) => setNewSkill({ ...newSkill, title: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, title: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
 
@@ -421,13 +484,17 @@ export const ProjectsEditor = () => {
                 placeholder="Description"
                 rows={3}
                 value={newSkill.description}
-                onChange={(e) => setNewSkill({ ...newSkill, description: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, description: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
 
               <select
                 value={newSkill.category}
-                onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, category: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               >
                 <option>Web Application</option>
@@ -443,7 +510,9 @@ export const ProjectsEditor = () => {
               <input
                 placeholder="Image URL"
                 value={newSkill.image}
-                onChange={(e) => setNewSkill({ ...newSkill, image: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, image: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
               <div
@@ -458,29 +527,39 @@ export const ProjectsEditor = () => {
                     className="hidden"
                     onChange={(e) => handleImageFile(e.target.files?.[0])}
                   />
-                  <span className="text-primary font-medium">click to browse</span>
+                  <span className="text-primary font-medium">
+                    click to browse
+                  </span>
                 </label>
-                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">JPEG/PNG • Stored as data URL for instant preview</p>
+                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">
+                  JPEG/PNG • Stored as data URL for instant preview
+                </p>
               </div>
 
               <input
                 placeholder="Demo URL"
                 value={newSkill.demoUrl}
-                onChange={(e) => setNewSkill({ ...newSkill, demoUrl: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, demoUrl: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
 
               <input
                 placeholder="GitHub URL"
                 value={newSkill.githubUrl}
-                onChange={(e) => setNewSkill({ ...newSkill, githubUrl: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, githubUrl: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
 
               <input
                 placeholder="Video URL (optional)"
                 value={newSkill.video}
-                onChange={(e) => setNewSkill({ ...newSkill, video: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, video: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
               <div
@@ -495,14 +574,20 @@ export const ProjectsEditor = () => {
                     className="hidden"
                     onChange={(e) => handleVideoFile(e.target.files?.[0])}
                   />
-                  <span className="text-primary font-medium">click to browse</span>
+                  <span className="text-primary font-medium">
+                    click to browse
+                  </span>
                 </label>
-                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">MP4/WebM • Stored as data URL (keep small)</p>
+                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">
+                  MP4/WebM • Stored as data URL (keep small)
+                </p>
               </div>
 
               <select
                 value={newSkill.status}
-                onChange={(e) => setNewSkill({ ...newSkill, status: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, status: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               >
                 <option>Live</option>
@@ -513,14 +598,18 @@ export const ProjectsEditor = () => {
               <input
                 placeholder="Tags (comma separated)"
                 value={newSkill.tags}
-                onChange={(e) => setNewSkill({ ...newSkill, tags: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, tags: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
 
               <input
                 placeholder="Highlights (comma separated)"
                 value={newSkill.highlights}
-                onChange={(e) => setNewSkill({ ...newSkill, highlights: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, highlights: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
 
@@ -528,7 +617,9 @@ export const ProjectsEditor = () => {
                 <input
                   type="checkbox"
                   checked={newSkill.featured}
-                  onChange={(e) => setNewSkill({ ...newSkill, featured: e.target.checked })}
+                  onChange={(e) =>
+                    setNewSkill({ ...newSkill, featured: e.target.checked })
+                  }
                 />
                 <span className="text-xs">Featured</span>
               </label>
@@ -555,96 +646,113 @@ export const ProjectsEditor = () => {
       {/* Bottom Section - Projects List */}
       <div>
         <div className="space-y-6">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentPage}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              >
-                {displayedProjects.map((project) => (
-                  <motion.div
-                    key={project.id}
-                    className={`bg-card border rounded-xl p-5 shadow-sm hover:border-primary/50 transition-all cursor-pointer ${
-                      editingProject?.id === project.id ? "border-primary bg-primary/5" : "border-border"
-                    }`}
-                    onClick={() => handleEdit(project)}
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <p className="text-xs uppercase tracking-wide text-muted-foreground">{project.category}</p>
-                        <h4 className="font-bold text-base mt-1">{project.title}</h4>
-                      </div>
-                      <div className="flex gap-2 ml-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(project);
-                          }}
-                          className="p-1 rounded hover:bg-primary/10 text-primary"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(project.id);
-                          }}
-                          className="p-1 rounded hover:bg-destructive/10 text-destructive"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentPage}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              {displayedProjects.map((project) => (
+                <motion.div
+                  key={project.id}
+                  className={`bg-card border rounded-xl p-5 shadow-sm hover:border-primary/50 transition-all cursor-pointer ${
+                    editingProject?.id === project.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border"
+                  }`}
+                  onClick={() => handleEdit(project)}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        {project.category}
+                      </p>
+                      <h4 className="font-bold text-base mt-1">
+                        {project.title}
+                      </h4>
                     </div>
+                    <div className="flex gap-2 ml-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(project);
+                        }}
+                        className="p-1 rounded hover:bg-primary/10 text-primary"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(project.id);
+                        }}
+                        className="p-1 rounded hover:bg-destructive/10 text-destructive"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
 
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-3">{project.description}</p>
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
+                    {project.description}
+                  </p>
 
-                    {Array.isArray(project.tags) && project.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {project.tags.slice(0, 4).map((tag, idx) => (
-                          <span key={idx} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
+                  {Array.isArray(project.tags) && project.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {project.tags.slice(0, 4).map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{project.status || "Live"}</span>
+                    {project.featured && (
+                      <span className="text-primary font-semibold">
+                        Featured
+                      </span>
                     )}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
 
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{project.status || "Live"}</span>
-                      {project.featured && <span className="text-primary font-semibold">Featured</span>}
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4 pt-4">
+              <button
+                onClick={prevPage}
+                disabled={currentPage === 0}
+                className="p-2 rounded-lg border border-border hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft size={18} />
+              </button>
 
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-4 pt-4">
-                <button
-                  onClick={prevPage}
-                  disabled={currentPage === 0}
-                  className="p-2 rounded-lg border border-border hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground">
-                    {startIdx + 1} – {Math.min(startIdx + itemsPerPage, projects.length)} of {projects.length}
-                  </span>
-                </div>
-
-                <button
-                  onClick={nextPage}
-                  disabled={currentPage >= totalPages - 1}
-                  className="p-2 rounded-lg border border-border hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight size={18} />
-                </button>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground">
+                  {startIdx + 1} –{" "}
+                  {Math.min(startIdx + itemsPerPage, projects.length)} of{" "}
+                  {projects.length}
+                </span>
               </div>
-            )}
-          </div>
+
+              <button
+                onClick={nextPage}
+                disabled={currentPage >= totalPages - 1}
+                className="p-2 rounded-lg border border-border hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </motion.div>
   );

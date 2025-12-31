@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Save, LayoutDashboard, Plus, ArrowUp, ArrowDown, Trash2 } from "lucide-react";
+import {
+  Save,
+  LayoutDashboard,
+  Plus,
+  ArrowUp,
+  ArrowDown,
+  Trash2,
+} from "lucide-react";
 
 export const TimelineEditor = () => {
-  const [data, setData] = useState({});
+  const [data, setData] = useState({ careerTimeline: [] });
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = async () => {
@@ -35,7 +42,6 @@ export const TimelineEditor = () => {
       if (res.ok) alert("Timeline saved!");
     } catch (err) {
       console.error("Save failed", err);
-      alert("Failed to save timeline");
     }
   };
 
@@ -43,22 +49,26 @@ export const TimelineEditor = () => {
     setData((prev) => ({ ...prev, [key]: value }));
   };
 
+  const updateTimelineField = (idx, key, value) => {
+    const next = Array.isArray(data.careerTimeline)
+      ? [...data.careerTimeline]
+      : [];
+    next[idx] = { ...(next[idx] || {}), [key]: value };
+    setData((prev) => ({ ...prev, careerTimeline: next }));
+  };
+
   const updateListField = (idx, key, value) => {
     const items = value
-      .split(',')
+      .split(",")
       .map((v) => v.trim())
       .filter(Boolean);
     updateTimelineField(idx, key, items);
   };
 
-  const updateTimelineField = (idx, key, value) => {
-    const next = Array.isArray(data.careerTimeline) ? [...data.careerTimeline] : [];
-    next[idx] = { ...(next[idx] || {}), [key]: value };
-    setData((prev) => ({ ...prev, careerTimeline: next }));
-  };
-
   const addTimelineItem = () => {
-    const next = Array.isArray(data.careerTimeline) ? [...data.careerTimeline] : [];
+    const next = Array.isArray(data.careerTimeline)
+      ? [...data.careerTimeline]
+      : [];
     next.push({
       period: "New Period",
       range: "",
@@ -73,13 +83,17 @@ export const TimelineEditor = () => {
   };
 
   const removeTimelineItem = (idx) => {
-    const next = Array.isArray(data.careerTimeline) ? [...data.careerTimeline] : [];
+    const next = Array.isArray(data.careerTimeline)
+      ? [...data.careerTimeline]
+      : [];
     next.splice(idx, 1);
     setData((prev) => ({ ...prev, careerTimeline: next }));
   };
 
   const moveTimelineItem = (idx, dir) => {
-    const next = Array.isArray(data.careerTimeline) ? [...data.careerTimeline] : [];
+    const next = Array.isArray(data.careerTimeline)
+      ? [...data.careerTimeline]
+      : [];
     const target = idx + dir;
     if (target < 0 || target >= next.length) return;
     [next[idx], next[target]] = [next[target], next[idx]];
@@ -101,7 +115,9 @@ export const TimelineEditor = () => {
         <form onSubmit={handleSave} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Career Title</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Career Title
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                 value={data.careerTitle || ""}
@@ -109,7 +125,9 @@ export const TimelineEditor = () => {
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Career Intro</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Career Intro
+              </label>
               <input
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                 value={data.careerIntro || ""}
@@ -120,7 +138,9 @@ export const TimelineEditor = () => {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-medium text-muted-foreground">Career Timeline</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Career Timeline
+              </label>
               <button
                 type="button"
                 onClick={addTimelineItem}
@@ -131,17 +151,37 @@ export const TimelineEditor = () => {
             </div>
             <div className="space-y-3">
               {(data.careerTimeline || []).map((item, idx) => (
-                <div key={idx} className="border border-border rounded-md p-3 bg-card/50 space-y-2">
+                <div
+                  key={idx}
+                  className="border border-border rounded-md p-3 bg-card/50 space-y-2"
+                >
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="font-semibold text-foreground">Milestone {idx + 1}</span>
+                    <span className="font-semibold text-foreground">
+                      Milestone {idx + 1}
+                    </span>
                     <div className="ml-auto flex items-center gap-1">
-                      <button type="button" onClick={() => moveTimelineItem(idx, -1)} className="p-1 hover:bg-primary/10 rounded" title="Move up">
+                      <button
+                        type="button"
+                        onClick={() => moveTimelineItem(idx, -1)}
+                        className="p-1 hover:bg-primary/10 rounded"
+                        title="Move up"
+                      >
                         <ArrowUp size={14} />
                       </button>
-                      <button type="button" onClick={() => moveTimelineItem(idx, 1)} className="p-1 hover:bg-primary/10 rounded" title="Move down">
+                      <button
+                        type="button"
+                        onClick={() => moveTimelineItem(idx, 1)}
+                        className="p-1 hover:bg-primary/10 rounded"
+                        title="Move down"
+                      >
                         <ArrowDown size={14} />
                       </button>
-                      <button type="button" onClick={() => removeTimelineItem(idx)} className="p-1 hover:bg-destructive/10 rounded text-destructive" title="Delete">
+                      <button
+                        type="button"
+                        onClick={() => removeTimelineItem(idx)}
+                        className="p-1 hover:bg-destructive/10 rounded text-destructive"
+                        title="Delete"
+                      >
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -151,57 +191,75 @@ export const TimelineEditor = () => {
                       className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
                       placeholder="Period (e.g., Infosys)"
                       value={item.period || ""}
-                      onChange={(e) => updateTimelineField(idx, "period", e.target.value)}
+                      onChange={(e) =>
+                        updateTimelineField(idx, "period", e.target.value)
+                      }
                     />
                     <input
                       className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
                       placeholder="Range (e.g., 2023 - Present)"
                       value={item.range || ""}
-                      onChange={(e) => updateTimelineField(idx, "range", e.target.value)}
+                      onChange={(e) =>
+                        updateTimelineField(idx, "range", e.target.value)
+                      }
                     />
                   </div>
                   <input
                     className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
                     placeholder="Title"
                     value={item.title || ""}
-                    onChange={(e) => updateTimelineField(idx, "title", e.target.value)}
+                    onChange={(e) =>
+                      updateTimelineField(idx, "title", e.target.value)
+                    }
                   />
                   <input
                     className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
                     placeholder="Subtitle"
                     value={item.subtitle || ""}
-                    onChange={(e) => updateTimelineField(idx, "subtitle", e.target.value)}
+                    onChange={(e) =>
+                      updateTimelineField(idx, "subtitle", e.target.value)
+                    }
                   />
                   <textarea
                     rows={2}
                     className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
                     placeholder="Highlights (comma separated)"
-                    value={(item.highlights || []).join(', ')}
-                    onChange={(e) => updateListField(idx, "highlights", e.target.value)}
+                    value={(item.highlights || []).join(", ")}
+                    onChange={(e) =>
+                      updateListField(idx, "highlights", e.target.value)
+                    }
                   />
                   <textarea
                     rows={2}
                     className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
                     placeholder="Tech (comma separated)"
-                    value={(item.tech || []).join(', ')}
-                    onChange={(e) => updateListField(idx, "tech", e.target.value)}
+                    value={(item.tech || []).join(", ")}
+                    onChange={(e) =>
+                      updateListField(idx, "tech", e.target.value)
+                    }
                   />
                   <input
                     className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
                     placeholder="Result"
                     value={item.result || ""}
-                    onChange={(e) => updateTimelineField(idx, "result", e.target.value)}
+                    onChange={(e) =>
+                      updateTimelineField(idx, "result", e.target.value)
+                    }
                   />
                   <input
                     className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
                     placeholder="Icon (graduation | college | work)"
                     value={item.icon || ""}
-                    onChange={(e) => updateTimelineField(idx, "icon", e.target.value)}
+                    onChange={(e) =>
+                      updateTimelineField(idx, "icon", e.target.value)
+                    }
                   />
                 </div>
               ))}
               {!data.careerTimeline?.length && (
-                <p className="text-xs text-muted-foreground">No milestones yet. Click "Add Milestone" to begin.</p>
+                <p className="text-xs text-muted-foreground">
+                  No milestones yet. Click &quot;Add Milestone&quot; to begin.
+                </p>
               )}
             </div>
           </div>
@@ -221,14 +279,23 @@ export const TimelineEditor = () => {
           <h3 className="text-sm font-semibold mb-3">Career Path Preview</h3>
           <div className="space-y-3">
             {(data.careerTimeline || []).map((item, idx) => (
-              <div key={idx} className="rounded-lg border border-border bg-background/70 p-3 shadow-sm">
+              <div
+                key={idx}
+                className="rounded-lg border border-border bg-background/70 p-3 shadow-sm"
+              >
                 <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                  <span className="font-semibold text-foreground">{item.period || 'Period'}</span>
-                  <span>{item.range || 'Range'}</span>
+                  <span className="font-semibold text-foreground">
+                    {item.period || "Period"}
+                  </span>
+                  <span>{item.range || "Range"}</span>
                 </div>
-                <p className="text-sm font-semibold text-foreground">{item.title || 'Title'}</p>
+                <p className="text-sm font-semibold text-foreground">
+                  {item.title || "Title"}
+                </p>
                 {item.subtitle && (
-                  <p className="text-xs text-muted-foreground mb-1">{item.subtitle}</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    {item.subtitle}
+                  </p>
                 )}
                 <div className="text-xs text-muted-foreground space-y-1">
                   {(item.highlights || []).slice(0, 3).map((h, i) => (
@@ -241,19 +308,26 @@ export const TimelineEditor = () => {
                 {item.tech?.length ? (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {item.tech.slice(0, 4).map((t, i) => (
-                      <span key={i} className="px-2 py-0.5 text-[11px] rounded-full bg-primary/10 text-primary border border-primary/20">
+                      <span
+                        key={i}
+                        className="px-2 py-0.5 text-[11px] rounded-full bg-primary/10 text-primary border border-primary/20"
+                      >
                         {t}
                       </span>
                     ))}
                   </div>
                 ) : null}
                 {item.result && (
-                  <p className="mt-2 text-xs font-semibold text-foreground">Result: {item.result}</p>
+                  <p className="mt-2 text-xs font-semibold text-foreground">
+                    Result: {item.result}
+                  </p>
                 )}
               </div>
             ))}
             {!data.careerTimeline?.length && (
-              <p className="text-xs text-muted-foreground">Add milestones to see the preview.</p>
+              <p className="text-xs text-muted-foreground">
+                Add milestones to see the preview.
+              </p>
             )}
           </div>
         </div>

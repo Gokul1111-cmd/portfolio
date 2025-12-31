@@ -9,15 +9,20 @@ import {
   MapPin,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { fetchStaticOrLive } from "../lib/staticData";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [siteData, setSiteData] = useState({
     brandName: "Gokul A",
-    brandBio: "Full-stack developer passionate about AI, cloud computing, and building impactful digital solutions.",
+    brandBio:
+      "Full-stack developer passionate about AI, cloud computing, and building impactful digital solutions.",
     footerSocialLinks: [
-      { label: "LinkedIn", href: "https://www.linkedin.com/in/gokulanbalagan1112/" },
+      {
+        label: "LinkedIn",
+        href: "https://www.linkedin.com/in/gokulanbalagan1112/",
+      },
       { label: "Instagram", href: "#" },
       { label: "YouTube", href: "#" },
       { label: "GitHub", href: "https://github.com/Gokul1111-cmd" },
@@ -30,7 +35,11 @@ export const Footer = () => {
       { name: "Projects", href: "#projects" },
       { name: "Contact", href: "#contact" },
     ],
-    contactInfo: { email: "gokulanbalagan1112@gmail.com", phone: "+91 8754740118", location: "Coimbatore, Tamil Nadu, India" },
+    contactInfo: {
+      email: "gokulanbalagan1112@gmail.com",
+      phone: "+91 8754740118",
+      location: "Coimbatore, Tamil Nadu, India",
+    },
     footerPolicyLinks: [
       { name: "Privacy", href: "#" },
       { name: "Terms", href: "#" },
@@ -38,26 +47,23 @@ export const Footer = () => {
     ],
     copyrightText: `© ${currentYear} Gokul A. All rights reserved.`,
   });
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     const fetchSiteSettings = async () => {
       try {
-        const res = await fetch("/api/content?key=site");
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.data) {
-            setSiteData((prev) => ({ ...prev, ...data.data }));
-          }
-        }
+        const payload = await fetchStaticOrLive({
+          name: "content",
+          liveUrl: "/api/content?key=site",
+          fallbackEmpty: siteData,
+        });
+        const resolved = payload?.site || payload?.data || payload;
+        if (resolved) setSiteData((prev) => ({ ...prev, ...resolved }));
       } catch (error) {
         console.error("Footer settings fetch failed", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchSiteSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const containerVariants = {
@@ -66,9 +72,9 @@ export const Footer = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants = {
@@ -77,16 +83,16 @@ export const Footer = () => {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.5
-      }
-    }
+        duration: 0.5,
+      },
+    },
   };
 
   return (
     <footer id="contact" className="px-6 py-12 mt-20">
       <div className="max-w-6xl mx-auto">
         {/* Glass background container */}
-        <motion.div 
+        <motion.div
           className="backdrop-blur-lg bg-white/70 dark:bg-gray-900/70 rounded-xl p-8 border border-white/20 dark:border-gray-700/50 shadow-lg"
           initial="hidden"
           whileInView="visible"
@@ -96,7 +102,9 @@ export const Footer = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Branding */}
             <motion.div variants={itemVariants} className="space-y-4">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{siteData.brandName}</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                {siteData.brandName}
+              </h3>
               <p className="text-gray-600 dark:text-gray-300 text-sm">
                 {siteData.brandBio}
               </p>
@@ -123,16 +131,18 @@ export const Footer = () => {
 
             {/* Navigation */}
             <motion.div variants={itemVariants}>
-              <h4 className="text-gray-900 dark:text-white font-medium mb-4 text-sm uppercase tracking-wider">Navigation</h4>
+              <h4 className="text-gray-900 dark:text-white font-medium mb-4 text-sm uppercase tracking-wider">
+                Navigation
+              </h4>
               <ul className="space-y-3">
                 {(siteData.footerQuickLinks || []).map((link, index) => (
-                  <motion.li 
+                  <motion.li
                     key={index}
                     whileHover={{ x: 2 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
-                    <a 
-                      href={link.href} 
+                    <a
+                      href={link.href}
                       className="hover:text-gray-900 dark:hover:text-white transition-colors duration-300 text-sm text-gray-600 dark:text-gray-300"
                     >
                       {link.name}
@@ -144,38 +154,46 @@ export const Footer = () => {
 
             {/* Contact */}
             <motion.div variants={itemVariants}>
-              <h4 className="text-gray-900 dark:text-white font-medium mb-4 text-sm uppercase tracking-wider">Contact</h4>
+              <h4 className="text-gray-900 dark:text-white font-medium mb-4 text-sm uppercase tracking-wider">
+                Contact
+              </h4>
               <ul className="space-y-3">
-                <motion.li 
+                <motion.li
                   className="flex items-start space-x-3 text-sm"
                   whileHover={{ scale: 1.02 }}
                 >
-                  <span className="text-gray-600 dark:text-gray-400 mt-0.5"><Mail size={16} /></span>
-                  <a 
+                  <span className="text-gray-600 dark:text-gray-400 mt-0.5">
+                    <Mail size={16} />
+                  </span>
+                  <a
                     href={`mailto:${siteData.contactInfo?.email || ""}`}
                     className="hover:text-gray-900 dark:hover:text-white transition-colors duration-300 text-gray-600 dark:text-gray-300"
                   >
                     {siteData.contactInfo?.email}
                   </a>
                 </motion.li>
-                <motion.li 
+                <motion.li
                   className="flex items-start space-x-3 text-sm"
                   whileHover={{ scale: 1.02 }}
                 >
-                  <span className="text-gray-600 dark:text-gray-400 mt-0.5"><Phone size={16} /></span>
-                  <a 
-                    href={`tel:${siteData.contactInfo?.phone?.replace(/\s/g, '') || ""}`}
+                  <span className="text-gray-600 dark:text-gray-400 mt-0.5">
+                    <Phone size={16} />
+                  </span>
+                  <a
+                    href={`tel:${siteData.contactInfo?.phone?.replace(/\s/g, "") || ""}`}
                     className="hover:text-gray-900 dark:hover:text-white transition-colors duration-300 text-gray-600 dark:text-gray-300"
                   >
                     {siteData.contactInfo?.phone}
                   </a>
                 </motion.li>
                 {siteData.contactInfo?.location && (
-                  <motion.li 
+                  <motion.li
                     className="flex items-start space-x-3 text-sm"
                     whileHover={{ scale: 1.02 }}
                   >
-                    <span className="text-gray-600 dark:text-gray-400 mt-0.5"><MapPin size={16} /></span>
+                    <span className="text-gray-600 dark:text-gray-400 mt-0.5">
+                      <MapPin size={16} />
+                    </span>
                     <span className="text-gray-600 dark:text-gray-300">
                       {siteData.contactInfo.location}
                     </span>
@@ -183,12 +201,10 @@ export const Footer = () => {
                 )}
               </ul>
             </motion.div>
-
-
           </div>
 
           {/* Bottom bar */}
-          <motion.div 
+          <motion.div
             className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700/50 flex flex-col items-center text-xs text-gray-600 dark:text-gray-400 space-y-4 sm:space-y-0 sm:flex-row sm:justify-center sm:gap-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -198,10 +214,16 @@ export const Footer = () => {
             <div>
               <p>{siteData.copyrightText}</p>
             </div>
-            
+
             <div className="flex items-center gap-4">
               {(siteData.footerPolicyLinks || []).map((link, index) => (
-                <a key={index} href={link.href} className="hover:text-gray-900 dark:hover:text-white transition-colors">{link.name}</a>
+                <a
+                  key={index}
+                  href={link.href}
+                  className="hover:text-gray-900 dark:hover:text-white transition-colors"
+                >
+                  {link.name}
+                </a>
               ))}
             </div>
 

@@ -4,6 +4,11 @@ import projectsHandler from "./api/projects.js";
 import contentHandler from "./api/content.js";
 import skillsHandler from "./api/skills.js";
 import testimonialsHandler from "./api/testimonials.js";
+import certificatesHandler from "./api/certificates.js";
+import syncHandler from "./api/sync.js";
+import settingsHandler from "./api/settings.js";
+import proxyImageHandler from "./api/proxy-image.js";
+import storageProxyHandler from "./api/storage-proxy.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -18,13 +23,17 @@ app.all("/api/projects", route(projectsHandler));
 app.all("/api/content", route(contentHandler));
 app.all("/api/skills", route(skillsHandler));
 app.all("/api/testimonials", route(testimonialsHandler));
+app.all("/api/certificates", route(certificatesHandler));
+app.all("/api/sync", route(syncHandler));
+app.all("/api/settings", route(settingsHandler));
+app.get("/api/proxy-image", route(proxyImageHandler));
+app.get("/api/storage-proxy", route(storageProxyHandler));
 
 app.get("/api/health", (_req, res) => {
   res.status(200).json({ ok: true });
 });
 
 const server = app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`API server running on http://localhost:${PORT}`);
 });
 

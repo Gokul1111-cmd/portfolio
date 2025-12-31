@@ -8,7 +8,7 @@ import { TestimonialSubmit } from "./pages/TestimonialSubmit";
 import { NotFound } from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 import WelcomeScreen from "@/components/WelcomeScreen";
-import { Analytics } from "@vercel/analytics/react"; 
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const [welcomeComplete, setWelcomeComplete] = useState(false);
@@ -33,7 +33,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/testimonial-submit" element={<TestimonialSubmit />} />
-          
+
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Analytics />

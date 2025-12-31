@@ -97,7 +97,9 @@
 
   body {
     @apply bg-background text-foreground transition-colors duration-300;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 }
 
@@ -161,6 +163,44 @@
   text-align: center;
 }
 
-::-webkit-scrollbar{
-  display:none
+@media (pointer: fine) {
+  :root {
+    --cursor-url:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cdefs%3E%3Cfilter id='g' x='-60%25' y='-60%25' width='220%25' height='220%25'%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='3' flood-color='%23e879f9' flood-opacity='1'/%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='6' flood-color='%23c084fc' flood-opacity='0.95'/%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='9' flood-color='%239333ea' flood-opacity='0.75'/%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='12' flood-color='%235b21b6' flood-opacity='0.55'/%3E%3C/filter%3E%3C/defs%3E%3Cpath filter='url(%23g)' fill='%23a855f7' stroke='%23fdf4ff' stroke-width='1.4' d='M6 3 L6 22 L11 17 L14.5 27 L18.5 25.5 L15.5 16 L23 16 Z'/%3E%3C/svg%3E")
+        1 1,
+      auto;
+  }
+
+  body,
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    cursor: var(--cursor-url);
+  }
+
+  .cursor-pointer,
+  button,
+  a {
+    cursor: var(--cursor-url);
+  }
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Make react-image-crop handles visible on dark background */
+.ReactCrop__crop-selection {
+  border: 2px solid #a855f7 !important;
+  box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.35);
+}
+
+.ReactCrop__drag-handle {
+  width: 12px !important;
+  height: 12px !important;
+  background: #a855f7 !important;
+  border: 2px solid #f4f4f5 !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
 }

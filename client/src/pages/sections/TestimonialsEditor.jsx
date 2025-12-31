@@ -1,5 +1,16 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Save, MessageSquare, Trash2, ChevronLeft, ChevronRight, Star, Pencil, X, Quote } from "lucide-react";
+import {
+  Save,
+  MessageSquare,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  Pencil,
+  X,
+  Quote,
+} from "lucide-react";
+/* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 
 // Live Preview Component
@@ -16,7 +27,9 @@ const TestimonialCardPreview = ({ testimonial }) => {
 
         {/* Testimonial Content */}
         <p className="text-base text-muted-foreground mb-6 flex-1 italic min-h-24">
-          {testimonial.content ? `"${testimonial.content}"` : '"Your testimonial preview appears here..."'}
+          {testimonial.content
+            ? `"${testimonial.content}"`
+            : '"Your testimonial preview appears here..."'}
         </p>
 
         {/* Rating */}
@@ -24,7 +37,7 @@ const TestimonialCardPreview = ({ testimonial }) => {
           {[...Array(5)].map((_, i) => (
             <Star
               key={i}
-              className={`h-5 w-5 ${i < (testimonial.rating || 5) ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground/30'}`}
+              className={`h-5 w-5 ${i < (testimonial.rating || 5) ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground/30"}`}
             />
           ))}
         </div>
@@ -36,25 +49,31 @@ const TestimonialCardPreview = ({ testimonial }) => {
               {testimonial.image ? (
                 <img
                   src={testimonial.image}
-                  alt={testimonial.name || 'Client'}
+                  alt={testimonial.name || "Client"}
                   className="w-full h-full object-cover"
                   loading="lazy"
                   onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'flex';
+                    e.target.style.display = "none";
+                    e.target.nextElementSibling.style.display = "flex";
                   }}
                 />
               ) : null}
               <div
                 className="w-full h-full bg-primary/10 flex items-center justify-center text-primary/50 font-semibold"
-                style={{ display: testimonial.image ? 'none' : 'flex' }}
+                style={{ display: testimonial.image ? "none" : "flex" }}
               >
-                {testimonial.name ? testimonial.name.charAt(0).toUpperCase() : '?'}
+                {testimonial.name
+                  ? testimonial.name.charAt(0).toUpperCase()
+                  : "?"}
               </div>
             </div>
             <div>
-              <p className="font-medium text-base">{testimonial.name || 'Client Name'}</p>
-              <p className="text-sm text-muted-foreground">{testimonial.role || 'Job Title'}</p>
+              <p className="font-medium text-base">
+                {testimonial.name || "Client Name"}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {testimonial.role || "Job Title"}
+              </p>
             </div>
           </div>
         </div>
@@ -87,7 +106,8 @@ export const TestimonialsEditor = () => {
     const reader = new FileReader();
     reader.onload = (ev) => {
       const result = ev.target?.result;
-      if (typeof result === "string") setNewTestimonial((p) => ({ ...p, image: result }));
+      if (typeof result === "string")
+        setNewTestimonial((p) => ({ ...p, image: result }));
     };
     reader.readAsDataURL(file);
   };
@@ -140,7 +160,9 @@ export const TestimonialsEditor = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete?")) return;
     try {
-      const res = await fetch(`/api/testimonials?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/testimonials?id=${id}`, {
+        method: "DELETE",
+      });
       if (res.ok) {
         setTestimonials(testimonials.filter((t) => t.id !== id));
         alert("Deleted!");
@@ -176,7 +198,11 @@ export const TestimonialsEditor = () => {
       });
       if (res.ok) {
         const updatedTestimonial = await res.json();
-        setTestimonials(testimonials.map((t) => (t.id === editingTestimonial.id ? updatedTestimonial : t)));
+        setTestimonials(
+          testimonials.map((t) =>
+            t.id === editingTestimonial.id ? updatedTestimonial : t,
+          ),
+        );
         cancelEdit();
         alert("Updated!");
       }
@@ -188,19 +214,28 @@ export const TestimonialsEditor = () => {
 
   const cancelEdit = () => {
     setEditingTestimonial(null);
-    setNewTestimonial({ name: "", role: "", content: "", rating: 5, image: "" });
+    setNewTestimonial({
+      name: "",
+      role: "",
+      content: "",
+      rating: 5,
+      image: "",
+    });
   };
 
   if (isLoading) return <div className="p-8">Loading...</div>;
 
   const totalPages = Math.ceil(testimonials.length / itemsPerPage);
   const startIdx = currentPage * itemsPerPage;
-  const displayedTestimonials = testimonials.slice(startIdx, startIdx + itemsPerPage);
-  
+  const displayedTestimonials = testimonials.slice(
+    startIdx,
+    startIdx + itemsPerPage,
+  );
+
   const nextPage = () => {
     if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1);
   };
-  
+
   const prevPage = () => {
     if (currentPage > 0) setCurrentPage(currentPage - 1);
   };
@@ -239,20 +274,28 @@ export const TestimonialsEditor = () => {
               )}
             </div>
             <div className="text-xs text-muted-foreground mb-2">
-              Adding new testimonials is disabled—use the public submission page. Select an existing testimonial below to edit or delete.
+              Adding new testimonials is disabled—use the public submission
+              page. Select an existing testimonial below to edit or delete.
             </div>
-            <form onSubmit={handleUpdate} className="space-y-4 text-sm max-h-[70vh] overflow-y-auto">
+            <form
+              onSubmit={handleUpdate}
+              className="space-y-4 text-sm max-h-[70vh] overflow-y-auto"
+            >
               <input
                 placeholder="Client Name"
                 required
                 value={newTestimonial.name}
-                onChange={(e) => setNewTestimonial({ ...newTestimonial, name: e.target.value })}
+                onChange={(e) =>
+                  setNewTestimonial({ ...newTestimonial, name: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
               <input
                 placeholder="Role/Title"
                 value={newTestimonial.role}
-                onChange={(e) => setNewTestimonial({ ...newTestimonial, role: e.target.value })}
+                onChange={(e) =>
+                  setNewTestimonial({ ...newTestimonial, role: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
               <textarea
@@ -260,13 +303,23 @@ export const TestimonialsEditor = () => {
                 rows={4}
                 required
                 value={newTestimonial.content}
-                onChange={(e) => setNewTestimonial({ ...newTestimonial, content: e.target.value })}
+                onChange={(e) =>
+                  setNewTestimonial({
+                    ...newTestimonial,
+                    content: e.target.value,
+                  })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary resize-none"
               />
               <input
                 placeholder="Image URL (optional)"
                 value={newTestimonial.image}
-                onChange={(e) => setNewTestimonial({ ...newTestimonial, image: e.target.value })}
+                onChange={(e) =>
+                  setNewTestimonial({
+                    ...newTestimonial,
+                    image: e.target.value,
+                  })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
               <div
@@ -281,9 +334,13 @@ export const TestimonialsEditor = () => {
                     className="hidden"
                     onChange={(e) => handleImageFile(e.target.files?.[0])}
                   />
-                  <span className="text-primary font-medium">click to browse</span>
+                  <span className="text-primary font-medium">
+                    click to browse
+                  </span>
                 </label>
-                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">JPEG/PNG • Stored as data URL for preview</p>
+                <p className="text-[11px] text-muted-foreground/80 text-center mt-2">
+                  JPEG/PNG • Stored as data URL for preview
+                </p>
               </div>
               <div>
                 <label className="text-xs flex items-center gap-2 mb-2">
@@ -297,7 +354,12 @@ export const TestimonialsEditor = () => {
                   min="1"
                   max="5"
                   value={newTestimonial.rating}
-                  onChange={(e) => setNewTestimonial({ ...newTestimonial, rating: parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    setNewTestimonial({
+                      ...newTestimonial,
+                      rating: parseInt(e.target.value),
+                    })
+                  }
                   className="w-full"
                 />
               </div>
@@ -306,7 +368,8 @@ export const TestimonialsEditor = () => {
                 disabled={!editingTestimonial}
                 className="w-full px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 text-sm"
               >
-                <Save size={16} /> {editingTestimonial ? "Update" : "Select a testimonial to edit"}
+                <Save size={16} />{" "}
+                {editingTestimonial ? "Update" : "Select a testimonial to edit"}
               </button>
             </form>
           </div>
@@ -329,7 +392,9 @@ export const TestimonialsEditor = () => {
                 <motion.div
                   key={testimonial.id}
                   className={`bg-card border rounded-xl p-5 hover:border-primary/50 transition-all cursor-pointer ${
-                    editingTestimonial?.id === testimonial.id ? "border-primary bg-primary/5" : "border-border"
+                    editingTestimonial?.id === testimonial.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border"
                   }`}
                   onClick={() => handleEdit(testimonial)}
                 >
@@ -337,7 +402,11 @@ export const TestimonialsEditor = () => {
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex gap-1">
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} size={14} className="fill-yellow-500 text-yellow-500" />
+                        <Star
+                          key={i}
+                          size={14}
+                          className="fill-yellow-500 text-yellow-500"
+                        />
                       ))}
                     </div>
                     <div className="flex gap-2">
@@ -363,12 +432,16 @@ export const TestimonialsEditor = () => {
                   </div>
 
                   {/* Testimonial Content */}
-                  <p className="text-sm text-muted-foreground italic mb-4">&ldquo;{testimonial.content}&rdquo;</p>
+                  <p className="text-sm text-muted-foreground italic mb-4">
+                    &ldquo;{testimonial.content}&rdquo;
+                  </p>
 
                   {/* Client Info */}
                   <div className="border-t border-border pt-3">
                     <h4 className="font-bold text-sm">{testimonial.name}</h4>
-                    <p className="text-xs text-primary font-medium">{testimonial.role}</p>
+                    <p className="text-xs text-primary font-medium">
+                      {testimonial.role}
+                    </p>
                   </div>
                 </motion.div>
               ))}
@@ -385,13 +458,15 @@ export const TestimonialsEditor = () => {
               >
                 <ChevronLeft size={18} />
               </button>
-              
+
               <div className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground">
-                  {startIdx + 1} – {Math.min(startIdx + itemsPerPage, testimonials.length)} of {testimonials.length}
+                  {startIdx + 1} –{" "}
+                  {Math.min(startIdx + itemsPerPage, testimonials.length)} of{" "}
+                  {testimonials.length}
                 </span>
               </div>
-              
+
               <button
                 onClick={nextPage}
                 disabled={currentPage >= totalPages - 1}

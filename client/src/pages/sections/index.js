@@ -5,3 +5,4 @@ export { SkillsEditor } from "./SkillsEditor";
 export { ApproachEditor } from "./ApproachEditor";
 export { TestimonialsEditor } from "./TestimonialsEditor";
 export { ContactEditor } from "./ContactEditor";
+export { CertificatesEditor } from "./CertificatesEditor";

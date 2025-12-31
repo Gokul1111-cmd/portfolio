@@ -1,72 +1,74 @@
-import { adminDb } from './firebase-admin.js';
+import { adminDb } from "./firebase-admin.js";
 
 // Testimonials CRUD API using Firebase Firestore Admin SDK
 export default async function handler(req, res) {
-  const testimonialsRef = adminDb.collection('testimonials');
+  const testimonialsRef = adminDb.collection("testimonials");
 
   // --- GET REQUEST: Fetch all testimonials ---
-  if (req.method === 'GET') {
+  if (req.method === "GET") {
     try {
-      const snapshot = await testimonialsRef.orderBy('createdAt', 'desc').get();
-      const testimonials = snapshot.docs.map(doc => ({
+      const snapshot = await testimonialsRef.orderBy("createdAt", "desc").get();
+      const testimonials = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       return res.status(200).json(testimonials);
     } catch (error) {
-      console.error('GET testimonials error:', error);
+      console.error("GET testimonials error:", error);
       return res.status(500).json({ error: error.message });
     }
   }
 
   // --- POST REQUEST: Add a new testimonial ---
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     const { name, role, relationship, link, content, rating, image } = req.body;
-    
+
     if (!name || !content) {
-      return res.status(400).json({ error: 'name and content are required' });
+      return res.status(400).json({ error: "name and content are required" });
     }
 
     try {
       const newTestimonial = {
         name,
-        role: role || '',
-        relationship: relationship || '',
-        link: link || '',
+        role: role || "",
+        relationship: relationship || "",
+        link: link || "",
         content,
         rating: rating || 5,
-        image: image || '',
-        createdAt: new Date()
+        image: image || "",
+        createdAt: new Date(),
       };
-      
+
       const docRef = await testimonialsRef.add(newTestimonial);
       return res.status(201).json({ id: docRef.id, ...newTestimonial });
     } catch (error) {
-      console.error('POST testimonial error:', error);
+      console.error("POST testimonial error:", error);
       return res.status(500).json({ error: error.message });
     }
   }
 
   // --- DELETE REQUEST: Remove a testimonial ---
-  if (req.method === 'DELETE') {
+  if (req.method === "DELETE") {
     const { id } = req.query;
-    if (!id) return res.status(400).json({ error: 'id is required' });
-    
+    if (!id) return res.status(400).json({ error: "id is required" });
+
     try {
       await testimonialsRef.doc(id).delete();
-      return res.status(200).json({ message: 'Testimonial deleted successfully' });
+      return res
+        .status(200)
+        .json({ message: "Testimonial deleted successfully" });
     } catch (error) {
-      console.error('DELETE testimonial error:', error);
+      console.error("DELETE testimonial error:", error);
       return res.status(500).json({ error: error.message });
     }
   }
 
   // --- PUT REQUEST: Update a testimonial ---
-  if (req.method === 'PUT') {
+  if (req.method === "PUT") {
     const { id } = req.query;
     const { name, role, relationship, link, content, rating, image } = req.body;
-    
-    if (!id) return res.status(400).json({ error: 'id is required' });
+
+    if (!id) return res.status(400).json({ error: "id is required" });
 
     try {
       const updateData = {};
@@ -82,10 +84,10 @@ export default async function handler(req, res) {
       await testimonialsRef.doc(id).update(updateData);
       return res.status(200).json({ id, ...updateData });
     } catch (error) {
-      console.error('PUT testimonial error:', error);
+      console.error("PUT testimonial error:", error);
       return res.status(500).json({ error: error.message });
     }
   }
 
-  return res.status(405).json({ error: 'Method not allowed' });
+  return res.status(405).json({ error: "Method not allowed" });
 }

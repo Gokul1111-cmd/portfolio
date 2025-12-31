@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { useInView } from "framer-motion";
 import { Quote, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { fetchStaticOrLive } from "../lib/staticData";
 
 export const TestimonialSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -18,17 +19,24 @@ export const TestimonialSection = () => {
       setIsLoading(true);
       setError("");
       try {
-        const res = await fetch('/api/testimonials');
-        if (!res.ok) throw new Error('Failed to fetch testimonials');
-        const data = await res.json();
+        const payload = await fetchStaticOrLive({
+          name: "testimonials",
+          liveUrl: "/api/testimonials",
+          fallbackEmpty: [],
+        });
+        const data = Array.isArray(payload?.items)
+          ? payload.items
+          : Array.isArray(payload)
+            ? payload
+            : [];
         if (Array.isArray(data)) {
           setTestimonials(data);
           setCurrentIndex(0);
         }
       } catch (err) {
-        console.error('Testimonials fetch failed', err);
+        console.error("Testimonials fetch failed", err);
         setTestimonials([]);
-        setError('Unable to load testimonials right now.');
+        setError("Unable to load testimonials right now.");
       } finally {
         setIsLoading(false);
       }
@@ -52,7 +60,9 @@ export const TestimonialSection = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const totalPages = testimonials.length ? Math.ceil(testimonials.length / itemsPerPage) : 0;
+  const totalPages = testimonials.length
+    ? Math.ceil(testimonials.length / itemsPerPage)
+    : 0;
 
   const nextTestimonial = () => {
     if (!totalPages) return;
@@ -66,7 +76,7 @@ export const TestimonialSection = () => {
 
   const visibleTestimonials = testimonials.slice(
     currentIndex * itemsPerPage,
-    (currentIndex + 1) * itemsPerPage
+    (currentIndex + 1) * itemsPerPage,
   );
 
   const containerVariants = {
@@ -75,9 +85,9 @@ export const TestimonialSection = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
+        delayChildren: 0.3,
+      },
+    },
   };
 
   const itemVariants = {
@@ -87,9 +97,9 @@ export const TestimonialSection = () => {
       opacity: 1,
       transition: {
         duration: 0.8,
-        ease: [0.16, 1, 0.3, 1]
-      }
-    }
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
   };
 
   return (
@@ -105,10 +115,10 @@ export const TestimonialSection = () => {
             key={i}
             className="absolute rounded-full bg-primary/10"
             style={{
-              width: Math.random() * 10 + 2 + 'px',
-              height: Math.random() * 10 + 2 + 'px',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
+              width: Math.random() * 10 + 2 + "px",
+              height: Math.random() * 10 + 2 + "px",
+              left: Math.random() * 100 + "%",
+              top: Math.random() * 100 + "%",
             }}
             animate={{
               y: [0, (Math.random() - 0.5) * 100],
@@ -118,8 +128,8 @@ export const TestimonialSection = () => {
             transition={{
               duration: Math.random() * 10 + 10,
               repeat: Infinity,
-              repeatType: 'reverse',
-              ease: 'linear'
+              repeatType: "reverse",
+              ease: "linear",
             }}
           />
         ))}
@@ -173,14 +183,30 @@ export const TestimonialSection = () => {
                 Share your testimonial
               </a>
             </motion.div>
-            {isLoading && <motion.p className="text-sm text-muted-foreground mt-3" variants={itemVariants}>Loading testimonials...</motion.p>}
-            {error && !isLoading && <motion.p className="text-sm text-destructive mt-3" variants={itemVariants}>{error}</motion.p>}
+            {isLoading && (
+              <motion.p
+                className="text-sm text-muted-foreground mt-3"
+                variants={itemVariants}
+              >
+                Loading testimonials...
+              </motion.p>
+            )}
+            {error && !isLoading && (
+              <motion.p
+                className="text-sm text-destructive mt-3"
+                variants={itemVariants}
+              >
+                {error}
+              </motion.p>
+            )}
           </motion.div>
 
           <div className="relative">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {!isLoading && testimonials.length === 0 && (
-                <div className="col-span-full text-center text-muted-foreground">No testimonials yet. Check back soon.</div>
+                <div className="col-span-full text-center text-muted-foreground">
+                  No testimonials yet. Check back soon.
+                </div>
               )}
               {visibleTestimonials.map((testimonial) => (
                 <motion.div
@@ -193,7 +219,7 @@ export const TestimonialSection = () => {
                     <Quote className="h-6 w-6 sm:h-8 sm:w-8 text-primary/30 mb-3 sm:mb-4 group-hover:text-primary/50 transition-colors" />
 
                     <p className="text-base sm:text-lg text-muted-foreground mb-4 sm:mb-6 flex-1">
-                      "{testimonial.content}"
+                      &ldquo;{testimonial.content}&rdquo;
                     </p>
 
                     <div className="mt-auto">
@@ -201,7 +227,7 @@ export const TestimonialSection = () => {
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-4 w-4 sm:h-5 sm:w-5 ${i < testimonial.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground/30'}`}
+                            className={`h-4 w-4 sm:h-5 sm:w-5 ${i < testimonial.rating ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground/30"}`}
                           />
                         ))}
                       </div>
@@ -222,8 +248,12 @@ export const TestimonialSection = () => {
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-sm sm:text-base">{testimonial.name}</p>
-                          <p className="text-xs sm:text-sm text-muted-foreground">{testimonial.role}</p>
+                          <p className="font-medium text-sm sm:text-base">
+                            {testimonial.name}
+                          </p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            {testimonial.role}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -270,7 +300,7 @@ export const TestimonialSection = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentIndex(index)}
-                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${currentIndex === index ? 'bg-primary' : 'bg-muted-foreground/20'}`}
+                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${currentIndex === index ? "bg-primary" : "bg-muted-foreground/20"}`}
                     aria-label={`Go to testimonial ${index + 1}`}
                   />
                 ))}
@@ -304,8 +334,8 @@ export const TestimonialSection = () => {
           transition={{
             duration: 15,
             repeat: Infinity,
-            repeatType: 'reverse',
-            ease: 'easeInOut'
+            repeatType: "reverse",
+            ease: "easeInOut",
           }}
         />
         <motion.div
@@ -317,9 +347,9 @@ export const TestimonialSection = () => {
           transition={{
             duration: 20,
             repeat: Infinity,
-            repeatType: 'reverse',
-            ease: 'easeInOut',
-            delay: 5
+            repeatType: "reverse",
+            ease: "easeInOut",
+            delay: 5,
           }}
         />
       </motion.div>

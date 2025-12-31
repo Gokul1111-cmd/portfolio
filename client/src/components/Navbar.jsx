@@ -5,9 +5,7 @@ import {
   User,
   Code,
   Briefcase,
-  MessageSquare,
   Mail,
-  BookOpen,
   Sun,
   Moon,
   Youtube,
@@ -16,9 +14,11 @@ import {
   Github,
   Linkedin,
   Globe,
+  Award,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { fetchStaticOrLive } from "../lib/staticData";
 
 const ThemeToggle = () => {
   const [theme, setTheme] = useState("light");
@@ -45,7 +45,11 @@ const ThemeToggle = () => {
       title="Toggle theme"
       aria-label="Toggle theme"
     >
-      {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      {theme === "dark" ? (
+        <Sun className="w-5 h-5" />
+      ) : (
+        <Moon className="w-5 h-5" />
+      )}
     </button>
   );
 };
@@ -60,6 +64,7 @@ export const Navbar = () => {
     { name: "Home", href: "#hero", icon: Home },
     { name: "About", href: "#about", icon: User },
     { name: "Skills", href: "#skills", icon: Code },
+    { name: "Certificates", href: "#certificates", icon: Award },
     { name: "Projects", href: "#projects", icon: Briefcase },
     { name: "Contact", href: "#contact", icon: Mail },
   ]);
@@ -70,28 +75,31 @@ export const Navbar = () => {
 
   // Icon mapping for nav items
   const iconMap = {
-    "Home": Home,
-    "About": User,
-    "Skills": Code,
-    "Projects": Briefcase,
-    "Contact": Mail,
+    Home: Home,
+    About: User,
+    Skills: Code,
+    Certificates: Award,
+    Projects: Briefcase,
+    Contact: Mail,
   };
 
   // Fetch site settings for nav links
   useEffect(() => {
     const fetchNavSettings = async () => {
       try {
-        const res = await fetch("/api/content?key=site");
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.data?.navLinks && Array.isArray(data.data.navLinks) && data.data.navLinks.length) {
-            const fetchedNavItems = data.data.navLinks.map((link) => ({
-              name: link.name,
-              href: link.href,
-              icon: iconMap[link.name] || Home, // Use mapped icon or default to Home
-            }));
-            setNavItems(fetchedNavItems);
-          }
+        const payload = await fetchStaticOrLive({
+          name: "content",
+          liveUrl: "/api/content?key=site",
+          fallbackEmpty: {},
+        });
+        const site = payload?.site || payload?.data || payload || {};
+        if (Array.isArray(site.navLinks) && site.navLinks.length) {
+          const fetchedNavItems = site.navLinks.map((link) => ({
+            name: link.name,
+            href: link.href,
+            icon: iconMap[link.name] || Home,
+          }));
+          setNavItems(fetchedNavItems);
         }
       } catch (error) {
         console.error("Navbar settings fetch failed", error);
@@ -99,6 +107,7 @@ export const Navbar = () => {
     };
 
     fetchNavSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -168,7 +177,7 @@ export const Navbar = () => {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [navItems]);
 
   return (
     <>
@@ -188,7 +197,7 @@ export const Navbar = () => {
             "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-green-600 hover:bg-green-100 dark:hover:bg-green-900/50",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center"
+            "flex items-center justify-center",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -200,14 +209,14 @@ export const Navbar = () => {
 
         {/* GitHub Button */}
         <motion.a
-          href="https://github.com/Gokul1111-cmd" 
+          href="https://github.com/Gokul1111-cmd"
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
             "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center"
+            "flex items-center justify-center",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -219,14 +228,14 @@ export const Navbar = () => {
 
         {/* LinkedIn Button */}
         <motion.a
-          href="https://www.linkedin.com/in/gokulanbalagan1112/" 
+          href="https://www.linkedin.com/in/gokulanbalagan1112/"
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
             "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/50",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center"
+            "flex items-center justify-center",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -245,7 +254,7 @@ export const Navbar = () => {
             "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center"
+            "flex items-center justify-center",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -264,18 +273,30 @@ export const Navbar = () => {
             "text-primary hover:bg-primary/10 dark:hover:bg-primary/20",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
             "flex items-center justify-center",
-            !isAudioReady && "opacity-50 cursor-not-allowed"
+            !isAudioReady && "opacity-50 cursor-not-allowed",
           )}
           whileHover={{ scale: isAudioReady ? 1.05 : 1 }}
           whileTap={{ scale: isAudioReady ? 0.95 : 1 }}
           title={
-            isAudioReady ? (isMusicPlaying ? "Pause music" : "Play music") : "Loading music..."
+            isAudioReady
+              ? isMusicPlaying
+                ? "Pause music"
+                : "Play music"
+              : "Loading music..."
           }
           aria-label={
-            isAudioReady ? (isMusicPlaying ? "Pause music" : "Play music") : "Loading music"
+            isAudioReady
+              ? isMusicPlaying
+                ? "Pause music"
+                : "Play music"
+              : "Loading music"
           }
         >
-          {isMusicPlaying ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+          {isMusicPlaying ? (
+            <Volume2 className="w-5 h-5" />
+          ) : (
+            <VolumeX className="w-5 h-5" />
+          )}
         </motion.button>
 
         <motion.button
@@ -284,7 +305,7 @@ export const Navbar = () => {
             "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-primary hover:bg-primary/10 dark:hover:bg-primary/20",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center"
+            "flex items-center justify-center",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -299,7 +320,7 @@ export const Navbar = () => {
         className={cn(
           "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50",
           "transition-transform duration-300 ease-in-out",
-          showNavbar ? "translate-y-0" : "translate-y-full"
+          showNavbar ? "translate-y-0" : "translate-y-full",
         )}
         style={{ willChange: "transform" }}
         initial={{ y: 20, opacity: 0 }}
@@ -316,12 +337,14 @@ export const Navbar = () => {
                   "p-2 rounded-full transition-colors flex flex-col items-center",
                   activeSection === item.href
                     ? "bg-primary text-white"
-                    : "text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary"
+                    : "text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary",
                 )}
                 aria-label={item.name}
               >
                 <item.icon className="w-5 h-5" />
-                <span className="text-xs mt-1 hidden md:block">{item.name}</span>
+                <span className="text-xs mt-1 hidden md:block">
+                  {item.name}
+                </span>
               </a>
             ))}
             <div className="flex items-center px-2">

@@ -1,8 +1,19 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Save, Zap, Plus, Trash2, Pencil, X, ChevronLeft, ChevronRight, Crop } from "lucide-react";
+import {
+  Save,
+  Zap,
+  Plus,
+  Trash2,
+  Pencil,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Crop,
+} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
-const normalizeSkillKey = (skill) => `${(skill?.name || '').trim().toLowerCase()}|${(skill?.category || '').trim().toLowerCase()}`;
+const normalizeSkillKey = (skill) =>
+  `${(skill?.name || "").trim().toLowerCase()}|${(skill?.category || "").trim().toLowerCase()}`;
 
 const dedupeSkills = (list = []) => {
   const seen = new Set();
@@ -28,7 +39,13 @@ export const SkillsEditor = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 6;
   const [editingSkill, setEditingSkill] = useState(null);
-  const [newSkill, setNewSkill] = useState({ name: "", category: "frontend", level: 50, icon: "", iconSize: 100 });
+  const [newSkill, setNewSkill] = useState({
+    name: "",
+    category: "frontend",
+    level: 50,
+    icon: "",
+    iconSize: 100,
+  });
   const [dragActive, setDragActive] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
   const [imageToCrop, setImageToCrop] = useState(null);
@@ -82,7 +99,13 @@ export const SkillsEditor = () => {
       if (res.ok) {
         const data = await res.json();
         setSkills(dedupeSkills([...skills, data]));
-        setNewSkill({ name: "", category: "frontend", level: 50, icon: "", iconSize: 100 });
+        setNewSkill({
+          name: "",
+          category: "frontend",
+          level: 50,
+          icon: "",
+          iconSize: 100,
+        });
         alert("Added!");
       }
     } catch (error) {
@@ -123,7 +146,12 @@ export const SkillsEditor = () => {
       return;
     }
     const normalizedKey = normalizeSkillKey(newSkill);
-    if (skills.some((s) => s.id !== editingSkill.id && normalizeSkillKey(s) === normalizedKey)) {
+    if (
+      skills.some(
+        (s) =>
+          s.id !== editingSkill.id && normalizeSkillKey(s) === normalizedKey,
+      )
+    ) {
       alert("That skill/category already exists.");
       return;
     }
@@ -141,7 +169,11 @@ export const SkillsEditor = () => {
       });
       if (res.ok) {
         const updatedSkill = await res.json();
-        setSkills(dedupeSkills(skills.map((s) => (s.id === editingSkill.id ? updatedSkill : s))));
+        setSkills(
+          dedupeSkills(
+            skills.map((s) => (s.id === editingSkill.id ? updatedSkill : s)),
+          ),
+        );
         cancelEdit();
         alert("Updated!");
       }
@@ -153,7 +185,13 @@ export const SkillsEditor = () => {
 
   const cancelEdit = () => {
     setEditingSkill(null);
-    setNewSkill({ name: "", category: "frontend", level: 50, icon: "", iconSize: 100 });
+    setNewSkill({
+      name: "",
+      category: "frontend",
+      level: 50,
+      icon: "",
+      iconSize: 100,
+    });
   };
 
   const handleIconFile = (file) => {
@@ -161,7 +199,7 @@ export const SkillsEditor = () => {
     const reader = new FileReader();
     reader.onload = (ev) => {
       const result = ev.target?.result;
-      if (typeof result === 'string') {
+      if (typeof result === "string") {
         setImageToCrop(result);
         setShowCropModal(true);
       }
@@ -171,21 +209,27 @@ export const SkillsEditor = () => {
 
   const handleCropComplete = () => {
     if (!imageRef.current || !canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const image = imageRef.current;
-    
+
     canvas.width = crop.width;
     canvas.height = crop.height;
-    
+
     ctx.drawImage(
       image,
-      crop.x, crop.y, crop.width, crop.height,
-      0, 0, crop.width, crop.height
+      crop.x,
+      crop.y,
+      crop.width,
+      crop.height,
+      0,
+      0,
+      crop.width,
+      crop.height,
     );
-    
-    const croppedDataUrl = canvas.toDataURL('image/png');
+
+    const croppedDataUrl = canvas.toDataURL("image/png");
     setNewSkill((prev) => ({ ...prev, icon: croppedDataUrl }));
     setShowCropModal(false);
     setImageToCrop(null);
@@ -202,11 +246,11 @@ export const SkillsEditor = () => {
     const newY = e.clientY - dragStart.y;
     const maxX = imageRef.current.width - crop.width;
     const maxY = imageRef.current.height - crop.height;
-    
+
     setCrop({
       ...crop,
       x: Math.max(0, Math.min(newX, maxX)),
-      y: Math.max(0, Math.min(newY, maxY))
+      y: Math.max(0, Math.min(newY, maxY)),
     });
   };
 
@@ -274,7 +318,7 @@ export const SkillsEditor = () => {
                 <X size={20} />
               </button>
             </div>
-            
+
             <div
               className="relative inline-block border border-border rounded-lg overflow-hidden"
               onMouseMove={handleMouseMove}
@@ -292,11 +336,11 @@ export const SkillsEditor = () => {
                     x: 0,
                     y: 0,
                     width: Math.min(200, img.width),
-                    height: Math.min(200, img.height)
+                    height: Math.min(200, img.height),
                   });
                 }}
               />
-              
+
               <div
                 className="absolute border-2 border-primary bg-primary/10 cursor-move"
                 style={{
@@ -318,29 +362,37 @@ export const SkillsEditor = () => {
             <div className="mt-4 space-y-3">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-muted-foreground">Width: {crop.width}px</label>
+                  <label className="text-xs text-muted-foreground">
+                    Width: {crop.width}px
+                  </label>
                   <input
                     type="range"
                     min="50"
                     max={imageRef.current?.width || 500}
                     value={crop.width}
-                    onChange={(e) => setCrop({ ...crop, width: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setCrop({ ...crop, width: parseInt(e.target.value) })
+                    }
                     className="w-full"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground">Height: {crop.height}px</label>
+                  <label className="text-xs text-muted-foreground">
+                    Height: {crop.height}px
+                  </label>
                   <input
                     type="range"
                     min="50"
                     max={imageRef.current?.height || 500}
                     value={crop.height}
-                    onChange={(e) => setCrop({ ...crop, height: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setCrop({ ...crop, height: parseInt(e.target.value) })
+                    }
                     className="w-full"
                   />
                 </div>
               </div>
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={handleCropComplete}
@@ -392,12 +444,17 @@ export const SkillsEditor = () => {
               )}
             </div>
 
-            <form onSubmit={editingSkill ? handleUpdate : handleAdd} className="space-y-4 text-sm">
+            <form
+              onSubmit={editingSkill ? handleUpdate : handleAdd}
+              className="space-y-4 text-sm"
+            >
               <input
                 placeholder="Skill Name"
                 required
                 value={newSkill.name}
-                onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, name: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               />
 
@@ -405,7 +462,9 @@ export const SkillsEditor = () => {
                 <input
                   placeholder="Icon URL or data URL"
                   value={newSkill.icon}
-                  onChange={(e) => setNewSkill({ ...newSkill, icon: e.target.value })}
+                  onChange={(e) =>
+                    setNewSkill({ ...newSkill, icon: e.target.value })
+                  }
                   className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
                 />
                 <div
@@ -414,8 +473,8 @@ export const SkillsEditor = () => {
                   onDrop={handleDrop}
                   className={`p-4 rounded-md border-2 border-dashed transition-all ${
                     dragActive
-                      ? 'border-primary bg-primary/10 scale-105'
-                      : 'border-border bg-background/50 hover:border-primary/50 cursor-pointer'
+                      ? "border-primary bg-primary/10 scale-105"
+                      : "border-border bg-background/50 hover:border-primary/50 cursor-pointer"
                   }`}
                 >
                   <label className="flex flex-col items-center justify-center text-xs text-muted-foreground gap-2 cursor-pointer">
@@ -426,7 +485,9 @@ export const SkillsEditor = () => {
                       onChange={(e) => handleIconFile(e.target.files?.[0])}
                       className="hidden"
                     />
-                    <span className="text-primary font-medium">click to browse</span>
+                    <span className="text-primary font-medium">
+                      click to browse
+                    </span>
                   </label>
                 </div>
                 {newSkill.icon && (
@@ -436,23 +497,30 @@ export const SkillsEditor = () => {
                         src={newSkill.icon}
                         alt="icon preview"
                         className="w-full h-full"
-                        style={{ 
+                        style={{
                           transform: `scale(${clampIconSize(newSkill.iconSize || 100) / 100})`,
-                          objectFit: 'contain'
+                          objectFit: "contain",
                         }}
                       />
                     </div>
                     <div className="flex-1">
                       <label className="text-xs flex items-center justify-between mb-1">
                         <span>Size</span>
-                        <span className="font-semibold text-primary">{clampIconSize(newSkill.iconSize || 100)}%</span>
+                        <span className="font-semibold text-primary">
+                          {clampIconSize(newSkill.iconSize || 100)}%
+                        </span>
                       </label>
                       <input
                         type="range"
                         min="50"
                         max="200"
                         value={clampIconSize(newSkill.iconSize || 100)}
-                        onChange={(e) => setNewSkill({ ...newSkill, iconSize: parseInt(e.target.value, 10) })}
+                        onChange={(e) =>
+                          setNewSkill({
+                            ...newSkill,
+                            iconSize: parseInt(e.target.value, 10),
+                          })
+                        }
                         className="w-full"
                       />
                     </div>
@@ -462,7 +530,9 @@ export const SkillsEditor = () => {
 
               <select
                 value={newSkill.category}
-                onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
+                onChange={(e) =>
+                  setNewSkill({ ...newSkill, category: e.target.value })
+                }
                 className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
               >
                 <option value="frontend">Frontend</option>
@@ -477,14 +547,21 @@ export const SkillsEditor = () => {
               <div>
                 <label className="text-xs flex items-center justify-between mb-2">
                   <span>Proficiency</span>
-                  <span className="font-semibold text-primary">{newSkill.level}%</span>
+                  <span className="font-semibold text-primary">
+                    {newSkill.level}%
+                  </span>
                 </label>
                 <input
                   type="range"
                   min="0"
                   max="100"
                   value={newSkill.level}
-                  onChange={(e) => setNewSkill({ ...newSkill, level: parseInt(e.target.value, 10) })}
+                  onChange={(e) =>
+                    setNewSkill({
+                      ...newSkill,
+                      level: parseInt(e.target.value, 10),
+                    })
+                  }
                   className="w-full"
                 />
               </div>
@@ -521,7 +598,9 @@ export const SkillsEditor = () => {
                   <motion.div
                     key={skill.id}
                     className={`bg-card border rounded-xl p-4 hover:border-primary/50 transition-all cursor-pointer ${
-                      editingSkill?.id === skill.id ? "border-primary bg-primary/5" : "border-border"
+                      editingSkill?.id === skill.id
+                        ? "border-primary bg-primary/5"
+                        : "border-border"
                     }`}
                     onClick={() => handleEdit(skill)}
                   >
@@ -533,18 +612,24 @@ export const SkillsEditor = () => {
                               src={skill.icon}
                               alt={skill.name}
                               className="w-full h-full"
-                              style={{ 
+                              style={{
                                 transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
-                                objectFit: 'contain'
+                                objectFit: "contain",
                               }}
                             />
                           ) : (
-                            <span className="text-sm font-semibold text-primary">{skill.name?.charAt(0) || '?'}</span>
+                            <span className="text-sm font-semibold text-primary">
+                              {skill.name?.charAt(0) || "?"}
+                            </span>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-sm truncate">{skill.name}</h4>
-                          <p className="text-xs text-primary font-medium capitalize">{skill.category}</p>
+                          <h4 className="font-bold text-sm truncate">
+                            {skill.name}
+                          </h4>
+                          <p className="text-xs text-primary font-medium capitalize">
+                            {skill.category}
+                          </p>
                         </div>
                       </div>
                       <div className="flex gap-2 ml-2">
@@ -571,8 +656,12 @@ export const SkillsEditor = () => {
 
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-muted-foreground">Proficiency</span>
-                        <span className="text-xs font-bold text-primary">{skill.level}%</span>
+                        <span className="text-xs text-muted-foreground">
+                          Proficiency
+                        </span>
+                        <span className="text-xs font-bold text-primary">
+                          {skill.level}%
+                        </span>
                       </div>
                       <div className="w-full bg-background rounded-full h-1.5">
                         <div
@@ -598,7 +687,9 @@ export const SkillsEditor = () => {
 
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-muted-foreground">
-                    {startIdx + 1} – {Math.min(startIdx + itemsPerPage, skills.length)} of {skills.length}
+                    {startIdx + 1} –{" "}
+                    {Math.min(startIdx + itemsPerPage, skills.length)} of{" "}
+                    {skills.length}
                   </span>
                 </div>
 

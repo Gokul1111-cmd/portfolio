@@ -1,0 +1,33 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow public read access to static-sync folder
+    match /static-sync/{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // Only server can write via Admin SDK
+    }
+    
+    // Allow public read for project images/videos
+    match /projects/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null; // Authenticated users can upload
+    }
+    
+    // Allow public read for testimonials
+    match /testimonials/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Allow public read for certificates
+    match /certificates/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Default: deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

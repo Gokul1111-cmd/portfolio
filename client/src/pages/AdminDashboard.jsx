@@ -1,7 +1,21 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, LogOut, Sparkles, Users, Code2, Zap, MessageSquare, Mail, Settings, ChevronRight, Milestone } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogOut,
+  Sparkles,
+  Users,
+  Code2,
+  Zap,
+  MessageSquare,
+  Mail,
+  Settings,
+  ChevronRight,
+  Milestone,
+  Award,
+  CloudUpload,
+} from "lucide-react";
 
 // Import section editor components
 import { HeroEditor } from "./sections/HeroEditor";
@@ -13,6 +27,8 @@ import { TestimonialsEditor } from "./sections/TestimonialsEditor";
 import { ContactEditor } from "./sections/ContactEditor";
 import { SiteSettingsEditor } from "./sections/SiteSettingsEditor";
 import { TimelineEditor } from "./sections/TimelineEditor";
+import { CertificatesEditor } from "./sections/CertificatesEditor";
+import { SyncSettings } from "./sections/SyncSettings";
 
 const navigationItems = [
   { id: "hero", label: "Hero", icon: Sparkles },
@@ -22,8 +38,10 @@ const navigationItems = [
   { id: "approach", label: "My Approach", icon: LayoutDashboard },
   { id: "career", label: "Career Timeline", icon: Milestone },
   { id: "testimonials", label: "Testimonials", icon: MessageSquare },
+  { id: "certificates", label: "Certificates", icon: Award },
   { id: "contact", label: "Contact", icon: Mail },
   { id: "site", label: "Site Settings", icon: Settings },
+  { id: "sync", label: "Sync", icon: CloudUpload },
 ];
 
 const sectionComponents = {
@@ -34,8 +52,10 @@ const sectionComponents = {
   approach: ApproachEditor,
   career: TimelineEditor,
   testimonials: TestimonialsEditor,
+  certificates: CertificatesEditor,
   contact: ContactEditor,
   site: SiteSettingsEditor,
+  sync: SyncSettings,
 };
 
 export const AdminDashboard = () => {
@@ -64,7 +84,7 @@ export const AdminDashboard = () => {
             <LayoutDashboard className="text-primary" />
             <span>Admin Dashboard</span>
           </div>
-          <button 
+          <button
             onClick={handleLogout}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-red-500 transition-colors"
           >
@@ -93,7 +113,9 @@ export const AdminDashboard = () => {
                 >
                   <Icon size={18} />
                   <span className="font-medium">{item.label}</span>
-                  {activeSection === item.id && <ChevronRight size={16} className="ml-auto" />}
+                  {activeSection === item.id && (
+                    <ChevronRight size={16} className="ml-auto" />
+                  )}
                 </motion.button>
               );
             })}

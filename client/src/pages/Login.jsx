@@ -22,8 +22,8 @@ export const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-background text-foreground relative overflow-hidden">
       {/* Background decoration matching your theme */}
       <div className="absolute inset-0 bg-primary/5 z-0" />
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="relative z-10 w-full max-w-md p-8 bg-card/50 backdrop-blur-xl border border-border rounded-2xl shadow-2xl"
@@ -34,7 +34,7 @@ export const Login = () => {
           </div>
         </div>
         <h1 className="text-2xl font-bold text-center mb-6">Admin Access</h1>
-        
+
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <input
@@ -46,8 +46,8 @@ export const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-colors shadow-lg shadow-primary/20"
           >
             Enter Dashboard

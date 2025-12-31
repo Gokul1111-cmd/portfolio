@@ -1,59 +1,104 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Sparkles, GraduationCap, Briefcase, Building2, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  CheckCircle2,
+  Sparkles,
+  GraduationCap,
+  Briefcase,
+  Building2,
+  ArrowRight,
+} from "lucide-react";
+import { fetchStaticOrLive } from "../lib/staticData";
 
 const defaultApproachContent = {
   title: "My Approach",
-  description: "I follow a structured methodology to ensure quality, scalability, and user satisfaction in every project.",
+  description:
+    "I follow a structured methodology to ensure quality, scalability, and user satisfaction in every project.",
   steps: [
-    { number: 1, title: "Understanding", description: "Deep dive into requirements and project goals" },
-    { number: 2, title: "Planning", description: "Strategic roadmap and architecture design" },
-    { number: 3, title: "Development", description: "Clean, scalable code implementation" },
-    { number: 4, title: "Testing", description: "Rigorous QA and performance optimization" },
-    { number: 5, title: "Deployment", description: "Smooth launch and continuous monitoring" }
+    {
+      number: 1,
+      title: "Understanding",
+      description: "Deep dive into requirements and project goals",
+    },
+    {
+      number: 2,
+      title: "Planning",
+      description: "Strategic roadmap and architecture design",
+    },
+    {
+      number: 3,
+      title: "Development",
+      description: "Clean, scalable code implementation",
+    },
+    {
+      number: 4,
+      title: "Testing",
+      description: "Rigorous QA and performance optimization",
+    },
+    {
+      number: 5,
+      title: "Deployment",
+      description: "Smooth launch and continuous monitoring",
+    },
   ],
   careerTitle: "Career Path",
-  careerIntro: "A quick look at how I grew from school to Infosys, building skills and impact along the way.",
+  careerIntro:
+    "A quick look at how I grew from school to Infosys, building skills and impact along the way.",
   careerTimeline: [
     {
       period: "School",
       range: "2019 - 2021",
       title: "Biology Major but Passion for Tech",
       subtitle: "Explored programming through self-learning",
-      highlights: ["Self-taught HTML, CSS basics", "Built simple websites", "Explored various programming languages"],
+      highlights: [
+        "Self-taught HTML, CSS basics",
+        "Built simple websites",
+        "Explored various programming languages",
+      ],
       tech: ["HTML"],
       result: "Laid the foundation for a tech career",
-      icon: "graduation"
+      icon: "graduation",
     },
     {
       period: "Diploma",
       range: "2021 - 2022",
       title: "ERP Tally",
       subtitle: "ERP systems and business applications",
-      highlights: ["Learned Tally ERP", "Understood business processes", "Developed small business apps"],
+      highlights: [
+        "Learned Tally ERP",
+        "Understood business processes",
+        "Developed small business apps",
+      ],
       tech: ["Tally ERP", "Basic SQL", "VBScript"],
       result: "Gained practical IT skills for business",
-      icon: "graduation"
+      icon: "graduation",
     },
     {
       period: "College",
       range: "2022 - 2026 (present)",
       title: "Computer Science Engineering",
       subtitle: "Projects, internships, and hackathons",
-      highlights: ["Built 7+ projects across web, AI", "Led team mini-projects, Full - stack projects", "Learned Spring Boot, React"],
+      highlights: [
+        "Built 7+ projects across web, AI",
+        "Led team mini-projects, Full - stack projects",
+        "Learned Spring Boot, React",
+      ],
       tech: ["React", "Java", "Spring Boot", "SQL"],
       result: "Preparing for professional software development",
-      icon: "college"
+      icon: "college",
     },
     {
       period: "Internship",
       range: "2023",
       title: "Python Bootcamp Intern",
       subtitle: "python development and best practices",
-      highlights: ["Developed projects using Python", "Learned coding standards"],
+      highlights: [
+        "Developed projects using Python",
+        "Learned coding standards",
+      ],
       tech: ["Python"],
       result: "Enhanced coding skills and discipline",
-      icon: "work"
+      icon: "work",
     },
     {
       period: "Internship",
@@ -63,54 +108,69 @@ const defaultApproachContent = {
       highlights: ["Gained hands-on experience with AWS"],
       tech: ["AWS", "Azure", "Python", "NoteBook"],
       result: "Gained Hands on experience on cloud infra",
-      icon: "work"
+      icon: "work",
     },
     {
       period: "Infosys",
       range: "2026",
       title: "Systems Engineer",
       subtitle: "Going to work on real-world enterprise solutions",
-      highlights: ["Joining Infosys as Systems Engineer", "Excited to apply skills in a corporate environment", "Looking forward to continuous learning and growth"],
+      highlights: [
+        "Joining Infosys as Systems Engineer",
+        "Excited to apply skills in a corporate environment",
+        "Looking forward to continuous learning and growth",
+      ],
       tech: ["To be determined"],
       result: "Starting professional software engineering career",
-      icon: "work"
-    }
-  ]
+      icon: "work",
+    },
+  ],
 };
 
 export const MyApproach = () => {
-  const [approachContent, setApproachContent] = useState(defaultApproachContent);
+  const [approachContent, setApproachContent] = useState(
+    defaultApproachContent,
+  );
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [viewMode, setViewMode] = useState('career');
+  const [error, setError] = useState("");
+  const [viewMode, setViewMode] = useState("career");
 
   useEffect(() => {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem('approach_view') : null;
-    if (saved === 'approach' || saved === 'career') setViewMode(saved);
+    const saved =
+      typeof window !== "undefined"
+        ? localStorage.getItem("approach_view")
+        : null;
+    if (saved === "approach" || saved === "career") setViewMode(saved);
 
     const fetchApproach = async () => {
       setIsLoading(true);
-      setError('');
+      setError("");
       try {
-        const res = await fetch('/api/content?key=approach');
-        if (!res.ok) throw new Error('Failed to fetch approach');
-        const data = await res.json();
-        if (data && data.data) {
-          setApproachContent({
-            title: data.data.title || defaultApproachContent.title,
-            description: data.data.description || defaultApproachContent.description,
-            steps: Array.isArray(data.data.steps) && data.data.steps.length ? data.data.steps : defaultApproachContent.steps,
-            careerTitle: data.data.careerTitle || defaultApproachContent.careerTitle,
-            careerIntro: data.data.careerIntro || defaultApproachContent.careerIntro,
-            careerTimeline: Array.isArray(data.data.careerTimeline) && data.data.careerTimeline.length ? data.data.careerTimeline : defaultApproachContent.careerTimeline
-          });
-        } else {
-          setApproachContent(defaultApproachContent);
-        }
+        const payload = await fetchStaticOrLive({
+          name: "content",
+          liveUrl: "/api/content?key=approach",
+          fallbackEmpty: defaultApproachContent,
+        });
+        const resolved = payload?.approach || payload?.data || payload;
+        const merged = resolved || {};
+        setApproachContent({
+          title: merged.title || defaultApproachContent.title,
+          description: merged.description || defaultApproachContent.description,
+          steps:
+            Array.isArray(merged.steps) && merged.steps.length
+              ? merged.steps
+              : defaultApproachContent.steps,
+          careerTitle: merged.careerTitle || defaultApproachContent.careerTitle,
+          careerIntro: merged.careerIntro || defaultApproachContent.careerIntro,
+          careerTimeline:
+            Array.isArray(merged.careerTimeline) && merged.careerTimeline.length
+              ? merged.careerTimeline
+              : defaultApproachContent.careerTimeline,
+        });
       } catch (err) {
-        console.error('Approach fetch failed', err);
+        console.error("Approach fetch failed", err);
         setApproachContent(defaultApproachContent);
-        setError('Unable to load approach content. Showing defaults.');
+        setError("Unable to load approach content. Showing defaults.");
       } finally {
         setIsLoading(false);
       }
@@ -121,34 +181,46 @@ export const MyApproach = () => {
 
   if (isLoading) {
     return (
-      <section id="approach" className="relative py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background">
-        <div className="container mx-auto max-w-6xl text-center text-muted-foreground">Loading...</div>
+      <section
+        id="approach"
+        className="relative py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background"
+      >
+        <div className="container mx-auto max-w-6xl text-center text-muted-foreground">
+          Loading...
+        </div>
       </section>
     );
   }
 
   const handleViewChange = (mode) => {
     setViewMode(mode);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('approach_view', mode);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("approach_view", mode);
     }
   };
 
-  const timeline = Array.isArray(approachContent.careerTimeline) && approachContent.careerTimeline.length
-    ? approachContent.careerTimeline
-    : defaultApproachContent.careerTimeline;
+  const timeline =
+    Array.isArray(approachContent.careerTimeline) &&
+    approachContent.careerTimeline.length
+      ? approachContent.careerTimeline
+      : defaultApproachContent.careerTimeline;
 
   const renderTimelineIcon = (icon) => {
-    if (icon === 'graduation') return <GraduationCap className="text-primary" size={20} />;
-    if (icon === 'college') return <Building2 className="text-primary" size={20} />;
+    if (icon === "graduation")
+      return <GraduationCap className="text-primary" size={20} />;
+    if (icon === "college")
+      return <Building2 className="text-primary" size={20} />;
     return <Briefcase className="text-primary" size={20} />;
   };
 
   return (
-    <section id="approach" className="relative py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background overflow-hidden">
+    <section
+      id="approach"
+      className="relative py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background overflow-hidden"
+    >
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
@@ -164,17 +236,21 @@ export const MyApproach = () => {
           {/* Toggle */}
           <div className="mt-6 inline-flex bg-card border border-border rounded-full p-1 shadow-sm">
             <button
-              onClick={() => handleViewChange('approach')}
+              onClick={() => handleViewChange("approach")}
               className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                viewMode === 'approach' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'
+                viewMode === "approach"
+                  ? "bg-primary text-primary-foreground shadow"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Development Approach
             </button>
             <button
-              onClick={() => handleViewChange('career')}
+              onClick={() => handleViewChange("career")}
               className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                viewMode === 'career' ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground hover:text-foreground'
+                viewMode === "career"
+                  ? "bg-primary text-primary-foreground shadow"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Career Path
@@ -182,7 +258,7 @@ export const MyApproach = () => {
           </div>
         </motion.div>
 
-        {viewMode === 'approach' ? (
+        {viewMode === "approach" ? (
           <div className="relative">
             <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary/20 via-primary/50 to-primary/20 transform -translate-x-1/2" />
 
@@ -194,7 +270,7 @@ export const MyApproach = () => {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`flex gap-6 md:gap-12 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+                    className={`flex gap-6 md:gap-12 ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}
                   >
                     <div className="flex-1">
                       <motion.div
@@ -204,12 +280,18 @@ export const MyApproach = () => {
                         <div className="flex items-start gap-4">
                           <div className="flex-shrink-0">
                             <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10 border border-primary/30">
-                              <span className="text-lg font-bold text-primary">{step.number}</span>
+                              <span className="text-lg font-bold text-primary">
+                                {step.number}
+                              </span>
                             </div>
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-xl font-bold text-foreground mb-2">{step.title}</h3>
-                            <p className="text-muted-foreground">{step.description}</p>
+                            <h3 className="text-xl font-bold text-foreground mb-2">
+                              {step.title}
+                            </h3>
+                            <p className="text-muted-foreground">
+                              {step.description}
+                            </p>
                           </div>
                         </div>
                       </motion.div>
@@ -238,7 +320,10 @@ export const MyApproach = () => {
         ) : (
           <div className="space-y-8">
             <div className="text-center max-w-3xl mx-auto text-muted-foreground">
-              <p>{approachContent.careerIntro || defaultApproachContent.careerIntro}</p>
+              <p>
+                {approachContent.careerIntro ||
+                  defaultApproachContent.careerIntro}
+              </p>
             </div>
             <div className="relative">
               <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-border" />
@@ -249,7 +334,7 @@ export const MyApproach = () => {
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.08 }}
-                    className={`flex flex-col md:flex-row md:items-stretch gap-4 md:gap-8 ${idx % 2 === 0 ? '' : 'md:flex-row-reverse'}`}
+                    className={`flex flex-col md:flex-row md:items-stretch gap-4 md:gap-8 ${idx % 2 === 0 ? "" : "md:flex-row-reverse"}`}
                   >
                     <div className="md:w-1/2 bg-card border border-border rounded-2xl p-6 shadow-sm">
                       <div className="flex items-center gap-3 mb-3">
@@ -257,12 +342,22 @@ export const MyApproach = () => {
                           {renderTimelineIcon(item.icon)}
                         </div>
                         <div>
-                          <p className="text-xs uppercase tracking-wide text-primary font-semibold">{item.period}</p>
-                          <p className="text-sm text-muted-foreground">{item.range}</p>
+                          <p className="text-xs uppercase tracking-wide text-primary font-semibold">
+                            {item.period}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {item.range}
+                          </p>
                         </div>
                       </div>
-                      <h3 className="text-xl font-bold text-foreground">{item.title}</h3>
-                      {item.subtitle && <p className="text-sm text-muted-foreground mt-1">{item.subtitle}</p>}
+                      <h3 className="text-xl font-bold text-foreground">
+                        {item.title}
+                      </h3>
+                      {item.subtitle && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {item.subtitle}
+                        </p>
+                      )}
                       <div className="mt-4 space-y-2 text-sm text-muted-foreground">
                         {(item.highlights || []).map((point, i) => (
                           <div key={i} className="flex items-start gap-2">
@@ -273,10 +368,19 @@ export const MyApproach = () => {
                       </div>
                       <div className="mt-4 flex flex-wrap gap-2">
                         {(item.tech || []).map((tag, i) => (
-                          <span key={i} className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">{tag}</span>
+                          <span
+                            key={i}
+                            className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20"
+                          >
+                            {tag}
+                          </span>
                         ))}
                       </div>
-                      {item.result && <p className="mt-4 text-sm font-semibold text-foreground">Result: {item.result}</p>}
+                      {item.result && (
+                        <p className="mt-4 text-sm font-semibold text-foreground">
+                          Result: {item.result}
+                        </p>
+                      )}
                     </div>
                     <div className="hidden md:flex md:w-1/2 items-center justify-center">
                       <div className="relative h-full flex items-center justify-center">
@@ -291,13 +395,16 @@ export const MyApproach = () => {
         )}
 
         {/* CTA Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           className="mt-20 text-center"
         >
-          <a href="#contact" className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 font-semibold hover:scale-105">
-            Let's Work Together
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 font-semibold hover:scale-105"
+          >
+            Let&apos;s Work Together
             <span>→</span>
           </a>
         </motion.div>

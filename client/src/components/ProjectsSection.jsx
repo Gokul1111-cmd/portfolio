@@ -1,17 +1,38 @@
-import { ArrowRight, Github, ChevronUp, Star, Code, Sparkles, Zap, Play, Eye, X } from "lucide-react";
+import {
+  ArrowRight,
+  Github,
+  ChevronUp,
+  Star,
+  Code,
+  Sparkles,
+  Zap,
+  Play,
+  Eye,
+  X,
+} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import PropTypes from "prop-types";
+import { fetchStaticOrLive } from "../lib/staticData";
 
 const categoryColors = {
-  "E-commerce": "from-purple-500/20 to-indigo-600/20 text-purple-600 border-purple-500/30",
-  "Web Application": "from-blue-500/20 to-cyan-600/20 text-blue-600 border-blue-500/30",
-  "Restaurant Management": "from-amber-500/20 to-orange-600/20 text-amber-600 border-amber-500/30",
-  "Food Tech": "from-rose-500/20 to-pink-600/20 text-rose-600 border-rose-500/30",
-  "Food & Recipe": "from-violet-500/20 to-purple-600/20 text-violet-600 border-violet-500/30",
-  "IoT Application": "from-orange-500/20 to-red-600/20 text-orange-600 border-orange-500/30",
-  "Web Design": "from-emerald-500/20 to-teal-600/20 text-emerald-600 border-emerald-500/30",
-  "Project Management": "from-green-500/20 to-emerald-600/20 text-green-600 border-green-500/30",
-  "AI/ML": "from-pink-500/20 to-rose-600/20 text-pink-600 border-pink-500/30"
+  "E-commerce":
+    "from-purple-500/20 to-indigo-600/20 text-purple-600 border-purple-500/30",
+  "Web Application":
+    "from-blue-500/20 to-cyan-600/20 text-blue-600 border-blue-500/30",
+  "Restaurant Management":
+    "from-amber-500/20 to-orange-600/20 text-amber-600 border-amber-500/30",
+  "Food Tech":
+    "from-rose-500/20 to-pink-600/20 text-rose-600 border-rose-500/30",
+  "Food & Recipe":
+    "from-violet-500/20 to-purple-600/20 text-violet-600 border-violet-500/30",
+  "IoT Application":
+    "from-orange-500/20 to-red-600/20 text-orange-600 border-orange-500/30",
+  "Web Design":
+    "from-emerald-500/20 to-teal-600/20 text-emerald-600 border-emerald-500/30",
+  "Project Management":
+    "from-green-500/20 to-emerald-600/20 text-green-600 border-green-500/30",
+  "AI/ML": "from-pink-500/20 to-rose-600/20 text-pink-600 border-pink-500/30",
 };
 
 export const ProjectsSection = () => {
@@ -31,33 +52,37 @@ export const ProjectsSection = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch("/api/projects");
-        if (res.ok) {
-          const data = await res.json();
-          // Ensure tags is an array if your DB stores it as JSON/Text, 
-          // otherwise default to empty array if undefined
-          const toArray = (value, fallback) => {
-            if (Array.isArray(value)) return value;
-            if (typeof value === "string") {
-              return value
-                .split(",")
-                .map((item) => item.trim())
-                .filter(Boolean);
-            }
-            return fallback;
-          };
+        const payload = await fetchStaticOrLive({
+          name: "projects",
+          liveUrl: "/api/projects",
+          fallbackEmpty: [],
+        });
+        const data = Array.isArray(payload?.items)
+          ? payload.items
+          : Array.isArray(payload)
+            ? payload
+            : [];
+        const toArray = (value, fallback) => {
+          if (Array.isArray(value)) return value;
+          if (typeof value === "string") {
+            return value
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean);
+          }
+          return fallback;
+        };
 
-          const formattedData = data.map(p => ({
-            ...p,
-            tags: toArray(p.tags, ["React", "Full Stack"]),
-            highlights: toArray(p.highlights, ["Responsive Design", "Modern UI"]),
-            status: p.status || "Live",
-            accentColor: p.accentColor || "from-blue-500 to-cyan-600",
-            featured: Boolean(p.featured),
-            video: p.video || "",
-          }));
-          setProjects(formattedData);
-        }
+        const formattedData = data.map((p) => ({
+          ...p,
+          tags: toArray(p.tags, ["React", "Full Stack"]),
+          highlights: toArray(p.highlights, ["Responsive Design", "Modern UI"]),
+          status: p.status || "Live",
+          accentColor: p.accentColor || "from-blue-500 to-cyan-600",
+          featured: Boolean(p.featured),
+          video: p.video || "",
+        }));
+        setProjects(formattedData);
       } catch (error) {
         console.error("Failed to fetch projects:", error);
       } finally {
@@ -66,16 +91,22 @@ export const ProjectsSection = () => {
     };
     fetchProjects();
   }, []);
-  
+
   // Filtering Logic
-  const filteredProjects = activeFilter === "All" 
-    ? projects 
-    : projects.filter(project => project.category === activeFilter);
-  
-  const displayedProjects = showAll ? filteredProjects : filteredProjects.slice(0, 3);
+  const filteredProjects =
+    activeFilter === "All"
+      ? projects
+      : projects.filter((project) => project.category === activeFilter);
+
+  const displayedProjects = showAll
+    ? filteredProjects
+    : filteredProjects.slice(0, 3);
 
   // Get unique categories from fetched data
-  const categories = ["All", ...new Set(projects.map(project => project.category))];
+  const categories = [
+    "All",
+    ...new Set(projects.map((project) => project.category)),
+  ];
 
   const handleFilterChange = (category) => {
     setActiveFilter(category);
@@ -96,18 +127,23 @@ export const ProjectsSection = () => {
 
   const ProjectHighlights = ({ highlights }) => (
     <div className="space-y-2">
-      {highlights && highlights.map((highlight, index) => (
-        <div key={index} className="flex items-center gap-2 text-sm">
-          <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-          <span className="text-muted-foreground">{highlight}</span>
-        </div>
-      ))}
+      {highlights &&
+        highlights.map((highlight, index) => (
+          <div key={index} className="flex items-center gap-2 text-sm">
+            <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+            <span className="text-muted-foreground">{highlight}</span>
+          </div>
+        ))}
     </div>
   );
 
+  ProjectHighlights.propTypes = {
+    highlights: PropTypes.arrayOf(PropTypes.string),
+  };
+
   return (
-    <section 
-      id="projects" 
+    <section
+      id="projects"
       className="relative min-h-screen py-20 md:py-32 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5"
       ref={sectionRef}
     >
@@ -118,14 +154,14 @@ export const ProjectsSection = () => {
 
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative">
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <motion.div 
+          <motion.div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6"
             initial={{ scale: 0.8, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
@@ -136,7 +172,7 @@ export const ProjectsSection = () => {
             My Projects
           </motion.div>
 
-          <motion.h2 
+          <motion.h2
             className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -147,14 +183,15 @@ export const ProjectsSection = () => {
             <span className="block text-primary">Portfolio</span>
           </motion.h2>
 
-          <motion.p 
+          <motion.p
             className="text-lg text-muted-foreground max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            A collection of projects I've built to showcase my skills in full-stack development and modern web technologies.
+            A collection of projects I&apos;ve built to showcase my skills in
+            full-stack development and modern web technologies.
           </motion.p>
         </motion.div>
 
@@ -166,7 +203,7 @@ export const ProjectsSection = () => {
         ) : (
           <>
             {/* Filter Buttons */}
-            <motion.div 
+            <motion.div
               className="flex justify-center mb-12"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -202,51 +239,59 @@ export const ProjectsSection = () => {
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ 
-                      duration: 0.6, 
+                    transition={{
+                      duration: 0.6,
                       delay: index * 0.1,
                       type: "spring",
-                      stiffness: 100
+                      stiffness: 100,
                     }}
                     className="group"
                     onMouseEnter={() => setHoveredProject(project.id)}
                     onMouseLeave={() => setHoveredProject(null)}
                   >
                     <div className="relative bg-background border border-border rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 h-full flex flex-col">
-                      
                       {/* Image/Video Section */}
                       <div className="relative h-48 overflow-hidden bg-muted">
                         <motion.img
-                          src={project.image || "/placeholder.png"} 
+                          src={project.image || "/placeholder.png"}
                           alt={project.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           loading="lazy"
-                          onError={(e) => { e.target.src = "https://placehold.co/600x400/1e293b/FFF?text=Project+Image"; }}
+                          onError={(e) => {
+                            e.target.src =
+                              "https://placehold.co/600x400/1e293b/FFF?text=Project+Image";
+                          }}
                         />
-                        
+
                         {/* Status Badge */}
                         <div className="absolute top-3 right-3">
-                          <div className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
-                            project.status === "Live" 
-                              ? "bg-emerald-500/20 text-emerald-600 border border-emerald-500/30"
-                              : "bg-amber-500/20 text-amber-600 border border-amber-500/30"
-                          }`}>
+                          <div
+                            className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
+                              project.status === "Live"
+                                ? "bg-emerald-500/20 text-emerald-600 border border-emerald-500/30"
+                                : "bg-amber-500/20 text-amber-600 border border-amber-500/30"
+                            }`}
+                          >
                             {project.status || "In Development"}
                           </div>
                         </div>
 
                         {/* Category Badge */}
                         <div className="absolute top-3 left-3">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${categoryColors[project.category] || "border-gray-500 text-gray-500"}`}>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${categoryColors[project.category] || "border-gray-500 text-gray-500"}`}
+                          >
                             {project.category}
                           </span>
                         </div>
 
                         {/* Hover Actions */}
-                        <motion.div 
+                        <motion.div
                           className="absolute inset-0 bg-black/50 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                           initial={{ opacity: 0 }}
-                          animate={{ opacity: hoveredProject === project.id ? 1 : 0 }}
+                          animate={{
+                            opacity: hoveredProject === project.id ? 1 : 0,
+                          }}
                         >
                           {/* Video Play Button - Only if video exists */}
                           {project.video && (
@@ -259,7 +304,7 @@ export const ProjectsSection = () => {
                               <Play size={20} />
                             </motion.button>
                           )}
-                          
+
                           {/* Code Button */}
                           <motion.a
                             href={project.githubUrl}
@@ -268,11 +313,15 @@ export const ProjectsSection = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             className={`p-3 rounded-full backdrop-blur-sm border transition-all duration-300 ${
-                              (!project.githubUrl || project.githubUrl === "#")
+                              !project.githubUrl || project.githubUrl === "#"
                                 ? "bg-gray-500/50 text-gray-300 border-gray-500/30 cursor-not-allowed"
                                 : "bg-white/20 text-white border-white/30 hover:bg-white/30"
                             }`}
-                            onClick={(e) => (!project.githubUrl || project.githubUrl === "#") && e.preventDefault()}
+                            onClick={(e) =>
+                              (!project.githubUrl ||
+                                project.githubUrl === "#") &&
+                              e.preventDefault()
+                            }
                           >
                             <Code size={20} />
                           </motion.a>
@@ -286,13 +335,13 @@ export const ProjectsSection = () => {
                             {project.title}
                           </h3>
                           {project.featured && (
-                            <motion.div 
+                            <motion.div
                               className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/20 text-amber-600 text-xs font-medium border border-amber-500/30"
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               transition={{ delay: index * 0.1 + 0.3 }}
                             >
-                              <Star size={12} className="fill-amber-500" /> 
+                              <Star size={12} className="fill-amber-500" />
                               Featured
                             </motion.div>
                           )}
@@ -309,17 +358,20 @@ export const ProjectsSection = () => {
 
                         {/* Tech Stack */}
                         <div className="flex flex-wrap gap-2 mb-4">
-                          {project.tags && project.tags.map((tag, tagIndex) => (
-                            <motion.span
-                              key={tagIndex}
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: index * 0.1 + tagIndex * 0.05 + 0.4 }}
-                              className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium border border-primary/20"
-                            >
-                              {tag}
-                            </motion.span>
-                          ))}
+                          {project.tags &&
+                            project.tags.map((tag, tagIndex) => (
+                              <motion.span
+                                key={tagIndex}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{
+                                  delay: index * 0.1 + tagIndex * 0.05 + 0.4,
+                                }}
+                                className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium border border-primary/20"
+                              >
+                                {tag}
+                              </motion.span>
+                            ))}
                         </div>
 
                         {/* Action Buttons */}
@@ -331,16 +383,21 @@ export const ProjectsSection = () => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
-                              (!project.demoUrl || project.demoUrl === "#")
+                              !project.demoUrl || project.demoUrl === "#"
                                 ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
                                 : "bg-primary text-primary-foreground hover:bg-primary/90"
                             }`}
-                            onClick={(e) => (!project.demoUrl || project.demoUrl === "#") && e.preventDefault()}
+                            onClick={(e) =>
+                              (!project.demoUrl || project.demoUrl === "#") &&
+                              e.preventDefault()
+                            }
                           >
                             <Eye size={16} />
-                            {(!project.demoUrl || project.demoUrl === "#") ? "Coming Soon" : "Live Demo"}
+                            {!project.demoUrl || project.demoUrl === "#"
+                              ? "Coming Soon"
+                              : "Live Demo"}
                           </motion.a>
-                          
+
                           <motion.a
                             href={project.githubUrl}
                             target="_blank"
@@ -348,11 +405,15 @@ export const ProjectsSection = () => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             className={`inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium border transition-all duration-300 ${
-                              (!project.githubUrl || project.githubUrl === "#")
+                              !project.githubUrl || project.githubUrl === "#"
                                 ? "bg-muted text-muted-foreground cursor-not-allowed border-border"
                                 : "bg-background text-foreground border-border hover:border-primary hover:bg-primary/5"
                             }`}
-                            onClick={(e) => (!project.githubUrl || project.githubUrl === "#") && e.preventDefault()}
+                            onClick={(e) =>
+                              (!project.githubUrl ||
+                                project.githubUrl === "#") &&
+                              e.preventDefault()
+                            }
                           >
                             <Github size={16} />
                             Code
@@ -361,7 +422,9 @@ export const ProjectsSection = () => {
                       </div>
 
                       {/* Accent Border */}
-                      <div className={`h-1 bg-gradient-to-r ${project.accentColor || "from-primary to-primary/50"}`} />
+                      <div
+                        className={`h-1 bg-gradient-to-r ${project.accentColor || "from-primary to-primary/50"}`}
+                      />
                     </div>
                   </motion.div>
                 ))}
@@ -370,7 +433,7 @@ export const ProjectsSection = () => {
 
             {/* Load More */}
             {filteredProjects.length > 3 && (
-              <motion.div 
+              <motion.div
                 className="text-center mt-16"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -405,7 +468,7 @@ export const ProjectsSection = () => {
         )}
 
         {/* Simple CTA */}
-        <motion.div 
+        <motion.div
           className="text-center mt-20"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -423,11 +486,14 @@ export const ProjectsSection = () => {
               Get In Touch
             </motion.div>
 
-            <h3 className="text-2xl md:text-3xl font-bold mb-4">Interested in collaborating?</h3>
+            <h3 className="text-2xl md:text-3xl font-bold mb-4">
+              Interested in collaborating?
+            </h3>
             <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Check out my GitHub for more projects or connect with me on LinkedIn.
+              Check out my GitHub for more projects or connect with me on
+              LinkedIn.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <motion.a
                 href="https://www.linkedin.com/in/gokulanbalagan1112/"
@@ -440,7 +506,7 @@ export const ProjectsSection = () => {
                 Connect on LinkedIn
                 <ArrowRight size={18} />
               </motion.a>
-              
+
               <motion.a
                 href="https://github.com/Gokul1111-cmd"
                 target="_blank"
@@ -523,11 +589,15 @@ export const ProjectsSection = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                        (!selectedVideo.demoUrl || selectedVideo.demoUrl === "#")
+                        !selectedVideo.demoUrl || selectedVideo.demoUrl === "#"
                           ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
                           : "bg-primary text-primary-foreground hover:bg-primary/90"
                       }`}
-                      onClick={(e) => (!selectedVideo.demoUrl || selectedVideo.demoUrl === "#") && e.preventDefault()}
+                      onClick={(e) =>
+                        (!selectedVideo.demoUrl ||
+                          selectedVideo.demoUrl === "#") &&
+                        e.preventDefault()
+                      }
                     >
                       Visit Live Site
                     </motion.a>
@@ -538,11 +608,16 @@ export const ProjectsSection = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className={`px-6 py-2 rounded-lg text-sm font-medium border transition-all duration-300 ${
-                        (!selectedVideo.githubUrl || selectedVideo.githubUrl === "#")
+                        !selectedVideo.githubUrl ||
+                        selectedVideo.githubUrl === "#"
                           ? "bg-muted text-muted-foreground cursor-not-allowed border-border"
                           : "bg-background text-foreground border-border hover:border-primary hover:bg-primary/5"
                       }`}
-                      onClick={(e) => (!selectedVideo.githubUrl || selectedVideo.githubUrl === "#") && e.preventDefault()}
+                      onClick={(e) =>
+                        (!selectedVideo.githubUrl ||
+                          selectedVideo.githubUrl === "#") &&
+                        e.preventDefault()
+                      }
                     >
                       View Code
                     </motion.a>

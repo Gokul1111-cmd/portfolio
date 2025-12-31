@@ -7,108 +7,111 @@ import {
   Send,
   Twitter,
   Github,
-  Loader2
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
+import { fetchStaticOrLive } from "../lib/staticData";
 
 export const ContactSection = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactData, setContactData] = useState({
-    email: 'gokulanbalagan1112@gmail.com',
-    phone: '+91 8754740118',
-    location: 'Coimbatore, Tamil Nadu, India',
-    linkedin: 'https://www.linkedin.com/in/gokulanbalagan1112/',
-    twitter: '#',
-    github: 'https://github.com/Gokul1111-cmd',
-    instagram: '#',
+    email: "gokulanbalagan1112@gmail.com",
+    phone: "+91 8754740118",
+    location: "Coimbatore, Tamil Nadu, India",
+    linkedin: "https://www.linkedin.com/in/gokulanbalagan1112/",
+    twitter: "#",
+    github: "https://github.com/Gokul1111-cmd",
+    instagram: "#",
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
+    name: "",
+    email: "",
+    message: "",
   });
 
   useEffect(() => {
     const fetchContact = async () => {
       setIsLoading(true);
-      setError('');
+      setError("");
       try {
-        const res = await fetch('/api/content?key=contact');
-        if (!res.ok) throw new Error('Failed to fetch contact details');
-        const data = await res.json();
-        if (data && data.data) {
-          setContactData((prev) => ({ ...prev, ...data.data }));
-        }
+        const payload = await fetchStaticOrLive({
+          name: "content",
+          liveUrl: "/api/content?key=contact",
+          fallbackEmpty: contactData,
+        });
+        const resolved = payload?.contact || payload?.data || payload;
+        if (resolved) setContactData((prev) => ({ ...prev, ...resolved }));
       } catch (err) {
-        console.error('Contact fetch failed', err);
-        setError('Unable to load contact details. Showing defaults.');
+        console.error("Contact fetch failed", err);
+        setError("Unable to load contact details. Showing defaults.");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchContact();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   const validateForm = () => {
     if (!formData.name.trim()) {
       toast({
         title: "Name is required",
-        variant: "destructive"
+        variant: "destructive",
       });
       return false;
     }
-    
+
     if (!formData.email.trim()) {
       toast({
         title: "Email is required",
-        variant: "destructive"
+        variant: "destructive",
       });
       return false;
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       toast({
         title: "Invalid email format",
-        variant: "destructive"
+        variant: "destructive",
       });
       return false;
     }
-    
+
     if (!formData.message.trim() || formData.message.length < 10) {
       toast({
         title: "Message must be at least 10 characters",
-        variant: "destructive"
+        variant: "destructive",
       });
       return false;
     }
-    
+
     return true;
   };
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
-      const response = await fetch('https://formspree.io/f/xqezwjjr', {
-        method: 'POST',
+      const response = await fetch("https://formspree.io/f/xqezwjjr", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -116,19 +119,21 @@ export const ContactSection = () => {
       if (response.ok) {
         toast({
           title: "Message sent! 🎉",
-          description: "I'll get back to you within 24 hours.",
+          description: "I&apos;ll get back to you within 24 hours.",
           variant: "success",
-          className: "bg-green-600 text-white dark:bg-green-500 border border-green-700 shadow-lg"
+          className:
+            "bg-green-600 text-white dark:bg-green-500 border border-green-700 shadow-lg",
         });
-        setFormData({ name: '', email: '', message: '' });
+        setFormData({ name: "", email: "", message: "" });
       } else {
-        throw new Error('Failed to send message');
+        throw new Error("Failed to send message");
       }
     } catch (error) {
       toast({
         title: "Oops! Something went wrong",
-        description: "Please try again or email me directly at gokulanbalagan1112@gmail.com",
-        variant: "destructive"
+        description:
+          "Please try again or email me directly at gokulanbalagan1112@gmail.com",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -136,20 +141,30 @@ export const ContactSection = () => {
   };
 
   return (
-    <section id="contact" className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative bg-background">
+    <section
+      id="contact"
+      className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 relative bg-background"
+    >
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-12 sm:mb-16">
           <span className="inline-block px-3 py-1 text-xs sm:text-sm font-medium rounded-full bg-primary/10 text-primary mb-3 sm:mb-4">
-            Let's Connect
+            Let&apos;s Connect
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
             Get In Touch
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Have a project in mind or just want to say hi? My inbox is always open.
+            Have a project in mind or just want to say hi? My inbox is always
+            open.
           </p>
-          {isLoading && <p className="text-sm text-muted-foreground mt-3">Loading contact details...</p>}
-          {error && !isLoading && <p className="text-sm text-destructive mt-3">{error}</p>}
+          {isLoading && (
+            <p className="text-sm text-muted-foreground mt-3">
+              Loading contact details...
+            </p>
+          )}
+          {error && !isLoading && (
+            <p className="text-sm text-destructive mt-3">{error}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12">
@@ -166,7 +181,9 @@ export const ContactSection = () => {
                   <Mail className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Email</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Email
+                  </p>
                   <a
                     href={`mailto:${contactData.email}`}
                     className="text-sm sm:text-base font-medium hover:text-primary transition-colors"
@@ -175,13 +192,15 @@ export const ContactSection = () => {
                   </a>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-accent/30 rounded-lg sm:rounded-xl transition-all duration-300">
                 <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10 text-primary">
                   <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Phone</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Phone
+                  </p>
                   <a
                     href={`tel:${contactData.phone}`}
                     className="text-sm sm:text-base font-medium hover:text-primary transition-colors"
@@ -190,13 +209,15 @@ export const ContactSection = () => {
                   </a>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-accent/30 rounded-lg sm:rounded-xl transition-all duration-300">
                 <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10 text-primary">
                   <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Location</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Location
+                  </p>
                   <span className="text-sm sm:text-base font-medium">
                     {contactData.location}
                   </span>
@@ -205,7 +226,9 @@ export const ContactSection = () => {
             </div>
 
             <div className="pt-6 sm:pt-8">
-              <h4 className="font-medium mb-3 sm:mb-4 text-xs sm:text-sm text-muted-foreground">Find me on</h4>
+              <h4 className="font-medium mb-3 sm:mb-4 text-xs sm:text-sm text-muted-foreground">
+                Find me on
+              </h4>
               <div className="flex gap-2 sm:gap-3">
                 {[
                   {
@@ -314,7 +337,7 @@ export const ContactSection = () => {
                 disabled={isSubmitting}
                 className={cn(
                   "w-full flex items-center justify-center gap-2 py-2 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium hover:opacity-90 transition-all duration-300 shadow-lg shadow-primary/20 text-sm sm:text-base",
-                  isSubmitting && "opacity-80 cursor-not-allowed"
+                  isSubmitting && "opacity-80 cursor-not-allowed",
                 )}
               >
                 {isSubmitting ? (
