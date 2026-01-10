@@ -92,7 +92,7 @@ export const Navbar = () => {
       try {
         const payload = await fetchStaticOrLive({
           name: "content",
-          liveUrl: "/api/content?key=site",
+          liveUrl: "/api/portfolio-data?type=content&key=site",
           fallbackEmpty: {},
         });
         const site = payload?.site || payload?.data || payload || {};

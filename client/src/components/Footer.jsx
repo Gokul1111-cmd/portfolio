@@ -52,7 +52,7 @@ export const Footer = () => {
       try {
         const payload = await fetchStaticOrLive({
           name: "content",
-          liveUrl: "/api/content?key=site",
+          liveUrl: "/api/portfolio-data?type=content&key=site",
           fallbackEmpty: siteData,
         });
         const resolved = payload?.site || payload?.data || payload;

@@ -15,7 +15,7 @@ export const TimelineEditor = () => {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/content?key=approach");
+      const res = await fetch("/api/portfolio-data?type=content&key=approach");
       if (res.ok) {
         const json = await res.json();
         setData(json?.data ? json.data : {});
@@ -34,7 +34,7 @@ export const TimelineEditor = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/content?key=approach", {
+      const res = await fetch("/api/portfolio-data?type=content&key=approach", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data }),

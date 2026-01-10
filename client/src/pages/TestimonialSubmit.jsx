@@ -157,10 +157,9 @@ export const TestimonialSubmit = () => {
   });
 
   const dropZoneClass = (active) =>
-    `grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 items-stretch p-3 rounded-lg border-2 border-dashed transition-all ${
-      active
-        ? "border-primary bg-primary/10 scale-[1.01]"
-        : "border-border bg-background/50 hover:border-primary/50"
+    `grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 items-stretch p-3 rounded-lg border-2 border-dashed transition-all ${active
+      ? "border-primary bg-primary/10 scale-[1.01]"
+      : "border-border bg-background/50 hover:border-primary/50"
     }`;
 
   const handleSubmit = async (e) => {
@@ -200,7 +199,7 @@ export const TestimonialSubmit = () => {
         link: formData.link.trim(),
       };
 
-      const res = await fetch("/api/testimonials", {
+      const res = await fetch("/api/portfolio-data?type=testimonials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -458,13 +457,12 @@ export const TestimonialSubmit = () => {
 
               {status && (
                 <div
-                  className={`p-3 rounded-lg border text-sm ${
-                    status.type === "error"
+                  className={`p-3 rounded-lg border text-sm ${status.type === "error"
                       ? "border-destructive/40 bg-destructive/10 text-destructive"
                       : status.type === "success"
                         ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-500"
                         : "border-primary/30 bg-primary/5 text-primary"
-                  }`}
+                    }`}
                 >
                   {status.msg}
                 </div>

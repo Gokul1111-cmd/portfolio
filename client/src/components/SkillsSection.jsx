@@ -135,13 +135,12 @@ const SkillBar = ({ level }) => (
       initial={{ width: 0 }}
       animate={{ width: `${level}%` }}
       transition={{ duration: 1.5, delay: 0.2 }}
-      className={`h-full rounded-full ${
-        level > 75
+      className={`h-full rounded-full ${level > 75
           ? "bg-gradient-to-r from-green-400 to-emerald-500"
           : level > 50
             ? "bg-gradient-to-r from-yellow-400 to-amber-500"
             : "bg-gradient-to-r from-red-400 to-pink-500"
-      }`}
+        }`}
     />
   </div>
 );
@@ -282,7 +281,7 @@ export const SkillsSection = () => {
       try {
         const payload = await fetchStaticOrLive({
           name: "skills",
-          liveUrl: `/api/skills?t=${Date.now()}`,
+          liveUrl: `/api/portfolio-data?type=skills&t=${Date.now()}`,
           fallbackEmpty: defaultSkills,
         });
         const data = Array.isArray(payload?.items)
@@ -368,11 +367,10 @@ export const SkillsSection = () => {
             <motion.button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
-              className={`px-6 py-2.5 rounded-full font-medium border border-transparent hover:shadow-lg ${
-                activeCategory === category.id
+              className={`px-6 py-2.5 rounded-full font-medium border border-transparent hover:shadow-lg ${activeCategory === category.id
                   ? `${category.color} text-white shadow-md`
                   : "bg-secondary/50 text-foreground hover:bg-secondary/70"
-              }`}
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -435,13 +433,12 @@ export const SkillsSection = () => {
                           {skill.name}
                         </h3>
                         <span
-                          className={`text-sm font-medium px-2 py-1 rounded-full ${
-                            skill.level > 75
+                          className={`text-sm font-medium px-2 py-1 rounded-full ${skill.level > 75
                               ? "bg-emerald-500/10 text-emerald-500"
                               : skill.level > 50
                                 ? "bg-amber-500/10 text-amber-500"
                                 : "bg-pink-500/10 text-pink-500"
-                          }`}
+                            }`}
                         >
                           {skill.level}%
                         </span>

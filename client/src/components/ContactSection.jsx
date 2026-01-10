@@ -41,7 +41,7 @@ export const ContactSection = () => {
       try {
         const payload = await fetchStaticOrLive({
           name: "content",
-          liveUrl: "/api/content?key=contact",
+          liveUrl: "/api/portfolio-data?type=content&key=contact",
           fallbackEmpty: contactData,
         });
         const resolved = payload?.contact || payload?.data || payload;

@@ -61,7 +61,7 @@ export const SkillsEditor = () => {
 
   const fetchSkills = async () => {
     try {
-      const res = await fetch("/api/skills");
+      const res = await fetch("/api/portfolio-data?type=skills");
       if (res.ok) {
         const data = await res.json();
         setSkills(Array.isArray(data) ? dedupeSkills(data) : []);
@@ -91,7 +91,7 @@ export const SkillsEditor = () => {
       iconSize: clampIconSize(newSkill.iconSize || 100),
     };
     try {
-      const res = await fetch("/api/skills", {
+      const res = await fetch("/api/portfolio-data?type=skills", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -117,7 +117,7 @@ export const SkillsEditor = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete?")) return;
     try {
-      const res = await fetch(`/api/skills?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/portfolio-data?type=skills&id=${id}`, { method: "DELETE" });
       if (res.ok) {
         setSkills(skills.filter((s) => s.id !== id));
         alert("Deleted!");
@@ -162,7 +162,7 @@ export const SkillsEditor = () => {
       iconSize: clampIconSize(newSkill.iconSize || 100),
     };
     try {
-      const res = await fetch(`/api/skills?id=${editingSkill.id}`, {
+      const res = await fetch(`/api/portfolio-data?type=skills&id=${editingSkill.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -471,11 +471,10 @@ export const SkillsEditor = () => {
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                  className={`p-4 rounded-md border-2 border-dashed transition-all ${
-                    dragActive
+                  className={`p-4 rounded-md border-2 border-dashed transition-all ${dragActive
                       ? "border-primary bg-primary/10 scale-105"
                       : "border-border bg-background/50 hover:border-primary/50 cursor-pointer"
-                  }`}
+                    }`}
                 >
                   <label className="flex flex-col items-center justify-center text-xs text-muted-foreground gap-2 cursor-pointer">
                     <span>📁 Drag & drop image here or</span>
@@ -597,11 +596,10 @@ export const SkillsEditor = () => {
                 {displayedSkills.map((skill) => (
                   <motion.div
                     key={skill.id}
-                    className={`bg-card border rounded-xl p-4 hover:border-primary/50 transition-all cursor-pointer ${
-                      editingSkill?.id === skill.id
+                    className={`bg-card border rounded-xl p-4 hover:border-primary/50 transition-all cursor-pointer ${editingSkill?.id === skill.id
                         ? "border-primary bg-primary/5"
                         : "border-border"
-                    }`}
+                      }`}
                     onClick={() => handleEdit(skill)}
                   >
                     <div className="flex justify-between items-start mb-3">

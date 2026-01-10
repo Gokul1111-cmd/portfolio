@@ -4,14 +4,14 @@ let fetchPromise = null; // Track in-flight fetch to prevent duplicates
 export const getSettings = async () => {
   // Return cached settings immediately if available
   if (cachedSettings) return cachedSettings;
-  
+
   // If there's already a fetch in progress, wait for it
   if (fetchPromise) return fetchPromise;
-  
+
   // Start a new fetch and cache the promise
   fetchPromise = (async () => {
     try {
-      const res = await fetch("/api/settings");
+      const res = await fetch("/api/admin?action=settings");
       if (!res.ok) throw new Error(`settings fetch ${res.status}`);
       cachedSettings = await res.json();
       return cachedSettings;
@@ -25,13 +25,13 @@ export const getSettings = async () => {
       fetchPromise = null;
     }
   })();
-  
+
   return fetchPromise;
 };
 
 export const setSettings = async (payload) => {
   cachedSettings = null;
-  const res = await fetch("/api/settings", {
+  const res = await fetch("/api/admin?action=settings", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),

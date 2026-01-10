@@ -63,7 +63,7 @@ export const HeroSection = () => {
       try {
         const payload = await fetchStaticOrLive({
           name: "content",
-          liveUrl: "/api/content?key=hero",
+          liveUrl: "/api/portfolio-data?type=content&key=hero",
           fallbackEmpty: defaultHero,
         });
         const resolved = payload?.hero || payload?.data || payload;

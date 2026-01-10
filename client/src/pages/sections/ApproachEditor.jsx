@@ -19,7 +19,7 @@ export const ApproachEditor = () => {
 
   const fetchApproach = async () => {
     try {
-      const res = await fetch("/api/content?key=approach");
+      const res = await fetch("/api/portfolio-data?type=content&key=approach");
       if (res.ok) {
         const data = await res.json();
         setApproachData(data?.data ? data.data : {});
@@ -34,7 +34,7 @@ export const ApproachEditor = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/content?key=approach", {
+      const res = await fetch("/api/portfolio-data?type=content&key=approach", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: approachData }),

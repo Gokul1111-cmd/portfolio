@@ -12,7 +12,7 @@ export const ContactEditor = () => {
 
   const fetchContact = async () => {
     try {
-      const res = await fetch("/api/content?key=contact");
+      const res = await fetch("/api/portfolio-data?type=content&key=contact");
       if (res.ok) {
         const data = await res.json();
         setContactData(data?.data ? data.data : {});
@@ -27,7 +27,7 @@ export const ContactEditor = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/content?key=contact", {
+      const res = await fetch("/api/portfolio-data?type=content&key=contact", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: contactData }),

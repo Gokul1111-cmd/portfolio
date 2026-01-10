@@ -154,7 +154,7 @@ export const SiteSettingsEditor = () => {
 
   const fetchSiteSettings = useCallback(async () => {
     try {
-      const res = await fetch("/api/content?key=site");
+      const res = await fetch("/api/portfolio-data?type=content&key=site");
       if (res.ok) {
         const data = await res.json();
         if (data?.data) {
@@ -181,7 +181,7 @@ export const SiteSettingsEditor = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/content?key=site", {
+      const res = await fetch("/api/portfolio-data?type=content&key=site", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: siteData }),

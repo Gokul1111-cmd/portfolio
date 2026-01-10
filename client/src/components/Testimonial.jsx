@@ -21,7 +21,7 @@ export const TestimonialSection = () => {
       try {
         const payload = await fetchStaticOrLive({
           name: "testimonials",
-          liveUrl: "/api/testimonials",
+          liveUrl: "/api/portfolio-data?type=testimonials",
           fallbackEmpty: [],
         });
         const data = Array.isArray(payload?.items)

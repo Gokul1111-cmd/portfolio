@@ -108,7 +108,7 @@ export const CertificatesEditor = () => {
     setLoading(true);
     try {
       console.info("[CertificatesEditor] Fetching certificates...");
-      const res = await fetch("/api/certificates");
+      const res = await fetch("/api/portfolio-data?type=certificates");
       console.info("[CertificatesEditor] Fetch status", res.status);
       if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
       const data = await res.json();
@@ -235,12 +235,12 @@ export const CertificatesEditor = () => {
     const bBoxWidth = Math.max(
       1,
       Math.abs(Math.cos(rotRad) * image.width) +
-        Math.abs(Math.sin(rotRad) * image.height),
+      Math.abs(Math.sin(rotRad) * image.height),
     );
     const bBoxHeight = Math.max(
       1,
       Math.abs(Math.sin(rotRad) * image.width) +
-        Math.abs(Math.cos(rotRad) * image.height),
+      Math.abs(Math.cos(rotRad) * image.height),
     );
 
     const canvas = document.createElement("canvas");
@@ -321,12 +321,12 @@ export const CertificatesEditor = () => {
     const bBoxWidth = Math.max(
       1,
       Math.abs(Math.cos(rotRad) * cropCanvas.width) +
-        Math.abs(Math.sin(rotRad) * cropCanvas.height),
+      Math.abs(Math.sin(rotRad) * cropCanvas.height),
     );
     const bBoxHeight = Math.max(
       1,
       Math.abs(Math.sin(rotRad) * cropCanvas.width) +
-        Math.abs(Math.cos(rotRad) * cropCanvas.height),
+      Math.abs(Math.cos(rotRad) * cropCanvas.height),
     );
 
     const outputCanvas = document.createElement("canvas");
@@ -369,14 +369,14 @@ export const CertificatesEditor = () => {
         ...form,
         tags: form.tags
           ? form.tags
-              .split(",")
-              .map((t) => t.trim())
-              .filter(Boolean)
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
           : [],
       };
 
       if (editing) {
-        const res = await fetch(`/api/certificates?id=${editing.id}`, {
+        const res = await fetch(`/api/portfolio-data?type=certificates&id=${editing.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -389,7 +389,7 @@ export const CertificatesEditor = () => {
         }
         if (!res.ok) throw new Error(`Update failed: ${res.status}`);
       } else {
-        const res = await fetch("/api/certificates", {
+        const res = await fetch("/api/portfolio-data?type=certificates", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -490,7 +490,7 @@ export const CertificatesEditor = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this certificate?")) return;
     try {
-      await fetch(`/api/certificates?id=${id}`, { method: "DELETE" });
+      await fetch(`/api/portfolio-data?type=certificates&id=${id}`, { method: "DELETE" });
       await loadCerts();
     } catch (err) {
       console.error("Delete failed", err);
@@ -645,13 +645,13 @@ export const CertificatesEditor = () => {
           prev.map((c) =>
             c.id === editing.id
               ? {
-                  ...c,
-                  url: downloadUrl,
-                  image: downloadUrl,
-                  fileName: storagePath,
-                  type: processed.type === "application/pdf" ? "pdf" : "image",
-                  updatedAt: new Date(),
-                }
+                ...c,
+                url: downloadUrl,
+                image: downloadUrl,
+                fileName: storagePath,
+                type: processed.type === "application/pdf" ? "pdf" : "image",
+                updatedAt: new Date(),
+              }
               : c,
           ),
         );
@@ -661,14 +661,14 @@ export const CertificatesEditor = () => {
           ...nextForm,
           tags: nextForm.tags
             ? nextForm.tags
-                .split(",")
-                .map((t) => t.trim())
-                .filter(Boolean)
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
             : [],
         };
 
         try {
-          const res = await fetch(`/api/certificates?id=${editing.id}`, {
+          const res = await fetch(`/api/portfolio-data?type=certificates&id=${editing.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),

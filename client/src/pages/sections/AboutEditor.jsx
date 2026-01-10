@@ -20,7 +20,7 @@ export const AboutEditor = () => {
 
   const fetchAbout = async () => {
     try {
-      const res = await fetch("/api/content?key=about");
+      const res = await fetch("/api/portfolio-data?type=content&key=about");
       if (res.ok) {
         const data = await res.json();
         if (data?.data) {
@@ -61,7 +61,7 @@ export const AboutEditor = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/content?key=about", {
+      const res = await fetch("/api/portfolio-data?type=content&key=about", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: aboutData }),

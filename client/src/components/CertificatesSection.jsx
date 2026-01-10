@@ -446,10 +446,10 @@ const manualCertificateMapping = {
   "C Programming.png": { title: "C Programming", category: "Programming" },
   "Learn C_page-0001.jpg": { title: "Learn C", category: "Programming" },
   "CertificateOfCompletion_C Programming Basics Flow Control Variables and Pointers_page-0001.jpg":
-    {
-      title: "C Programming Basics: Flow Control, Variables, and Pointers",
-      category: "Programming",
-    },
+  {
+    title: "C Programming Basics: Flow Control, Variables, and Pointers",
+    category: "Programming",
+  },
   "CertificateOfCompletion_Master C Language Pointers_page-0001.jpg": {
     title: "Master C Language Pointers",
     category: "Programming",
@@ -717,7 +717,7 @@ export const CertificatesSection = () => {
       try {
         const payload = await fetchStaticOrLive({
           name: "certificates",
-          liveUrl: "/api/certificates",
+          liveUrl: "/api/portfolio-data?type=certificates",
           fallbackEmpty: withFallbackData,
         });
         const usedFallback = payload === withFallbackData;
@@ -850,11 +850,10 @@ export const CertificatesSection = () => {
             <Award className="w-4 h-4" />
             Certifications
             <span
-              className={`text-[11px] px-2 py-0.5 rounded-full border ${
-                isLiveData
+              className={`text-[11px] px-2 py-0.5 rounded-full border ${isLiveData
                   ? "border-emerald-400 text-emerald-400 bg-emerald-400/10"
                   : "border-amber-400 text-amber-400 bg-amber-400/10"
-              }`}
+                }`}
             >
               {isLiveData ? "Live" : "Fallback"}
             </span>
@@ -873,11 +872,10 @@ export const CertificatesSection = () => {
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-5 py-2 rounded-full text-sm font-medium border transition-all duration-200 flex items-center gap-2 ${
-                activeFilter === filter
+              className={`px-5 py-2 rounded-full text-sm font-medium border transition-all duration-200 flex items-center gap-2 ${activeFilter === filter
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-background text-muted-foreground border-border hover:border-primary hover:text-primary"
-              }`}
+                }`}
             >
               <Filter className="w-4 h-4" />
               {filter === "all" ? "All" : labelForCategory[filter] || filter}

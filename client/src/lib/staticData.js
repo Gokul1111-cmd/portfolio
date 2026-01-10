@@ -55,7 +55,7 @@ const checkAndShowSummary = () => {
 const staticUrl = (name, version) => {
   // Always use API proxy to avoid CORS issues
   const v = version ? `&v=${version}` : "";
-  return `/api/storage-proxy?name=${name}${v}`;
+  return `/api/media-proxy?type=storage&name=${name}${v}`;
 };
 
 export const fetchStaticOrLive = async ({ name, liveUrl, fallbackEmpty }) => {

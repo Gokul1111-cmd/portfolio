@@ -119,7 +119,7 @@ export const SyncSettings = () => {
 		setSummary(null);
 		try {
 			const res = await fetch(
-				target === "all" ? "/api/sync" : `/api/sync?target=${target}`,
+				target === "all" ? "/api/admin?action=sync" : `/api/admin?action=sync&target=${target}`,
 				{ method: "POST" },
 			);
 			const data = await res.json();

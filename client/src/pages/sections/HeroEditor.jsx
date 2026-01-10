@@ -46,7 +46,7 @@ export const HeroEditor = () => {
 
   const fetchHero = async () => {
     try {
-      const res = await fetch("/api/content?key=hero");
+      const res = await fetch("/api/portfolio-data?type=content&key=hero");
       if (res.ok) {
         const data = await res.json();
         setHeroData(
@@ -66,7 +66,7 @@ export const HeroEditor = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/content?key=hero", {
+      const res = await fetch("/api/portfolio-data?type=content&key=hero", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: heroData }),

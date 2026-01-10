@@ -126,10 +126,9 @@ export const TestimonialsEditor = () => {
   });
 
   const dropZoneClass = (active) =>
-    `mt-2 p-4 rounded-md border-2 border-dashed transition-all ${
-      active
-        ? "border-primary bg-primary/10 scale-[1.02]"
-        : "border-border bg-background/50 hover:border-primary/50 cursor-pointer"
+    `mt-2 p-4 rounded-md border-2 border-dashed transition-all ${active
+      ? "border-primary bg-primary/10 scale-[1.02]"
+      : "border-border bg-background/50 hover:border-primary/50 cursor-pointer"
     }`;
 
   useEffect(() => {
@@ -145,7 +144,7 @@ export const TestimonialsEditor = () => {
 
   const fetchTestimonials = async () => {
     try {
-      const res = await fetch("/api/testimonials");
+      const res = await fetch("/api/portfolio-data?type=testimonials");
       if (res.ok) {
         const data = await res.json();
         setTestimonials(Array.isArray(data) ? data : []);
@@ -160,7 +159,7 @@ export const TestimonialsEditor = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete?")) return;
     try {
-      const res = await fetch(`/api/testimonials?id=${id}`, {
+      const res = await fetch(`/api/portfolio-data?type=testimonials&id=${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -191,7 +190,7 @@ export const TestimonialsEditor = () => {
       return;
     }
     try {
-      const res = await fetch(`/api/testimonials?id=${editingTestimonial.id}`, {
+      const res = await fetch(`/api/portfolio-data?type=testimonials&id=${editingTestimonial.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newTestimonial),
@@ -391,11 +390,10 @@ export const TestimonialsEditor = () => {
               {displayedTestimonials.map((testimonial) => (
                 <motion.div
                   key={testimonial.id}
-                  className={`bg-card border rounded-xl p-5 hover:border-primary/50 transition-all cursor-pointer ${
-                    editingTestimonial?.id === testimonial.id
+                  className={`bg-card border rounded-xl p-5 hover:border-primary/50 transition-all cursor-pointer ${editingTestimonial?.id === testimonial.id
                       ? "border-primary bg-primary/5"
                       : "border-border"
-                  }`}
+                    }`}
                   onClick={() => handleEdit(testimonial)}
                 >
                   {/* Star Rating */}

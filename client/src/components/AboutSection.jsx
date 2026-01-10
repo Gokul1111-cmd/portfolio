@@ -110,7 +110,7 @@ export const AboutSection = () => {
       try {
         const payload = await fetchStaticOrLive({
           name: "content",
-          liveUrl: "/api/content?key=about",
+          liveUrl: "/api/portfolio-data?type=content&key=about",
           fallbackEmpty: defaultAboutContent,
         });
         const resolved = payload?.about || payload?.data || payload;

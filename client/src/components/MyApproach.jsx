@@ -148,7 +148,7 @@ export const MyApproach = () => {
       try {
         const payload = await fetchStaticOrLive({
           name: "content",
-          liveUrl: "/api/content?key=approach",
+          liveUrl: "/api/portfolio-data?type=content&key=approach",
           fallbackEmpty: defaultApproachContent,
         });
         const resolved = payload?.approach || payload?.data || payload;
