@@ -1,4 +1,4 @@
-import { adminDb } from "./firebase-admin.js";
+import { adminDb } from "../lib/firebase-admin.js";
 
 // Projects CRUD API using Firebase Firestore Admin SDK
 export default async function handler(req, res) {

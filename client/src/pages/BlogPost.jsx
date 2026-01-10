@@ -234,7 +234,7 @@ export const BlogPost = () => {
 
     const trackView = async () => {
       try {
-        await fetch(`/api/blog-interactions?slug=${encodeURIComponent(slug)}&action=view`, {
+        await fetch(`/api/blog-data?slug=${encodeURIComponent(slug)}&action=view`, {
           method: 'POST',
         });
       } catch (error) {
@@ -301,7 +301,7 @@ export const BlogPost = () => {
       setLoadingComments(true);
       setCommentError(null);
       try {
-        const res = await fetch(`/api/comments?slug=${encodeURIComponent(slug)}`);
+        const res = await fetch(`/api/blog-data?slug=${encodeURIComponent(slug)}&action=comments`);
         if (!res.ok) throw new Error(`Failed to load comments (${res.status})`);
         const data = await res.json();
         setComments(Array.isArray(data) ? data : []);
@@ -336,7 +336,7 @@ export const BlogPost = () => {
     // Persist like to database (only if not already liked)
     if (!wasLiked) {
       try {
-        await fetch(`/api/blog-interactions?slug=${slug}&action=like`, {
+        await fetch(`/api/blog-data?slug=${slug}&action=like`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ increment: true })
@@ -370,7 +370,7 @@ export const BlogPost = () => {
 
     // Persist to database
     try {
-      await fetch(`/api/blog-interactions?slug=${slug}&action=like`, {
+      await fetch(`/api/blog-data?slug=${slug}&action=like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ increment: newLiked })
@@ -415,7 +415,7 @@ export const BlogPost = () => {
     setSubmittingComment(true);
     setCommentError(null);
     try {
-      const res = await fetch("/api/comments", {
+      const res = await fetch("/api/blog-data?action=comment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, author: name, text }),

@@ -1,5 +1,5 @@
 /* eslint-env node */
-import { adminDb } from "./firebase-admin.js";
+import { adminDb } from "../lib/firebase-admin.js";
 
 const collection = adminDb.collection("blogPosts");
 
