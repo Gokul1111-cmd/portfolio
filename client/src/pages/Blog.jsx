@@ -30,6 +30,60 @@ const formatNumber = (num) => {
   return num;
 };
 
+// Skeleton Loaders
+const SkeletonFeaturedPost = () => (
+  <div className="border bg-card rounded-xl overflow-hidden shadow-sm animate-pulse">
+    <div className="h-48 bg-muted" />
+    <div className="p-5 space-y-3">
+      <div className="flex items-center gap-2">
+        <div className="h-6 w-20 bg-muted rounded-md" />
+        <div className="h-4 w-24 bg-muted rounded" />
+      </div>
+      <div className="h-6 w-3/4 bg-muted rounded" />
+      <div className="h-4 w-full bg-muted rounded" />
+      <div className="h-4 w-2/3 bg-muted rounded" />
+      <div className="flex gap-2 pt-2">
+        <div className="h-6 w-16 bg-muted rounded-full" />
+        <div className="h-6 w-20 bg-muted rounded-full" />
+        <div className="h-6 w-16 bg-muted rounded-full" />
+      </div>
+    </div>
+  </div>
+);
+
+const SkeletonRegularPost = () => (
+  <div className="border bg-card rounded-xl p-5 animate-pulse">
+    <div className="flex gap-4">
+      <div className="w-32 h-32 bg-muted rounded-lg flex-shrink-0" />
+      <div className="flex-1 space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-24 bg-muted rounded-md" />
+          <div className="h-4 w-20 bg-muted rounded" />
+        </div>
+        <div className="h-6 w-3/4 bg-muted rounded" />
+        <div className="h-4 w-full bg-muted rounded" />
+        <div className="h-4 w-5/6 bg-muted rounded" />
+        <div className="flex gap-2 pt-2">
+          <div className="h-6 w-16 bg-muted rounded-full" />
+          <div className="h-6 w-20 bg-muted rounded-full" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const SkeletonTrendingItem = () => (
+  <div className="space-y-2 animate-pulse">
+    <div className="flex items-start gap-3">
+      <div className="text-2xl font-bold text-muted-foreground/30">•</div>
+      <div className="space-y-2 flex-1">
+        <div className="h-4 w-full bg-muted rounded" />
+        <div className="h-3 w-20 bg-muted rounded" />
+      </div>
+    </div>
+  </div>
+);
+
 export const Blog = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -176,8 +230,8 @@ export const Blog = () => {
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
                     className={`px-3 py-1.5 rounded-full border text-xs md:text-sm transition-colors ${activeCategory === cat
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-card hover:border-primary/40"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card hover:border-primary/40"
                       }`}
                   >
                     {cat}
@@ -188,8 +242,8 @@ export const Blog = () => {
                     key={tag}
                     onClick={() => setActiveTag(tag)}
                     className={`px-3 py-1.5 rounded-full border text-xs md:text-sm transition-colors ${activeTag === tag
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-card hover:border-primary/40"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card hover:border-primary/40"
                       }`}
                   >
                     {tag}
@@ -239,8 +293,8 @@ export const Blog = () => {
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
                       className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${activeCategory === cat
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card hover:border-primary/40"
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card hover:border-primary/40"
                         }`}
                     >
                       {cat === "all" ? "All Categories" : cat}
@@ -258,8 +312,8 @@ export const Blog = () => {
                       key={tag}
                       onClick={() => setActiveTag(tag)}
                       className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${activeTag === tag
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card hover:border-primary/40"
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card hover:border-primary/40"
                         }`}
                     >
                       {tag === "all" ? "All Tags" : `#${tag}`}
@@ -308,7 +362,30 @@ export const Blog = () => {
           {/* Main Content */}
           <div className="space-y-12">
             {loadingPosts && posts.length === 0 && (
-              <div className="text-sm text-muted-foreground">Loading articles…</div>
+              <div className="space-y-12">
+                {/* Featured Skeletons */}
+                <section className="space-y-6">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Sparkles size={16} className="text-primary" />
+                    Featured Articles
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <SkeletonFeaturedPost />
+                    <SkeletonFeaturedPost />
+                  </div>
+                </section>
+
+                {/* Regular Post Skeletons */}
+                <section className="space-y-6">
+                  <div className="text-sm font-semibold">All Articles</div>
+                  <div className="grid gap-6">
+                    <SkeletonRegularPost />
+                    <SkeletonRegularPost />
+                    <SkeletonRegularPost />
+                    <SkeletonRegularPost />
+                  </div>
+                </section>
+              </div>
             )}
             {error && (
               <div className="flex items-center gap-3 text-sm text-red-500 bg-red-500/5 border border-red-500/30 rounded-md px-3 py-2">
@@ -567,28 +644,44 @@ export const Blog = () => {
                   Trending
                 </div>
                 <div className="space-y-4">
-                  {trending.slice(0, 5).map((post, idx) => (
-                    <div
-                      key={post.slug}
-                      className="space-y-2 cursor-pointer group"
-                      onClick={() => navigate(`/blog/${post.slug}`)}
-                    >
-                      <div className="flex items-start gap-3">
-                        <span className="text-2xl font-bold text-muted-foreground/30">
-                          {idx + 1}
-                        </span>
-                        <div className="space-y-1">
-                          <h4 className="text-sm font-semibold line-clamp-2 group-hover:text-primary">
-                            {post.title}
-                          </h4>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Eye size={12} /> {formatNumber(post.views)} views
+                  {loadingPosts && posts.length === 0 ? (
+                    // Skeleton loaders
+                    <>
+                      <SkeletonTrendingItem />
+                      <div className="border-b" />
+                      <SkeletonTrendingItem />
+                      <div className="border-b" />
+                      <SkeletonTrendingItem />
+                      <div className="border-b" />
+                      <SkeletonTrendingItem />
+                      <div className="border-b" />
+                      <SkeletonTrendingItem />
+                    </>
+                  ) : (
+                    trending.slice(0, 5).map((post, idx) => (
+                      <div key={post.slug}>
+                        <div
+                          className="space-y-2 cursor-pointer group"
+                          onClick={() => navigate(`/blog/${post.slug}`)}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl font-bold text-muted-foreground/30">
+                              {idx + 1}
+                            </span>
+                            <div className="space-y-1">
+                              <h4 className="text-sm font-semibold line-clamp-2 group-hover:text-primary">
+                                {post.title}
+                              </h4>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <Eye size={12} /> {formatNumber(post.views)} views
+                              </div>
+                            </div>
                           </div>
                         </div>
+                        {idx < trending.length - 1 && <div className="border-b" />}
                       </div>
-                      {idx < trending.length - 1 && <div className="border-b" />}
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -598,20 +691,33 @@ export const Blog = () => {
                   <Tag size={18} className="text-primary" />
                   Popular Tags
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {popularTags.map(({ tag, count }) => (
-                    <button
-                      key={tag}
-                      onClick={() => {
-                        setActiveTag(tag);
-                        setShowFilters(true);
-                      }}
-                      className="px-3 py-1.5 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground text-sm transition-colors"
-                    >
-                      #{tag} <span className="text-xs opacity-70">({count})</span>
-                    </button>
-                  ))}
-                </div>
+                {loadingPosts && posts.length === 0 ? (
+                  <div className="flex flex-wrap gap-2 animate-pulse">
+                    <div className="h-7 w-20 bg-muted rounded-full" />
+                    <div className="h-7 w-24 bg-muted rounded-full" />
+                    <div className="h-7 w-16 bg-muted rounded-full" />
+                    <div className="h-7 w-28 bg-muted rounded-full" />
+                    <div className="h-7 w-20 bg-muted rounded-full" />
+                    <div className="h-7 w-24 bg-muted rounded-full" />
+                    <div className="h-7 w-18 bg-muted rounded-full" />
+                    <div className="h-7 w-22 bg-muted rounded-full" />
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {popularTags.map(({ tag, count }) => (
+                      <button
+                        key={tag}
+                        onClick={() => setActiveTag(tag)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${activeTag === tag
+                          ? "bg-primary text-primary-foreground"
+                          : "border hover:border-primary/40"
+                          }`}
+                      >
+                        {tag} ({count})
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Newsletter moved to bottom */}
@@ -635,8 +741,8 @@ export const Blog = () => {
             </div>
           </aside>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 
