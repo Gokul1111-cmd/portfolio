@@ -25,10 +25,10 @@ export const HeroSection = () => {
     subheadline:
       "I build AI-powered web applications that solve real-world problems. Passionate about cybersecurity, cloud computing, and creating impactful digital solutions.",
     availability: "Available Immediately for Full-Stack Developer roles",
-    primaryCtaText: "View Case Studies",
+    primaryCtaText: "View Projects",
     primaryCtaLink: "#projects",
-    secondaryCtaText: "View Projects",
-    secondaryCtaLink: "#projects",
+    secondaryCtaText: "View Blogs",
+    secondaryCtaLink: "/blog",
     resumeUrl: "/gokul-resume.pdf",
     profileImage: "/profile-logo.png",
     achievements: [
@@ -331,7 +331,7 @@ export const HeroSection = () => {
               >
                 {hero.profileImage && (
                   <motion.div
-                    className="absolute -top-8 left-8 w-16 h-16 rounded-full border-4 border-background shadow-xl overflow-hidden bg-primary/10"
+                    className="absolute -top-8 right-8 w-16 h-16 rounded-full border-4 border-background shadow-xl overflow-hidden bg-primary/10"
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5, delay: 0.2 }}

@@ -15,6 +15,7 @@ import {
   Milestone,
   Award,
   CloudUpload,
+  FileText,
 } from "lucide-react";
 
 // Import section editor components
@@ -29,6 +30,7 @@ import { SiteSettingsEditor } from "./sections/SiteSettingsEditor";
 import { TimelineEditor } from "./sections/TimelineEditor";
 import { CertificatesEditor } from "./sections/CertificatesEditor";
 import { SyncSettings } from "./sections/SyncSettings";
+import { BlogEditor } from "./sections/BlogEditor";
 
 const navigationItems = [
   { id: "hero", label: "Hero", icon: Sparkles },
@@ -39,6 +41,7 @@ const navigationItems = [
   { id: "career", label: "Career Timeline", icon: Milestone },
   { id: "testimonials", label: "Testimonials", icon: MessageSquare },
   { id: "certificates", label: "Certificates", icon: Award },
+  { id: "blog", label: "Blog", icon: FileText },
   { id: "contact", label: "Contact", icon: Mail },
   { id: "site", label: "Site Settings", icon: Settings },
   { id: "sync", label: "Sync", icon: CloudUpload },
@@ -53,6 +56,7 @@ const sectionComponents = {
   career: TimelineEditor,
   testimonials: TestimonialsEditor,
   certificates: CertificatesEditor,
+  blog: BlogEditor,
   contact: ContactEditor,
   site: SiteSettingsEditor,
   sync: SyncSettings,

@@ -93,10 +93,12 @@
 
   html {
     @apply scroll-smooth;
+    cursor: none !important;
   }
 
   body {
     @apply bg-background text-foreground transition-colors duration-300;
+    cursor: none !important;
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
@@ -160,7 +162,7 @@
   max-width: 100%;
   margin: 0 auto;
   padding: 0;
-  text-align: center;
+  text-align: left;
 }
 
 @media (pointer: fine) {

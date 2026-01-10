@@ -15,10 +15,10 @@ export const HeroEditor = () => {
     headline: "I'm Gokul A",
     subheadline: "I build AI-powered web applications.",
     availability: "Available Immediately",
-    primaryCtaText: "View Case Studies",
+    primaryCtaText: "View Projects",
     primaryCtaLink: "#projects",
-    secondaryCtaText: "View Projects",
-    secondaryCtaLink: "#projects",
+    secondaryCtaText: "View Blogs",
+    secondaryCtaLink: "/blog",
     resumeUrl: "/gokul-resume.pdf",
     profileImage: "/profile-logo.png",
     codeSnippets: [

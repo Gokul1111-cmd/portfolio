@@ -1,16 +1,32 @@
 let cachedSettings = null;
+let fetchPromise = null; // Track in-flight fetch to prevent duplicates
 
 export const getSettings = async () => {
+  // Return cached settings immediately if available
   if (cachedSettings) return cachedSettings;
-  try {
-    const res = await fetch("/api/settings");
-    if (!res.ok) throw new Error(`settings fetch ${res.status}`);
-    cachedSettings = await res.json();
-    return cachedSettings;
-  } catch (err) {
-    console.warn("settings fetch failed", err);
-    return { useSyncedData: false };
-  }
+  
+  // If there's already a fetch in progress, wait for it
+  if (fetchPromise) return fetchPromise;
+  
+  // Start a new fetch and cache the promise
+  fetchPromise = (async () => {
+    try {
+      const res = await fetch("/api/settings");
+      if (!res.ok) throw new Error(`settings fetch ${res.status}`);
+      cachedSettings = await res.json();
+      return cachedSettings;
+    } catch (err) {
+      console.warn("settings fetch failed", err);
+      // Cache the fallback to prevent repeated failures
+      cachedSettings = { useSyncedData: false };
+      return cachedSettings;
+    } finally {
+      // Clear the promise after fetch completes
+      fetchPromise = null;
+    }
+  })();
+  
+  return fetchPromise;
 };
 
 export const setSettings = async (payload) => {

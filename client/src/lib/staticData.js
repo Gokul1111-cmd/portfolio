@@ -1,10 +1,5 @@
 import { getSettings } from "./settingsClient";
 
-const bucket =
-  import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ||
-  "gokul-portfolio-23143.firebasestorage.app";
-const base = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o`;
-
 // Track total items fetched for summary (unique data sources only)
 let fetchStats = {
   static: 0,
