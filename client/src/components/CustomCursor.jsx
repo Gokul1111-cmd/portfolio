@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const CustomCursor = () => {
   const cursorRef = useRef(null);
@@ -6,8 +6,35 @@ export const CustomCursor = () => {
   const cursorPos = useRef({ x: 0, y: 0 });
   const isHoveringRef = useRef(false);
   const isClickingRef = useRef(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Check if device is mobile/touch-enabled
+    const checkMobile = () => {
+      const isTouchDevice = () => {
+        return (
+          (typeof window !== 'undefined' && 'ontouchstart' in window) ||
+          (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0)
+        );
+      };
+      
+      const isSmallScreen = window.innerWidth <= 768; // Tailwind md breakpoint
+      
+      setIsMobile(isTouchDevice() || isSmallScreen);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Don't initialize cursor on mobile
+    if (isMobile) return;
+
     // Update mouse position
     const handleMouseMove = (e) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
@@ -71,7 +98,12 @@ export const CustomCursor = () => {
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, []);
+  }, [isMobile]);
+
+  // Don't render cursor on mobile
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <div
