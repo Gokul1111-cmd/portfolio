@@ -2,6 +2,17 @@ import { adminDb } from "../lib/firebase-admin.js";
 
 // Projects CRUD API using Firebase Firestore Admin SDK
 export default async function handler(req, res) {
+  // Set CORS headers for Vercel
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle OPTIONS request for CORS preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   const projectsRef = adminDb.collection("projects");
 
   // --- GET REQUEST: Fetch all projects ---
@@ -76,23 +87,19 @@ export default async function handler(req, res) {
   // --- PUT REQUEST: Update a project ---
   if (req.method === "PUT") {
     const { id } = req.query;
-    const {
-      title,
-      description,
-      category,
-      image,
-      demoUrl,
-      githubUrl,
-      tags = [],
-      highlights = [],
-      featured = false,
-      accentColor = "from-blue-500 to-cyan-600",
-      status = "Live",
-      video = "",
-    } = req.body;
+    
+    if (!id) {
+      return res.status(400).json({ error: "Project ID is required" });
+    }
 
     try {
-      const updated = {
+      // Check if document exists
+      const docSnapshot = await projectsRef.doc(id).get();
+      if (!docSnapshot.exists) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      const {
         title,
         description,
         category,
@@ -105,13 +112,30 @@ export default async function handler(req, res) {
         accentColor,
         status,
         video,
-      };
+      } = req.body;
+
+      // Only update fields that are provided
+      const updated = {};
+      if (title !== undefined) updated.title = title;
+      if (description !== undefined) updated.description = description;
+      if (category !== undefined) updated.category = category;
+      if (image !== undefined) updated.image = image;
+      if (demoUrl !== undefined) updated.demoUrl = demoUrl;
+      if (githubUrl !== undefined) updated.githubUrl = githubUrl;
+      if (tags !== undefined) updated.tags = Array.isArray(tags) ? tags : [];
+      if (highlights !== undefined) updated.highlights = Array.isArray(highlights) ? highlights : [];
+      if (featured !== undefined) updated.featured = Boolean(featured);
+      if (accentColor !== undefined) updated.accentColor = accentColor;
+      if (status !== undefined) updated.status = status;
+      if (video !== undefined) updated.video = video;
+      
+      updated.updated_at = new Date();
 
       await projectsRef.doc(id).update(updated);
       return res.status(200).json({ id, ...updated });
     } catch (error) {
       console.error("PUT project error:", error);
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message, details: error.toString() });
     }
   }
 
