@@ -32,9 +32,10 @@ export const HeroSection = () => {
     resumeUrl: "/gokul-resume.pdf",
     profileImage: "/profile-logo.png",
     achievements: [
-      { number: "0", label: "Years Experience", suffix: "+" },
-      { number: "8", label: "Projects Completed", suffix: "+" },
-      { number: "0", label: "Happy Clients", suffix: "" },
+      { number: "4", label: "Projects Completed", suffix: "+" },
+      { number: "5", label: "Ongoing Projects", suffix: "" },
+      { number: "10", label: "Technologies Used", suffix: "+" },
+      { number: "100", label: "Code Commits", suffix: "+" },
     ],
     codeSnippets: [
       "import { FullStackDeveloper } from 'gokul.dev';",
@@ -374,26 +375,25 @@ export const HeroSection = () => {
                             ${index < currentCodeLine ? "opacity-100" : "opacity-0"}
                             ${index === currentCodeLine ? "opacity-100" : ""}
                             transition-opacity duration-150 ease-in-out
-                            ${
-                              line.includes("import")
+                            ${line.includes("import")
                                 ? "text-purple-400 font-semibold"
                                 : line.includes("const") || line.includes("new")
                                   ? "text-blue-400 font-semibold"
                                   : line.includes("React") ||
-                                      line.includes("Node.js") ||
-                                      line.includes("TypeScript")
+                                    line.includes("Node.js") ||
+                                    line.includes("TypeScript")
                                     ? "text-cyan-400"
                                     : line.includes("FullStackDeveloper")
                                       ? "text-emerald-400 font-semibold"
                                       : line.includes("//")
                                         ? "text-muted-foreground italic"
                                         : line.includes("await") ||
-                                            line.includes("connect")
+                                          line.includes("connect")
                                           ? "text-yellow-400"
                                           : line.includes("'")
                                             ? "text-amber-400"
                                             : "text-foreground"
-                            }
+                              }
                           `}
                           >
                             {index < currentCodeLine ? line : ""}

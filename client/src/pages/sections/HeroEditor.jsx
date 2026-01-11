@@ -21,6 +21,12 @@ export const HeroEditor = () => {
     secondaryCtaLink: "/blog",
     resumeUrl: "/gokul-resume.pdf",
     profileImage: "/profile-logo.png",
+    achievements: [
+      { number: "4", label: "Projects Completed", suffix: "+" },
+      { number: "5", label: "Ongoing Projects", suffix: "" },
+      { number: "10", label: "Technologies Used", suffix: "+" },
+      { number: "8569", label: "Code Commits", suffix: "+" },
+    ],
     codeSnippets: [
       "import { FullStackDeveloper } from 'gokul.dev';",
       "",
@@ -125,10 +131,9 @@ export const HeroEditor = () => {
   });
 
   const dropZoneClass = (active) =>
-    `mt-2 p-4 rounded-md border-2 border-dashed transition-all ${
-      active
-        ? "border-primary bg-primary/10 scale-[1.02]"
-        : "border-border bg-background/50 hover:border-primary/50 cursor-pointer"
+    `mt-2 p-4 rounded-md border-2 border-dashed transition-all ${active
+      ? "border-primary bg-primary/10 scale-[1.02]"
+      : "border-border bg-background/50 hover:border-primary/50 cursor-pointer"
     }`;
 
   const updateCodeSnippet = (index, value) => {
@@ -367,6 +372,84 @@ export const HeroEditor = () => {
                   JPEG/PNG • Stored as data URL for instant preview
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Achievements */}
+          <div className="border-t border-border pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">Achievement Stats</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  const next = [...(heroData.achievements || [])];
+                  next.push({ number: "0", label: "New Achievement", suffix: "+" });
+                  setHeroData({ ...heroData, achievements: next });
+                }}
+                className="text-xs text-primary hover:underline flex items-center gap-1"
+              >
+                <Plus size={14} /> Add Achievement
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(heroData.achievements || []).map((achievement, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col gap-2 p-4 rounded-md bg-background/50 border border-border"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Achievement {idx + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = [...(heroData.achievements || [])];
+                        next.splice(idx, 1);
+                        setHeroData({ ...heroData, achievements: next });
+                      }}
+                      className="text-xs text-destructive hover:bg-destructive/10 rounded px-2"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
+                      placeholder="Number"
+                      value={achievement.number || ""}
+                      onChange={(e) => {
+                        const next = [...(heroData.achievements || [])];
+                        next[idx] = { ...next[idx], number: e.target.value };
+                        setHeroData({ ...heroData, achievements: next });
+                      }}
+                    />
+                    <input
+                      type="text"
+                      className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
+                      placeholder="Suffix (+, etc)"
+                      value={achievement.suffix || ""}
+                      onChange={(e) => {
+                        const next = [...(heroData.achievements || [])];
+                        next[idx] = { ...next[idx], suffix: e.target.value };
+                        setHeroData({ ...heroData, achievements: next });
+                      }}
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    className="p-2 rounded-md bg-background border border-border outline-none focus:border-primary text-sm"
+                    placeholder="Label"
+                    value={achievement.label || ""}
+                    onChange={(e) => {
+                      const next = [...(heroData.achievements || [])];
+                      next[idx] = { ...next[idx], label: e.target.value };
+                      setHeroData({ ...heroData, achievements: next });
+                    }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
 

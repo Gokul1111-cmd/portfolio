@@ -8,7 +8,6 @@ import {
   Mail,
   Sun,
   Moon,
-  Youtube,
   Volume2,
   VolumeX,
   Github,
@@ -102,20 +101,20 @@ export const Navbar = () => {
             href: link.href,
             icon: iconMap[link.name] || Home,
           }));
-          
+
           // Ensure Certificates is always included
           const hasCertificates = fetchedNavItems.some(item => item.name === "Certificates");
           if (!hasCertificates) {
             // Insert Certificates after Skills
             const skillsIndex = fetchedNavItems.findIndex(item => item.name === "Skills");
             const insertIndex = skillsIndex >= 0 ? skillsIndex + 1 : 3;
-            fetchedNavItems.splice(insertIndex, 0, { 
-              name: "Certificates", 
-              href: "#certificates", 
-              icon: Award 
+            fetchedNavItems.splice(insertIndex, 0, {
+              name: "Certificates",
+              href: "#certificates",
+              icon: Award
             });
           }
-          
+
           setNavItems(fetchedNavItems);
         }
       } catch (error) {
@@ -262,24 +261,6 @@ export const Navbar = () => {
           <Linkedin className="w-5 h-5" />
         </motion.a>
 
-        {/* YouTube Button */}
-        <motion.a
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={cn(
-            "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
-            "text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50",
-            "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center",
-          )}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          title="YouTube Channel"
-          aria-label="YouTube Channel"
-        >
-          <Youtube className="w-5 h-5" />
-        </motion.a>
 
         {/* Blog Button */}
         <motion.button
