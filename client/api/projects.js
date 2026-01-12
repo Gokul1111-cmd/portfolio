@@ -95,8 +95,18 @@ export default async function handler(req, res) {
     try {
       // Check if document exists
       const docSnapshot = await projectsRef.doc(id).get();
+      console.log(`[PUT] Checking project ID: ${id}, exists: ${docSnapshot.exists}`);
+      
       if (!docSnapshot.exists) {
-        return res.status(404).json({ error: "Project not found" });
+        // Log all existing project IDs for debugging
+        const allProjects = await projectsRef.get();
+        const existingIds = allProjects.docs.map(doc => doc.id);
+        console.log('[PUT] Project not found. Existing IDs:', existingIds);
+        return res.status(404).json({ 
+          error: "Project not found", 
+          requestedId: id,
+          existingIds: existingIds 
+        });
       }
 
       const {
