@@ -41,7 +41,7 @@ export const ProjectsSection = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // --- Existing State ---
-  const [showAll, setShowAll] = useState(false);
+  const [showAll] = useState(true); // Always show all projects
   const [activeFilter, setActiveFilter] = useState("All");
   const [hoveredProject, setHoveredProject] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -110,7 +110,6 @@ export const ProjectsSection = () => {
 
   const handleFilterChange = (category) => {
     setActiveFilter(category);
-    setShowAll(false);
   };
 
   const handleVideoPlay = (project) => {
@@ -430,40 +429,6 @@ export const ProjectsSection = () => {
                 ))}
               </AnimatePresence>
             </div>
-
-            {/* Load More */}
-            {filteredProjects.length > 3 && (
-              <motion.div
-                className="text-center mt-16"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                viewport={{ once: true }}
-              >
-                <motion.button
-                  onClick={() => setShowAll(!showAll)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-medium transition-all duration-300 ${
-                    showAll
-                      ? "bg-muted text-foreground border border-border"
-                      : "bg-primary text-primary-foreground hover:bg-primary/90"
-                  }`}
-                >
-                  {showAll ? (
-                    <>
-                      <ChevronUp size={18} />
-                      Show Less
-                    </>
-                  ) : (
-                    <>
-                      View More Projects
-                      <ArrowRight size={18} />
-                    </>
-                  )}
-                </motion.button>
-              </motion.div>
-            )}
           </>
         )}
 
