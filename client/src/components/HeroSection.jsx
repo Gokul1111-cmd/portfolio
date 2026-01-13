@@ -243,11 +243,15 @@ export const HeroSection = () => {
                 hidden: { y: 30, opacity: 0 },
                 visible: { y: 0, opacity: 1, transition: { duration: 0.8 } },
               }}
+              role="list"
+              aria-label="Key achievements and statistics"
             >
               {(hero.achievements || []).map((achievement, index) => (
                 <div
                   key={index}
+                  role="listitem"
                   className="text-center p-4 rounded-xl bg-background/60 border border-border/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-300"
+                  aria-label={`${achievement.number}${achievement.suffix} ${achievement.label}`}
                 >
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <div className="text-2xl font-bold text-foreground">
@@ -339,7 +343,7 @@ export const HeroSection = () => {
                   >
                     <img
                       src={hero.profileImage}
-                      alt={hero.name || "Profile"}
+                      alt={`${hero.name || 'Developer'} - Profile photo`}
                       className="w-full h-full object-cover"
                       loading="lazy"
                       onError={(e) => {

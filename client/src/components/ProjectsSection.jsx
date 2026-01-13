@@ -254,7 +254,7 @@ export const ProjectsSection = () => {
                       <div className="relative h-40 sm:h-48 overflow-hidden bg-muted">
                         <motion.img
                           src={project.image || "/placeholder.png"}
-                          alt={project.title}
+                          alt={`${project.title} - ${project.category} project screenshot`}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           loading="lazy"
                           onError={(e) => {

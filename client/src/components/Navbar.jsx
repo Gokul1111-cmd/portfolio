@@ -343,7 +343,7 @@ export const Navbar = () => {
         transition={{ duration: 0.3 }}
       >
         <div className="flex items-center justify-center bg-white/80 dark:bg-black/80 backdrop-blur-md rounded-full shadow-lg p-1.5 sm:p-2 border border-gray-200 dark:border-gray-700">
-          <div className="flex space-x-0.5 sm:space-x-1 items-center">
+          <nav aria-label="Main navigation" className="flex space-x-0.5 sm:space-x-1 items-center">
             {navItems.map((item) => {
               const isBlogLink =
                 item.name?.toLowerCase() === "blog" ||
@@ -368,9 +368,10 @@ export const Navbar = () => {
                       ? "bg-primary text-white"
                       : "text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary",
                   )}
-                  aria-label={item.name}
+                  aria-label={`Navigate to ${item.name}`}
+                  aria-current={activeSection === item.href ? "page" : undefined}
                 >
-                  <item.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <item.icon className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
                   <span className="text-xs mt-1 hidden md:block">
                     {item.name}
                   </span>
@@ -380,7 +381,7 @@ export const Navbar = () => {
             <div className="flex items-center px-1 sm:px-2">
               <ThemeToggle />
             </div>
-          </div>
+          </nav>
         </div>
       </motion.div>
     </>

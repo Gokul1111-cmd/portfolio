@@ -176,7 +176,7 @@ const InfiniteScrollSkills = ({ skills }) => {
               {resolveIcon(skill) ? (
                 <img
                   src={resolveIcon(skill)}
-                  alt={skill.name}
+                  alt={`${skill.name} technology logo`}
                   className="w-full h-full object-cover"
                   style={{
                     transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
@@ -222,7 +222,7 @@ const InfiniteScrollSkills = ({ skills }) => {
               {resolveIcon(skill) ? (
                 <img
                   src={resolveIcon(skill)}
-                  alt={skill.name}
+                  alt={`${skill.name} technology logo`}
                   className="w-full h-full object-cover"
                   style={{
                     transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
@@ -403,7 +403,7 @@ export const SkillsSection = () => {
                       {resolveIcon(skill) ? (
                         <img
                           src={resolveIcon(skill)}
-                          alt={skill.name}
+                          alt={`${skill.name} logo`}
                           className="w-full h-full object-cover"
                           style={{
                             transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
@@ -422,7 +422,7 @@ export const SkillsSection = () => {
                           }}
                         />
                       ) : (
-                        <span className="text-base font-semibold text-primary">
+                        <span className="text-base font-semibold text-primary" aria-label={`${skill.name} icon`}>
                           {skill.name?.charAt(0) || "?"}
                         </span>
                       )}
