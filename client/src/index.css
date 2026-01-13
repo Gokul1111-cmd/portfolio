@@ -181,9 +181,9 @@
 
 @media (pointer: fine) {
 
-  /* Hide default cursor on desktop */
-  html,
-  body {
+  /* Hide default cursor on desktop - except admin pages */
+  html:not(:has([data-admin-page])),
+  body:not(:has([data-admin-page])) {
     cursor: none !important;
   }
 
@@ -193,18 +193,18 @@
       auto;
   }
 
-  body,
-  button,
-  a,
-  input,
-  textarea,
-  select {
+  body:not(:has([data-admin-page])),
+  body:not(:has([data-admin-page])) button,
+  body:not(:has([data-admin-page])) a,
+  body:not(:has([data-admin-page])) input,
+  body:not(:has([data-admin-page])) textarea,
+  body:not(:has([data-admin-page])) select {
     cursor: var(--cursor-url);
   }
 
-  .cursor-pointer,
-  button,
-  a {
+  body:not(:has([data-admin-page])) .cursor-pointer,
+  body:not(:has([data-admin-page])) button,
+  body:not(:has([data-admin-page])) a {
     cursor: var(--cursor-url);
   }
 }

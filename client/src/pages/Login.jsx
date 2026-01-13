@@ -19,7 +19,7 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background text-foreground relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground relative overflow-hidden" data-admin-page>
       {/* Background decoration matching your theme */}
       <div className="absolute inset-0 bg-primary/5 z-0" />
 

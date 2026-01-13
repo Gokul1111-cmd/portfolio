@@ -80,7 +80,7 @@ export const AdminDashboard = () => {
   const CurrentComponent = sectionComponents[activeSection] || HeroEditor;
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden" data-admin-page>
       {/* Navbar */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
         <div className="px-6 h-16 flex items-center justify-between">
