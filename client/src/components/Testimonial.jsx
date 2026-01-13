@@ -286,33 +286,41 @@ export const TestimonialSection = () => {
 
           {/* Mobile Navigation - Show only when needed */}
           {totalPages > 1 && (
-            <div className="flex justify-center gap-3 sm:gap-4 sm:hidden">
-              <button
-                onClick={prevTestimonial}
-                className="p-1 sm:p-2 rounded-full border border-muted-foreground/20 hover:border-primary/50 bg-background/80 backdrop-blur-sm transition-all hover:scale-110"
-                aria-label="Previous testimonial"
-              >
-                <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-              </button>
-
+            <div className="flex flex-col items-center gap-4 sm:hidden">
+              {/* Swipe indicators/dots */}
               <div className="flex items-center gap-2">
                 {Array.from({ length: totalPages }).map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentIndex(index)}
-                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${currentIndex === index ? "bg-primary" : "bg-muted-foreground/20"}`}
+                    className={`rounded-full transition-all duration-300 ${
+                      currentIndex === index 
+                        ? "w-8 h-2.5 bg-primary" 
+                        : "w-2.5 h-2.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                    }`}
                     aria-label={`Go to testimonial ${index + 1}`}
                   />
                 ))}
               </div>
 
-              <button
-                onClick={nextTestimonial}
-                className="p-1 sm:p-2 rounded-full border border-muted-foreground/20 hover:border-primary/50 bg-background/80 backdrop-blur-sm transition-all hover:scale-110"
-                aria-label="Next testimonial"
-              >
-                <ChevronRight className="h-4 w-4 sm:h-5 sm:h-5" />
-              </button>
+              {/* Navigation buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={prevTestimonial}
+                  className="p-2 rounded-full border border-muted-foreground/20 hover:border-primary/50 bg-background/80 backdrop-blur-sm transition-all hover:scale-110"
+                  aria-label="Previous testimonial"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+
+                <button
+                  onClick={nextTestimonial}
+                  className="p-2 rounded-full border border-muted-foreground/20 hover:border-primary/50 bg-background/80 backdrop-blur-sm transition-all hover:scale-110"
+                  aria-label="Next testimonial"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           )}
         </motion.div>

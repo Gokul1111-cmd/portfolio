@@ -851,14 +851,6 @@ export const CertificatesSection = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             <Award className="w-4 h-4" />
             Certifications
-            <span
-              className={`text-[11px] px-2 py-0.5 rounded-full border ${isLiveData
-                  ? "border-emerald-400 text-emerald-400 bg-emerald-400/10"
-                  : "border-amber-400 text-amber-400 bg-amber-400/10"
-                }`}
-            >
-              {isLiveData ? "Live" : "Fallback"}
-            </span>
           </div>
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
             Certificates & Badges
