@@ -706,7 +706,6 @@ export const CertificatesSection = () => {
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [, setError] = useState("");
-  const [isLiveData, setIsLiveData] = useState(false);
   const [previewCert, setPreviewCert] = useState(null);
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
 
@@ -722,7 +721,6 @@ export const CertificatesSection = () => {
           liveUrl: "/api/portfolio-data?type=certificates",
           fallbackEmpty: withFallbackData,
         });
-        const usedFallback = payload === withFallbackData;
         const data = Array.isArray(payload?.items)
           ? payload.items
           : Array.isArray(payload)
@@ -730,7 +728,6 @@ export const CertificatesSection = () => {
             : [];
         console.info("[CertificatesSection] Using dataset", data.length);
         if (Array.isArray(data) && data.length) {
-          setIsLiveData(!usedFallback);
           const normalized = data.map((item, idx) => {
             const lowerImage = (item.image || item.url || "").toLowerCase();
             const type =
@@ -769,14 +766,12 @@ export const CertificatesSection = () => {
           setError("Showing fallback certificates");
           console.warn("[CertificatesSection] Empty data; using fallback list");
           setCertificates(withFallbackData);
-          setIsLiveData(false);
         }
       } catch (err) {
         console.error("Certificate fetch failed", err);
         setError("Showing fallback certificates");
         console.warn("[CertificatesSection] Error; using fallback list");
         setCertificates(withFallbackData);
-        setIsLiveData(false);
       } finally {
         setLoading(false);
       }

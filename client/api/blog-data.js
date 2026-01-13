@@ -4,7 +4,7 @@ import { admin, adminDb } from "../lib/firebase-admin.js";
 // Consolidated Blog Data API
 // Handles: views, likes, comments
 export default async function handler(req, res) {
-    const { action, slug, id } = req.query || {};
+    const { action, slug } = req.query || {};
 
     if (!action) {
         return res.status(400).json({ error: "action parameter is required (view|like|stats|comments|comment)" });

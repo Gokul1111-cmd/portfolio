@@ -1,11 +1,9 @@
 import {
-  Instagram,
   Linkedin,
   Mail,
   MapPin,
   Phone,
   Send,
-  Twitter,
   Github,
   Loader2,
 } from "lucide-react";

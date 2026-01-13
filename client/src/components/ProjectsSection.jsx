@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   Github,
-  ChevronUp,
   Star,
   Code,
   Sparkles,
