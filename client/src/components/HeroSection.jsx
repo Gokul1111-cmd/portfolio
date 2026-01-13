@@ -24,7 +24,7 @@ export const HeroSection = () => {
     headline: "I'm Gokul A",
     subheadline:
       "I build AI-powered web applications that solve real-world problems. Passionate about cybersecurity, cloud computing, and creating impactful digital solutions.",
-    availability: "Available Immediately for Full-Stack Developer roles",
+    availability: "Available Immediately for Full-Stack Developer & Cloud Computing roles",
     primaryCtaText: "View Projects",
     primaryCtaLink: "#projects",
     secondaryCtaText: "View Blogs",
@@ -33,9 +33,9 @@ export const HeroSection = () => {
     profileImage: "/profile-logo.png",
     achievements: [
       { number: "4", label: "Projects Completed", suffix: "+" },
-      { number: "5", label: "Ongoing Projects", suffix: "" },
+      { number: "5", label: "Ongoing Projects", suffix: "+" },
       { number: "10", label: "Technologies Used", suffix: "+" },
-      { number: "100", label: "Code Commits", suffix: "+" },
+      { number: "12615", label: "Code Commits", suffix: "+" },
     ],
     codeSnippets: [
       "import { FullStackDeveloper } from 'gokul.dev';",

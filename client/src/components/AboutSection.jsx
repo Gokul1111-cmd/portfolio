@@ -22,7 +22,7 @@ export const AboutSection = () => {
   const [error, setError] = useState("");
 
   const defaultAboutContent = {
-    bio: "I'm Gokul A, a Computer Science Engineering student passionate about AI, cloud computing, and full-stack development. I love transforming ideas into impactful digital solutions that blend creativity, logic, and real-world value.",
+    bio: "I'm Gokul A, a Computer Science Engineering student passionate about AI, cloud computing, and full-stack development. I love transforming ideas into impactful digital solutions.",
     experience:
       "Fresh graduate with hands-on experience building 7+ projects using modern technologies. I specialize in full-stack development, AI integration, and creating scalable web applications with a focus on cybersecurity.",
     education:
@@ -57,7 +57,7 @@ export const AboutSection = () => {
   ];
 
   const features = [
-    "AI & Cloud expertise",
+    "AI & Cloud exposure",
     "Clean, scalable code",
     "Cybersecurity focused",
     "Full-stack development",

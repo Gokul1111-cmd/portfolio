@@ -37,7 +37,7 @@ export const Footer = () => {
     ],
     contactInfo: {
       email: "gokulanbalagan1112@gmail.com",
-      phone: "+91 8754740118",
+      phone: "+91 8754740118, +91 8056540118",
       location: "Coimbatore, Tamil Nadu, India",
     },
     footerPolicyLinks: [

@@ -19,8 +19,8 @@ export const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactData, setContactData] = useState({
     email: "gokulanbalagan1112@gmail.com",
-    phone: "+91 8754740118",
-    location: "Coimbatore, Tamil Nadu, India",
+    phone: "+91-8056540118, +91-8754740118",
+    location: "India",
     linkedin: "https://www.linkedin.com/in/gokulanbalagan1112/",
     twitter: "#",
     github: "https://github.com/Gokul1111-cmd",

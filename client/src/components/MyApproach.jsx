@@ -13,37 +13,37 @@ import { fetchStaticOrLive } from "../lib/staticData";
 const defaultApproachContent = {
   title: "My Approach",
   description:
-    "I follow a structured methodology to ensure quality, scalability, and user satisfaction in every project.",
+    "I follow a systematic, user-centric approach to building web applications that are not just functional but also beautiful and performant.",
   steps: [
     {
       number: 1,
-      title: "Understanding",
-      description: "Deep dive into requirements and project goals",
+      title: "Discovery",
+      description: "Understanding requirements, goals, and user needs",
     },
     {
       number: 2,
       title: "Planning",
-      description: "Strategic roadmap and architecture design",
+      description: "Creating architecture and technical specifications",
     },
     {
       number: 3,
-      title: "Development",
-      description: "Clean, scalable code implementation",
+      title: "Design",
+      description: "Crafting intuitive UI/UX with attention to detail",
     },
     {
       number: 4,
-      title: "Testing",
-      description: "Rigorous QA and performance optimization",
+      title: "Development",
+      description: "Writing clean, scalable, and maintainable code",
     },
     {
       number: 5,
-      title: "Deployment",
-      description: "Smooth launch and continuous monitoring",
+      title: "Testing",
+      description: "Rigorous QA and performance optimization",
     },
   ],
   careerTitle: "Career Path",
   careerIntro:
-    "A quick look at how I grew from school to Infosys, building skills and impact along the way.",
+    "A quick look at how I grew from school to ..., building skills and impact along the way.",
   careerTimeline: [
     {
       period: "School",
