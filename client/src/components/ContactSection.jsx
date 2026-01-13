@@ -22,9 +22,7 @@ export const ContactSection = () => {
     phone: "+91-8056540118, +91-8754740118",
     location: "India",
     linkedin: "https://www.linkedin.com/in/gokulanbalagan1112/",
-    twitter: "#",
     github: "https://github.com/Gokul1111-cmd",
-    instagram: "#",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -57,6 +55,19 @@ export const ContactSection = () => {
     fetchContact();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const socialLinks = [
+    {
+      icon: Linkedin,
+      label: "LinkedIn",
+      url: contactData.linkedin,
+    },
+    {
+      icon: Github,
+      label: "GitHub",
+      url: contactData.github,
+    },
+  ].filter((link) => link.url && link.url !== "#");
 
   const validateForm = () => {
     if (!formData.name.trim()) {
@@ -230,28 +241,7 @@ export const ContactSection = () => {
                 Find me on
               </h4>
               <div className="flex gap-2 sm:gap-3">
-                {[
-                  {
-                    icon: Linkedin,
-                    label: "LinkedIn",
-                    url: contactData.linkedin,
-                  },
-                  {
-                    icon: Twitter,
-                    label: "Twitter",
-                    url: contactData.twitter,
-                  },
-                  {
-                    icon: Github,
-                    label: "GitHub",
-                    url: contactData.github,
-                  },
-                  {
-                    icon: Instagram,
-                    label: "Instagram",
-                    url: contactData.instagram,
-                  },
-                ].map((social, index) => (
+                {socialLinks.map((social, index) => (
                   <a
                     key={index}
                     href={social.url}
