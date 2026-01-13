@@ -161,9 +161,9 @@ const InfiniteScrollSkills = ({ skills }) => {
   const duplicatedSkills = [...skills, ...skills, ...skills];
 
   return (
-    <div className="overflow-hidden py-8">
+    <div className="overflow-hidden py-4 sm:py-8">
       <motion.div
-        className="flex gap-8 mb-8"
+        className="flex gap-6 sm:gap-8 mb-6 sm:mb-8"
         animate={{ x: ["0%", "-100%"] }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
       >
@@ -172,7 +172,7 @@ const InfiniteScrollSkills = ({ skills }) => {
             key={`${skill.name}-${index}`}
             className="flex-shrink-0 flex flex-col items-center gap-2"
           >
-            <div className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform overflow-hidden">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform overflow-hidden">
               {resolveIcon(skill) ? (
                 <img
                   src={resolveIcon(skill)}
@@ -201,7 +201,7 @@ const InfiniteScrollSkills = ({ skills }) => {
                 </span>
               )}
             </div>
-            <span className="text-sm font-medium text-center">
+            <span className="text-xs sm:text-sm font-medium text-center">
               {skill.name}
             </span>
           </div>
@@ -209,7 +209,7 @@ const InfiniteScrollSkills = ({ skills }) => {
       </motion.div>
 
       <motion.div
-        className="flex gap-8"
+        className="flex gap-6 sm:gap-8 mt-4 sm:mt-0"
         animate={{ x: ["-100%", "0%"] }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
       >
@@ -218,7 +218,7 @@ const InfiniteScrollSkills = ({ skills }) => {
             key={`${skill.name}-reverse-${index}`}
             className="flex-shrink-0 flex flex-col items-center gap-2"
           >
-            <div className="w-16 h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform overflow-hidden">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center shadow-lg hover:scale-110 transition-transform overflow-hidden">
               {resolveIcon(skill) ? (
                 <img
                   src={resolveIcon(skill)}
@@ -247,7 +247,7 @@ const InfiniteScrollSkills = ({ skills }) => {
                 </span>
               )}
             </div>
-            <span className="text-sm font-medium text-center">
+            <span className="text-xs sm:text-sm font-medium text-center">
               {skill.name}
             </span>
           </div>
@@ -338,18 +338,18 @@ export const SkillsSection = () => {
   return (
     <section
       id="skills"
-      className="relative py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background"
+      className="relative py-16 sm:py-24 md:py-28 px-4 bg-gradient-to-br from-background via-secondary/5 to-background"
     >
       <div className="container mx-auto max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="text-center mb-20"
+          className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
             My Skills
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+          <p className="text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg">
             Technologies I&apos;ve mastered and my proficiency levels
           </p>
           {isLoading && (
@@ -362,12 +362,12 @@ export const SkillsSection = () => {
           )}
         </motion.div>
 
-        <div className="flex flex-wrap justify-center gap-3 mb-16">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12">
           {categories.map((category) => (
             <motion.button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
-              className={`px-6 py-2.5 rounded-full font-medium border border-transparent hover:shadow-lg ${activeCategory === category.id
+              className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-medium border border-transparent hover:shadow-lg ${activeCategory === category.id
                   ? `${category.color} text-white shadow-md`
                   : "bg-secondary/50 text-foreground hover:bg-secondary/70"
                 }`}
@@ -380,9 +380,13 @@ export const SkillsSection = () => {
         </div>
 
         {activeCategory === "all" ? (
-          <InfiniteScrollSkills skills={uniqueSkills} />
+          <div className="-mx-2 sm:mx-0">
+            <div className="px-2 sm:px-0">
+              <InfiniteScrollSkills skills={uniqueSkills} />
+            </div>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {filteredSkills.length === 0 && (
               <div className="col-span-full text-center text-muted-foreground">
                 No skills found in this category.
@@ -396,10 +400,10 @@ export const SkillsSection = () => {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  className="bg-card p-6 rounded-2xl border border-border/30 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-lg group"
+                  className="bg-card p-4 sm:p-5 md:p-6 rounded-2xl border border-border/30 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-lg group"
                 >
                   <div className="flex items-start gap-4 mb-5">
-                    <div className="w-12 h-12 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-card border-2 border-primary/50 flex items-center justify-center overflow-hidden flex-shrink-0">
                       {resolveIcon(skill) ? (
                         <img
                           src={resolveIcon(skill)}
@@ -429,7 +433,7 @@ export const SkillsSection = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+                        <h3 className="font-semibold text-base sm:text-lg group-hover:text-primary transition-colors">
                           {skill.name}
                         </h3>
                         <span
