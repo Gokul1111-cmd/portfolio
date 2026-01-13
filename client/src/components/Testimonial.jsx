@@ -157,7 +157,7 @@ export const TestimonialSection = () => {
               transition={{ delay: 0.4 }}
             >
               <Star className="h-3 w-3 sm:h-4 sm:w-4" />
-              Client Feedback
+              Testimonials
               <Star className="h-3 w-3 sm:h-4 sm:w-4" />
             </motion.div>
             <motion.h2
@@ -170,7 +170,7 @@ export const TestimonialSection = () => {
               className="text-base sm:text-lg text-muted-foreground mt-3 sm:mt-4 max-w-2xl mx-auto"
               variants={itemVariants}
             >
-              What Clients Will Say About Working with Me.
+              Feedback from peers, classmates, and collaborators.
             </motion.p>
             <motion.div
               className="flex justify-center mt-4"
