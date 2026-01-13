@@ -82,6 +82,15 @@ export const ProjectsSection = () => {
           featured: Boolean(p.featured),
           video: p.video || "",
         }));
+        
+        // Sort projects: Live first, then Prototype, then Coming Soon
+        const statusOrder = { "Live": 1, "Prototype": 2, "Coming Soon": 3 };
+        formattedData.sort((a, b) => {
+          const orderA = statusOrder[a.status] || 999;
+          const orderB = statusOrder[b.status] || 999;
+          return orderA - orderB;
+        });
+        
         setProjects(formattedData);
       } catch (error) {
         console.error("Failed to fetch projects:", error);

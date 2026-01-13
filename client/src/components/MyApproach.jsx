@@ -274,22 +274,27 @@ export const MyApproach = () => {
                   >
                     <div className="flex-1">
                       <motion.div
-                        className="bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-lg"
-                        whileHover={{ scale: 1.02 }}
+                        className="bg-gradient-to-br from-card via-card to-card/80 border border-border rounded-2xl p-6 md:p-8 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 shadow-lg group"
+                        whileHover={{ scale: 1.03, y: -4 }}
                       >
                         <div className="flex items-start gap-4">
                           <div className="flex-shrink-0">
-                            <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10 border border-primary/30">
-                              <span className="text-lg font-bold text-primary">
+                            <motion.div
+                              className="relative flex items-center justify-center h-16 w-16 rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg group-hover:shadow-xl group-hover:shadow-primary/50 transition-all"
+                              whileHover={{ rotate: 360 }}
+                              transition={{ duration: 0.6 }}
+                            >
+                              <span className="text-2xl font-bold text-white">
                                 {step.number}
                               </span>
-                            </div>
+                              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </motion.div>
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-xl font-bold text-foreground mb-2">
+                            <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
                               {step.title}
                             </h3>
-                            <p className="text-muted-foreground">
+                            <p className="text-muted-foreground leading-relaxed">
                               {step.description}
                             </p>
                           </div>
@@ -299,14 +304,15 @@ export const MyApproach = () => {
 
                     <div className="hidden md:flex items-center justify-center flex-shrink-0">
                       <motion.div
-                        initial={{ scale: 0 }}
-                        whileInView={{ scale: 1 }}
-                        transition={{ delay: index * 0.1 + 0.2 }}
+                        initial={{ scale: 0, rotate: -180 }}
+                        whileInView={{ scale: 1, rotate: 0 }}
+                        transition={{ delay: index * 0.1 + 0.2, type: "spring", stiffness: 200 }}
                         className="relative"
                       >
-                        <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
-                        <div className="relative flex items-center justify-center h-12 w-12 rounded-full bg-card border-2 border-primary shadow-lg">
-                          <CheckCircle2 size={24} className="text-primary" />
+                        <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse blur-sm" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary/10 rounded-full animate-ping" />
+                        <div className="relative flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-primary to-primary/80 border-2 border-primary shadow-xl shadow-primary/50">
+                          <CheckCircle2 size={28} className="text-white" />
                         </div>
                       </motion.div>
                     </div>
@@ -384,7 +390,15 @@ export const MyApproach = () => {
                     </div>
                     <div className="hidden md:flex md:w-1/2 items-center justify-center">
                       <div className="relative h-full flex items-center justify-center">
-                        <div className="h-4 w-4 rounded-full bg-primary shadow-lg" />
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          whileInView={{ scale: 1 }}
+                          transition={{ delay: idx * 0.08 + 0.2, type: "spring" }}
+                          className="relative"
+                        >
+                          <div className="absolute inset-0 bg-primary/30 rounded-full animate-ping" />
+                          <div className="h-5 w-5 rounded-full bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg shadow-primary/50 border-2 border-background" />
+                        </motion.div>
                       </div>
                     </div>
                   </motion.div>
