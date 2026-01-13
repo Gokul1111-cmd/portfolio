@@ -199,7 +199,7 @@ export const Navbar = () => {
     <>
       {/* Top Right Buttons */}
       <motion.div
-        className="fixed top-4 right-4 z-50 flex gap-2"
+        className="fixed top-2 right-2 sm:top-4 sm:right-4 z-50 flex gap-1 sm:gap-2"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -210,17 +210,17 @@ export const Navbar = () => {
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
-            "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
+            "p-1.5 sm:p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-green-600 hover:bg-green-100 dark:hover:bg-green-900/50",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center",
+            "flex items-center justify-center min-w-[36px] min-h-[36px]",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title="My Website"
           aria-label="My Website"
         >
-          <Globe className="w-5 h-5" />
+          <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
         </motion.a>
 
         {/* GitHub Button */}
@@ -229,17 +229,17 @@ export const Navbar = () => {
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
-            "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
+            "p-1.5 sm:p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center",
+            "flex items-center justify-center min-w-[36px] min-h-[36px]",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title="GitHub Profile"
           aria-label="GitHub Profile"
         >
-          <Github className="w-5 h-5" />
+          <Github className="w-4 h-4 sm:w-5 sm:h-5" />
         </motion.a>
 
         {/* LinkedIn Button */}
@@ -248,17 +248,17 @@ export const Navbar = () => {
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
-            "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
+            "p-1.5 sm:p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/50",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center",
+            "flex items-center justify-center min-w-[36px] min-h-[36px]",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title="LinkedIn Profile"
           aria-label="LinkedIn Profile"
         >
-          <Linkedin className="w-5 h-5" />
+          <Linkedin className="w-4 h-4 sm:w-5 sm:h-5" />
         </motion.a>
 
 
@@ -266,17 +266,17 @@ export const Navbar = () => {
         <motion.button
           onClick={() => navigate("/blog")}
           className={cn(
-            "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
+            "p-1.5 sm:p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-primary hover:bg-primary/10 dark:hover:bg-primary/20",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center",
+            "flex items-center justify-center min-w-[36px] min-h-[36px]",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title="Blog"
           aria-label="Blog"
         >
-          <FileText className="w-5 h-5" />
+          <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
         </motion.button>
 
         {/* Music Button */}
@@ -284,10 +284,10 @@ export const Navbar = () => {
           onClick={toggleMusic}
           disabled={!isAudioReady}
           className={cn(
-            "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
+            "p-1.5 sm:p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-primary hover:bg-primary/10 dark:hover:bg-primary/20",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center",
+            "flex items-center justify-center min-w-[36px] min-h-[36px]",
             !isAudioReady && "opacity-50 cursor-not-allowed",
           )}
           whileHover={{ scale: isAudioReady ? 1.05 : 1 }}
@@ -308,33 +308,33 @@ export const Navbar = () => {
           }
         >
           {isMusicPlaying ? (
-            <Volume2 className="w-5 h-5" />
+            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
           ) : (
-            <VolumeX className="w-5 h-5" />
+            <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" />
           )}
         </motion.button>
 
         <motion.button
           onClick={() => navigate("/login")}
           className={cn(
-            "p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
+            "p-1.5 sm:p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
             "text-primary hover:bg-primary/10 dark:hover:bg-primary/20",
             "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center",
+            "flex items-center justify-center min-w-[36px] min-h-[36px]",
           )}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title="Admin Login"
         >
-          <User className="w-5 h-5" />
+          <User className="w-4 h-4 sm:w-5 sm:h-5" />
         </motion.button>
       </motion.div>
 
       {/* Bottom Navbar */}
       <motion.div
         className={cn(
-          "fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50",
-          "transition-transform duration-300 ease-in-out",
+          "fixed bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 z-50",
+          "transition-transform duration-300 ease-in-out px-2",
           showNavbar ? "translate-y-0" : "translate-y-full",
         )}
         style={{ willChange: "transform" }}
@@ -342,8 +342,8 @@ export const Navbar = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex items-center justify-center bg-white/80 dark:bg-black/80 backdrop-blur-md rounded-full shadow-lg p-2 border border-gray-200 dark:border-gray-700">
-          <div className="flex space-x-1 items-center">
+        <div className="flex items-center justify-center bg-white/80 dark:bg-black/80 backdrop-blur-md rounded-full shadow-lg p-1.5 sm:p-2 border border-gray-200 dark:border-gray-700">
+          <div className="flex space-x-0.5 sm:space-x-1 items-center">
             {navItems.map((item) => {
               const isBlogLink =
                 item.name?.toLowerCase() === "blog" ||
@@ -363,21 +363,21 @@ export const Navbar = () => {
                   href={isBlogLink ? "/blog" : item.href}
                   onClick={handleClick}
                   className={cn(
-                    "p-2 rounded-full transition-colors flex flex-col items-center",
+                    "p-1.5 sm:p-2 rounded-full transition-colors flex flex-col items-center min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px]",
                     activeSection === item.href
                       ? "bg-primary text-white"
                       : "text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-primary",
                   )}
                   aria-label={item.name}
                 >
-                  <item.icon className="w-5 h-5" />
+                  <item.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="text-xs mt-1 hidden md:block">
                     {item.name}
                   </span>
                 </a>
               );
             })}
-            <div className="flex items-center px-2">
+            <div className="flex items-center px-1 sm:px-2">
               <ThemeToggle />
             </div>
           </div>

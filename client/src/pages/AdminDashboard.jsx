@@ -80,7 +80,7 @@ export const AdminDashboard = () => {
   const CurrentComponent = sectionComponents[activeSection] || HeroEditor;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Navbar */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
         <div className="px-6 h-16 flex items-center justify-between">
@@ -128,7 +128,7 @@ export const AdminDashboard = () => {
 
         {/* Main Content - Scrollable; full-width on mobile */}
         <main className="md:ml-64 md:w-[calc(100%-256px)] w-full overflow-y-auto h-[calc(100vh-64px)]">
-          <div className="p-8 pb-20">
+          <div className="p-4 sm:p-6 md:p-8 pb-20">
             {/* Mobile Section Switcher */}
             <div className="md:hidden mb-6">
               <label className="block text-sm text-muted-foreground mb-2">Section</label>
