@@ -382,7 +382,7 @@ export const ProjectsSection = () => {
                             rel="noopener noreferrer"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className={`flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+                            className={`flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium transition-all duration-300 ${
                               !project.demoUrl || project.demoUrl === "#"
                                 ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
                                 : "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -404,7 +404,7 @@ export const ProjectsSection = () => {
                             rel="noopener noreferrer"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className={`inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium border transition-all duration-300 ${
+                            className={`inline-flex items-center justify-center gap-2 py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium border transition-all duration-300 ${
                               !project.githubUrl || project.githubUrl === "#"
                                 ? "bg-muted text-muted-foreground cursor-not-allowed border-border"
                                 : "bg-background text-foreground border-border hover:border-primary hover:bg-primary/5"

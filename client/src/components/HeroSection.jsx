@@ -271,7 +271,7 @@ export const HeroSection = () => {
             >
               <motion.a
                 href={hero.primaryCtaLink || "#projects"}
-                className="group relative overflow-hidden px-8 py-4 rounded-xl font-semibold bg-gradient-to-r from-primary to-purple-600 text-primary-foreground shadow-lg hover:shadow-xl text-sm flex items-center justify-center gap-3"
+                className="group relative overflow-hidden px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold bg-gradient-to-r from-primary to-purple-600 text-primary-foreground shadow-lg hover:shadow-xl text-sm sm:text-base flex items-center justify-center gap-3"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -282,7 +282,7 @@ export const HeroSection = () => {
 
               <motion.a
                 href={hero.secondaryCtaLink || "#projects"}
-                className="group relative overflow-hidden px-8 py-4 rounded-xl font-semibold border border-primary/50 text-foreground hover:border-primary transition-all duration-300 bg-background/80 backdrop-blur-sm text-sm flex items-center justify-center gap-3"
+                className="group relative overflow-hidden px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold border border-primary/50 text-foreground hover:border-primary transition-all duration-300 bg-background/80 backdrop-blur-sm text-sm sm:text-base flex items-center justify-center gap-3"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -292,7 +292,7 @@ export const HeroSection = () => {
 
               <motion.button
                 onClick={handleViewResume}
-                className="group relative overflow-hidden px-6 py-4 rounded-xl font-semibold border border-border text-muted-foreground hover:border-primary/30 transition-all duration-300 bg-background/60 backdrop-blur-sm text-sm flex items-center justify-center gap-2"
+                className="group relative overflow-hidden px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold border border-border text-muted-foreground hover:border-primary/30 transition-all duration-300 bg-background/60 backdrop-blur-sm text-sm sm:text-base flex items-center justify-center gap-2"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >

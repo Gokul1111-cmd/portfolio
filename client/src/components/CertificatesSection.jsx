@@ -926,7 +926,7 @@ export const CertificatesSection = () => {
                         href={cert.link || cert.image}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 inline-flex items-center justify-center gap-2 text-sm font-medium px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition"
+                        className="flex-1 inline-flex items-center justify-center gap-2 text-sm font-medium px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -937,7 +937,7 @@ export const CertificatesSection = () => {
                           e.stopPropagation();
                           openPreview(cert);
                         }}
-                        className="inline-flex items-center justify-center gap-2 text-sm font-medium px-3 py-2 rounded-lg border border-border hover:border-primary transition bg-background/80"
+                        className="inline-flex items-center justify-center gap-2 text-sm font-medium px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border border-border hover:border-primary transition bg-background/80"
                       >
                         <Eye className="w-4 h-4" />
                         Preview
@@ -997,7 +997,7 @@ export const CertificatesSection = () => {
                       href={cert.link || cert.image}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 inline-flex items-center justify-center gap-2 text-sm font-medium px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition"
+                      className="flex-1 inline-flex items-center justify-center gap-2 text-sm font-medium px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -1008,7 +1008,7 @@ export const CertificatesSection = () => {
                         e.stopPropagation();
                         openPreview(cert);
                       }}
-                      className="inline-flex items-center justify-center gap-2 text-sm font-medium px-3 py-2 rounded-lg border border-border hover:border-primary transition bg-background/80"
+                      className="inline-flex items-center justify-center gap-2 text-sm font-medium px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg border border-border hover:border-primary transition bg-background/80"
                     >
                       <Eye className="w-4 h-4" />
                       Preview
