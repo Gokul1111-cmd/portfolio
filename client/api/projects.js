@@ -19,10 +19,15 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const snapshot = await projectsRef.orderBy("created_at", "desc").get();
-      const projects = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const projects = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        // Remove any 'id' field from the document data to avoid conflicts
+        delete data.id;
+        return {
+          id: doc.id, // Always use Firestore document ID
+          ...data,
+        };
+      });
       return res.status(200).json(projects);
     } catch (error) {
       console.error("GET projects error:", error);
@@ -75,11 +80,13 @@ export default async function handler(req, res) {
   // --- DELETE REQUEST: Remove a project ---
   if (req.method === "DELETE") {
     const { id } = req.query;
-    try {
-      await projectsRef.doc(id).delete();
-      return res.status(200).json({ message: "Deleted successfully" });
-    } catch (error) {
-      console.error("DELETE project error:", error);
+      const snapshot = await projectsRef.orderBy("created_at", "desc").get();
+      // Ensure Firestore doc ID is used, not an `id` field from data
+      const projects = snapshot.docs.map((doc) => {
+        const data = doc.data() || {};
+        const { id: _ignore, ...rest } = data; // prevent overriding the doc ID
+        return { id: doc.id, ...rest };
+      });
       return res.status(500).json({ error: error.message });
     }
   }

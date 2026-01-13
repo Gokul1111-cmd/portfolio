@@ -223,6 +223,8 @@ export const ProjectsEditor = () => {
     try {
       const res = await fetch("/api/projects");
       const data = await res.json();
+      console.log("[ProjectsEditor] Fetched projects:", data);
+      console.log("[ProjectsEditor] First project ID:", data[0]?.id);
       const uniqueProjects = Array.isArray(data) ? data : [];
       const seen = new Set();
       const filtered = uniqueProjects.filter((project) => {
@@ -230,6 +232,7 @@ export const ProjectsEditor = () => {
         seen.add(project.id);
         return true;
       });
+      console.log("[ProjectsEditor] Filtered projects:", filtered.map(p => ({ id: p.id, title: p.title })));
       setProjects(filtered);
     } catch (error) {
       console.error("Failed to load projects", error);
@@ -291,6 +294,7 @@ export const ProjectsEditor = () => {
   };
 
   const handleEdit = (project) => {
+    console.log("[ProjectsEditor] handleEdit called with project:", { id: project.id, title: project.title });
     setEditingProject(project);
     setNewSkill({
       title: project.title,

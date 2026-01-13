@@ -230,7 +230,7 @@ export const ProjectsSection = () => {
             </motion.div>
 
             {/* Projects Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 relative">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8 relative">
               <AnimatePresence mode="popLayout">
                 {displayedProjects.map((project, index) => (
                   <motion.div
@@ -251,7 +251,7 @@ export const ProjectsSection = () => {
                   >
                     <div className="relative bg-background border border-border rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 h-full flex flex-col">
                       {/* Image/Video Section */}
-                      <div className="relative h-48 overflow-hidden bg-muted">
+                      <div className="relative h-40 sm:h-48 overflow-hidden bg-muted">
                         <motion.img
                           src={project.image || "/placeholder.png"}
                           alt={project.title}
@@ -329,9 +329,9 @@ export const ProjectsSection = () => {
                       </div>
 
                       {/* Content Section */}
-                      <div className="p-6 flex-1 flex flex-col">
+                      <div className="p-4 sm:p-6 flex-1 flex flex-col">
                         <div className="flex items-start justify-between mb-3">
-                          <h3 className="text-xl font-bold text-foreground">
+                          <h3 className="text-lg md:text-xl font-bold text-foreground">
                             {project.title}
                           </h3>
                           {project.featured && (
@@ -475,7 +475,7 @@ export const ProjectsSection = () => {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <div className="bg-background border border-border rounded-2xl p-12 max-w-4xl mx-auto">
+          <div className="bg-background border border-border rounded-2xl p-6 sm:p-10 md:p-12 max-w-4xl mx-auto">
             <motion.div
               initial={{ scale: 0 }}
               whileInView={{ scale: 1 }}
@@ -542,12 +542,12 @@ export const ProjectsSection = () => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-border">
+              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border">
                 <div>
-                  <h3 className="text-xl font-bold text-foreground">
+                  <h3 className="text-base sm:text-xl font-bold text-foreground">
                     {selectedVideo.title} Demo
                   </h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-xs sm:text-sm">
                     {selectedVideo.category}
                   </p>
                 </div>
@@ -576,7 +576,7 @@ export const ProjectsSection = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="p-6 border-t border-border">
+              <div className="p-4 sm:p-6 border-t border-border">
                 <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
                   <p className="text-muted-foreground text-sm flex-1">
                     Watch the demo of {selectedVideo.title} in action

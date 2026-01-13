@@ -98,8 +98,8 @@ export const AdminDashboard = () => {
       </nav>
 
       <div className="flex">
-        {/* Sidebar Navigation - Fixed */}
-        <aside className="w-64 border-r border-border bg-card/30 p-6 fixed left-0 top-16 h-[calc(100vh-64px)]">
+        {/* Sidebar Navigation - Fixed on md+; hidden on mobile */}
+        <aside className="hidden md:block md:w-64 border-r border-border bg-card/30 p-6 md:fixed md:left-0 md:top-16 md:h-[calc(100vh-64px)]">
           <div className="space-y-2">
             {navigationItems.map((item) => {
               const Icon = item.icon;
@@ -126,9 +126,22 @@ export const AdminDashboard = () => {
           </div>
         </aside>
 
-        {/* Main Content - Scrollable */}
-        <main className="ml-64 w-[calc(100%-256px)] overflow-y-auto h-[calc(100vh-64px)]">
+        {/* Main Content - Scrollable; full-width on mobile */}
+        <main className="md:ml-64 md:w-[calc(100%-256px)] w-full overflow-y-auto h-[calc(100vh-64px)]">
           <div className="p-8 pb-20">
+            {/* Mobile Section Switcher */}
+            <div className="md:hidden mb-6">
+              <label className="block text-sm text-muted-foreground mb-2">Section</label>
+              <select
+                value={activeSection}
+                onChange={(e) => setActiveSection(e.target.value)}
+                className="w-full p-2 rounded-md bg-card border border-border"
+              >
+                {navigationItems.map((item) => (
+                  <option key={item.id} value={item.id}>{item.label}</option>
+                ))}
+              </select>
+            </div>
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={activeSection}
