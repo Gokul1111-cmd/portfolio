@@ -14,6 +14,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { fetchStaticOrLive } from "../lib/staticData";
 
+const FORM_ENDPOINT =
+  import.meta.env.VITE_FORM_ENDPOINT || "https://formspree.io/f/xqezwjjr";
+
 export const ContactSection = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -119,7 +122,7 @@ export const ContactSection = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("https://formspree.io/f/xqezwjjr", {
+      const response = await fetch(FORM_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
