@@ -23,8 +23,6 @@ export const Footer = () => {
         label: "LinkedIn",
         href: "https://www.linkedin.com/in/gokulanbalagan1112/",
       },
-      { label: "Instagram", href: "#" },
-      { label: "YouTube", href: "#" },
       { label: "GitHub", href: "https://github.com/Gokul1111-cmd" },
     ],
     footerQuickLinks: [
@@ -40,11 +38,6 @@ export const Footer = () => {
       phone: "+91 8754740118, +91 8056540118",
       location: "Coimbatore, Tamil Nadu, India",
     },
-    footerPolicyLinks: [
-      { name: "Privacy", href: "#" },
-      { name: "Terms", href: "#" },
-      { name: "Cookies", href: "#" },
-    ],
     copyrightText: `© ${currentYear} Gokul A. All rights reserved.`,
   });
   useEffect(() => {
@@ -65,6 +58,10 @@ export const Footer = () => {
     fetchSiteSettings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const socialLinks = (siteData.footerSocialLinks || []).filter(
+    (link) => link?.href && link.href !== "#",
+  );
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -109,7 +106,7 @@ export const Footer = () => {
                 {siteData.brandBio}
               </p>
               <div className="flex space-x-4">
-                {(siteData.footerSocialLinks || []).map((social, index) => (
+                {socialLinks.map((social, index) => (
                   <motion.a
                     key={index}
                     href={social.href}
@@ -214,19 +211,6 @@ export const Footer = () => {
             <div>
               <p>{siteData.copyrightText}</p>
             </div>
-
-            <div className="flex items-center gap-4">
-              {(siteData.footerPolicyLinks || []).map((link, index) => (
-                <a
-                  key={index}
-                  href={link.href}
-                  className="hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  {link.name}
-                </a>
-              ))}
-            </div>
-
             <motion.a
               href="#hero"
               aria-label="Back to top"
