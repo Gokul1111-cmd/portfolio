@@ -80,13 +80,16 @@ export default async function handler(req, res) {
   // --- DELETE REQUEST: Remove a project ---
   if (req.method === "DELETE") {
     const { id } = req.query;
-      const snapshot = await projectsRef.orderBy("created_at", "desc").get();
-      // Ensure Firestore doc ID is used, not an `id` field from data
-      const projects = snapshot.docs.map((doc) => {
-        const data = doc.data() || {};
-        const { id: _ignore, ...rest } = data; // prevent overriding the doc ID
-        return { id: doc.id, ...rest };
-      });
+    
+    if (!id) {
+      return res.status(400).json({ error: "Project ID is required" });
+    }
+
+    try {
+      await projectsRef.doc(id).delete();
+      return res.status(200).json({ message: "Project deleted", id });
+    } catch (error) {
+      console.error("DELETE project error:", error);
       return res.status(500).json({ error: error.message });
     }
   }
