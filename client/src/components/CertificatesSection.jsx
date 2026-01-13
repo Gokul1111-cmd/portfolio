@@ -9,6 +9,7 @@ import {
   Eye,
   X,
   Sparkles,
+  ChevronDown,
 } from "lucide-react";
 import { fetchStaticOrLive } from "../lib/staticData";
 
@@ -707,6 +708,7 @@ export const CertificatesSection = () => {
   const [, setError] = useState("");
   const [isLiveData, setIsLiveData] = useState(false);
   const [previewCert, setPreviewCert] = useState(null);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
 
   const openPreview = (cert) => setPreviewCert(cert);
 
@@ -867,7 +869,8 @@ export const CertificatesSection = () => {
           </p>
         </motion.div>
 
-        <div className="flex flex-wrap justify-center gap-3 mb-10">
+        {/* Desktop: Horizontal filter buttons */}
+        <div className="hidden sm:flex flex-wrap justify-center gap-3 mb-10">
           {filters.map((filter) => (
             <button
               key={filter}
@@ -881,6 +884,42 @@ export const CertificatesSection = () => {
               {filter === "all" ? "All" : labelForCategory[filter] || filter}
             </button>
           ))}
+        </div>
+
+        {/* Mobile: Dropdown filter */}
+        <div className="sm:hidden mb-10 relative max-w-xs mx-auto">
+          <button
+            onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+            className="w-full px-5 py-3 rounded-xl text-sm font-medium border bg-background text-foreground border-border flex items-center justify-between gap-2 hover:border-primary transition-all"
+          >
+            <span className="flex items-center gap-2">
+              <Filter className="w-4 h-4" />
+              {activeFilter === "all" ? "All Certificates" : labelForCategory[activeFilter] || activeFilter}
+            </span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${
+              isFilterDropdownOpen ? "rotate-180" : ""
+            }`} />
+          </button>
+          {isFilterDropdownOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 py-2 rounded-xl bg-card border border-border shadow-lg z-50 max-h-80 overflow-y-auto">
+              {filters.map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => {
+                    setActiveFilter(filter);
+                    setIsFilterDropdownOpen(false);
+                  }}
+                  className={`w-full px-5 py-3 text-left text-sm transition-colors ${
+                    activeFilter === filter
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  }`}
+                >
+                  {filter === "all" ? "All Certificates" : labelForCategory[filter] || filter}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Featured carousel */}

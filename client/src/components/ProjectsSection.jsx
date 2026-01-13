@@ -375,7 +375,7 @@ export const ProjectsSection = () => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex gap-3 pt-4 border-t border-border">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4 border-t border-border">
                           <motion.a
                             href={project.demoUrl}
                             target="_blank"
@@ -404,7 +404,7 @@ export const ProjectsSection = () => {
                             rel="noopener noreferrer"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className={`inline-flex items-center justify-center gap-2 py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium border transition-all duration-300 ${
+                            className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 py-3 px-4 sm:px-6 rounded-lg text-sm sm:text-base font-medium border transition-all duration-300 ${
                               !project.githubUrl || project.githubUrl === "#"
                                 ? "bg-muted text-muted-foreground cursor-not-allowed border-border"
                                 : "bg-background text-foreground border-border hover:border-primary hover:bg-primary/5"
