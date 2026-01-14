@@ -14,6 +14,10 @@ import {
   RotateCcw,
   RotateCw,
   Crop as CropIcon,
+  Search,
+  CheckSquare,
+  Eye,
+  GripVertical,
 } from "lucide-react";
 import ReactCrop, { convertToPixelCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -75,6 +79,12 @@ export const CertificatesEditor = () => {
   const [loadingExisting, setLoadingExisting] = useState(false);
   const [cropError, setCropError] = useState("");
   const imgRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedForDelete, setSelectedForDelete] = useState(new Set());
+  const [bulkDeleteMode, setBulkDeleteMode] = useState(false);
+  const [previewCert, setPreviewCert] = useState(null);
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [reorderMode, setReorderMode] = useState(false);
 
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -496,6 +506,114 @@ export const CertificatesEditor = () => {
       console.error("Delete failed", err);
     }
   };
+
+  const toggleSelectForDelete = (certId) => {
+    const newSelection = new Set(selectedForDelete);
+    if (newSelection.has(certId)) {
+      newSelection.delete(certId);
+    } else {
+      newSelection.add(certId);
+    }
+    setSelectedForDelete(newSelection);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedForDelete.size === 0) return;
+    
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${selectedForDelete.size} certificate(s)? This action cannot be undone.`
+    );
+    
+    if (!confirmed) return;
+
+    try {
+      // Delete each certificate
+      const deletePromises = Array.from(selectedForDelete).map(id =>
+        fetch(`/api/portfolio-data?type=certificates&id=${id}`, { method: "DELETE" })
+      );
+      
+      await Promise.all(deletePromises);
+      await loadCerts();
+      setSelectedForDelete(new Set());
+      setBulkDeleteMode(false);
+    } catch (err) {
+      console.error("Bulk delete failed", err);
+      alert("Some deletions failed. Please try again.");
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedForDelete.size === filteredCerts.length) {
+      setSelectedForDelete(new Set());
+    } else {
+      setSelectedForDelete(new Set(filteredCerts.map(c => c.id)));
+    }
+  };
+
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/html", e.currentTarget);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDragEnter = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    
+    const newCerts = [...certs];
+    const draggedItem = newCerts[draggedIndex];
+    newCerts.splice(draggedIndex, 1);
+    newCerts.splice(index, 0, draggedItem);
+    
+    setCerts(newCerts);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  const saveOrder = async () => {
+    setSaving(true);
+    try {
+      // Update each certificate with its new order
+      const updatePromises = certs.map((cert, index) => 
+        fetch(`/api/portfolio-data?type=certificates&id=${cert.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order: index })
+        }).then(res => {
+          if (!res.ok) throw new Error(`Failed to update ${cert.id}`);
+          return res.json();
+        })
+      );
+      
+      await Promise.all(updatePromises);
+      await loadCerts();
+      alert("Certificate order saved successfully!");
+      setReorderMode(false);
+    } catch (err) {
+      console.error("Failed to save order", err);
+      alert("Failed to save order. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const filteredCerts = certs.filter(cert => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      cert.title?.toLowerCase().includes(query) ||
+      cert.provider?.toLowerCase().includes(query) ||
+      cert.category?.toLowerCase().includes(query)
+    );
+  });
 
   const handleEditExistingImage = async () => {
     if (!form.url && !form.fileName) {
@@ -934,7 +1052,7 @@ export const CertificatesEditor = () => {
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Existing Certificates</h3>
+              <h3 className="text-lg font-semibold">Existing Certificates ({certs.length})</h3>
               <button
                 onClick={() => {
                   setEditing(null);
@@ -946,23 +1064,139 @@ export const CertificatesEditor = () => {
               </button>
             </div>
 
+            {/* Search and Bulk Actions */}
+            <div className="space-y-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search certificates by title, provider, or category..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+              
+              <div className="flex flex-wrap gap-2">
+                {!reorderMode && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setBulkDeleteMode(!bulkDeleteMode);
+                        setSelectedForDelete(new Set());
+                      }}
+                      className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        bulkDeleteMode
+                          ? "bg-destructive/10 text-destructive border border-destructive"
+                          : "bg-background text-muted-foreground border border-border hover:border-primary hover:text-primary"
+                      }`}
+                    >
+                      <CheckSquare className="w-4 h-4" />
+                      {bulkDeleteMode ? "Cancel Selection" : "Bulk Delete"}
+                    </button>
+                    {bulkDeleteMode && (
+                      <>
+                        <button
+                          onClick={toggleSelectAll}
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-background text-muted-foreground border border-border hover:border-primary hover:text-primary"
+                        >
+                          {selectedForDelete.size === filteredCerts.length ? "Deselect All" : "Select All"}
+                        </button>
+                        {selectedForDelete.size > 0 && (
+                          <button
+                            onClick={handleBulkDelete}
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete Selected ({selectedForDelete.size})
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </>
+                )}
+                
+                {!bulkDeleteMode && (
+                  <button
+                    onClick={() => setReorderMode(!reorderMode)}
+                    className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      reorderMode
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-muted-foreground border border-border hover:border-primary hover:text-primary"
+                    }`}
+                  >
+                    <GripVertical className="w-4 h-4" />
+                    {reorderMode ? "Reordering..." : "Reorder"}
+                  </button>
+                )}
+                
+                {reorderMode && (
+                  <button
+                    onClick={saveOrder}
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700"
+                  >
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Save Order
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {loading && <p className="text-muted-foreground">Loading...</p>}
+            {!loading && filteredCerts.length === 0 && (
+              <p className="text-muted-foreground">
+                {searchQuery ? "No certificates match your search." : "No certificates yet."}
+              </p>
+            )}
+            
             <div className="grid sm:grid-cols-2 gap-4">
               <AnimatePresence>
-                {loading ? (
-                  <p className="text-muted-foreground">Loading...</p>
-                ) : certs.length === 0 ? (
-                  <p className="text-muted-foreground">No certificates yet.</p>
-                ) : (
-                  certs.map((cert) => (
-                    <motion.div
-                      key={cert.id}
-                      layout
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="border border-border rounded-lg p-4 bg-card/60 backdrop-blur"
-                    >
-                      <div className="flex items-start justify-between gap-2">
+                {!loading && (reorderMode ? certs : filteredCerts).map((cert, index) => (
+                  <motion.div
+                    key={cert.id}
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    draggable={reorderMode}
+                    onDragStart={(e) => reorderMode && handleDragStart(e, index)}
+                    onDragOver={(e) => reorderMode && handleDragOver(e)}
+                    onDragEnter={(e) => reorderMode && handleDragEnter(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className={`border rounded-lg p-4 bg-card/60 backdrop-blur relative transition-all ${
+                      bulkDeleteMode && selectedForDelete.has(cert.id)
+                        ? "border-destructive ring-2 ring-destructive/20"
+                        : reorderMode
+                        ? "border-primary/50 cursor-move hover:shadow-lg hover:border-primary"
+                        : "border-border"
+                    } ${draggedIndex === index ? "opacity-50" : ""}`}
+                    onClick={() => bulkDeleteMode && toggleSelectForDelete(cert.id)}
+                    style={{ cursor: bulkDeleteMode ? "pointer" : reorderMode ? "move" : "default" }}
+                  >
+                    {reorderMode && (
+                      <div className="absolute top-3 left-3 z-10 text-muted-foreground">
+                        <GripVertical className="w-5 h-5" />
+                      </div>
+                    )}
+                    {bulkDeleteMode && (
+                      <div className="absolute top-3 left-3 z-10">
+                        <div
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                            selectedForDelete.has(cert.id)
+                              ? "bg-destructive border-destructive"
+                              : "bg-background border-border"
+                          }`}
+                        >
+                          {selectedForDelete.has(cert.id) && (
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    <div className={`flex items-start justify-between gap-2 ${reorderMode || bulkDeleteMode ? "ml-8" : ""}`}>
                         <div>
                           <div className="flex items-center gap-2">
                             <p className="font-semibold line-clamp-2">
@@ -982,20 +1216,37 @@ export const CertificatesEditor = () => {
                             {cert.category}
                           </p>
                         </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleEdit(cert)}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary/10 text-primary text-xs"
-                          >
-                            <Pencil size={12} /> Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(cert.id)}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded bg-red-500/10 text-red-600 text-xs"
-                          >
-                            <Trash2 size={12} /> Del
-                          </button>
-                        </div>
+                        {!reorderMode && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewCert(cert);
+                              }}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded bg-blue-500/10 text-blue-600 text-xs hover:bg-blue-500/20"
+                            >
+                              <Eye size={12} /> Preview
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(cert);
+                              }}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary/10 text-primary text-xs hover:bg-primary/20"
+                            >
+                              <Pencil size={12} /> Edit
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(cert.id);
+                              }}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded bg-red-500/10 text-red-600 text-xs hover:bg-red-500/20"
+                            >
+                              <Trash2 size={12} /> Del
+                            </button>
+                          </div>
+                        )}
                       </div>
                       <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
                         <FileText size={12} />
@@ -1004,7 +1255,7 @@ export const CertificatesEditor = () => {
                         </span>
                       </div>
                     </motion.div>
-                  ))
+                  )
                 )}
               </AnimatePresence>
             </div>
@@ -1176,6 +1427,135 @@ export const CertificatesEditor = () => {
                       <UploadCloud className="w-4 h-4" />
                     )}
                     Apply & Upload
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Preview Modal */}
+      <AnimatePresence>
+        {previewCert && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setPreviewCert(null)}
+          >
+            <motion.div
+              className="bg-card border border-border rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden"
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              transition={{ type: "spring", stiffness: 260, damping: 22 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/50">
+                <div className="flex items-center gap-3">
+                  <Award className="w-5 h-5 text-primary" />
+                  <div>
+                    <h3 className="font-semibold text-lg">{previewCert.title}</h3>
+                    <p className="text-sm text-muted-foreground">{previewCert.provider}</p>
+                  </div>
+                </div>
+                <button
+                  className="p-2 rounded-full hover:bg-muted transition-colors"
+                  onClick={() => setPreviewCert(null)}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                {/* Certificate Image/PDF */}
+                {previewCert.type === "pdf" || previewCert.url?.endsWith(".pdf") ? (
+                  <div className="w-full aspect-[4/3] bg-muted rounded-lg flex flex-col items-center justify-center gap-3">
+                    <FileText className="w-16 h-16 text-primary" />
+                    <p className="text-sm text-muted-foreground">PDF Certificate</p>
+                    <a
+                      href={previewCert.url || previewCert.image}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Eye size={16} />
+                      Open PDF
+                    </a>
+                  </div>
+                ) : (
+                  <div className="w-full rounded-lg overflow-hidden border border-border">
+                    <img
+                      src={previewCert.url || previewCert.image}
+                      alt={previewCert.title}
+                      className="w-full h-auto object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+
+                {/* Details */}
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Category</p>
+                    <p className="text-sm font-medium">{previewCert.category}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Type</p>
+                    <p className="text-sm font-medium capitalize">{previewCert.type || "Image"}</p>
+                  </div>
+                  {previewCert.tags && (
+                    <div className="col-span-2">
+                      <p className="text-xs text-muted-foreground mb-2">Tags</p>
+                      <div className="flex flex-wrap gap-2">
+                        {previewCert.tags.split(",").map((tag, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs"
+                          >
+                            {tag.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {previewCert.featured && (
+                    <div className="col-span-2">
+                      <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/20 text-amber-700 border border-amber-500/30 text-sm">
+                        <Star size={14} className="fill-amber-500" />
+                        Featured Certificate
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4 border-t border-border">
+                  <a
+                    href={previewCert.url || previewCert.image}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Eye size={16} />
+                    View Full Size
+                  </a>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPreviewCert(null);
+                      handleEdit(previewCert);
+                    }}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm font-medium hover:bg-muted"
+                  >
+                    <Pencil size={16} />
+                    Edit
                   </button>
                 </div>
               </div>

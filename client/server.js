@@ -9,6 +9,7 @@ import blogDataHandler from "./api/blog-data.js";
 import aiBlogHandler from "./api/ai-blog.js";
 import mediaProxyHandler from "./api/media-proxy.js";
 import adminHandler from "./api/admin.js";
+import newsletterHandler from "./api/newsletter.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -27,6 +28,7 @@ app.all("/api/blog-data", route(blogDataHandler));
 app.all("/api/ai-blog", route(aiBlogHandler));
 app.all("/api/media-proxy", route(mediaProxyHandler));
 app.all("/api/admin", route(adminHandler));
+app.all("/api/newsletter", route(newsletterHandler));
 
 app.get("/api/health", (_req, res) => {
   res.status(200).json({ ok: true });

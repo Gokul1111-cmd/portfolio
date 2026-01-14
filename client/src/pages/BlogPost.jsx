@@ -149,20 +149,12 @@ export const BlogPost = () => {
       }
     };
 
-    const handleScroll = () => {
-      if (showRightSidebar) {
-        setShowRightSidebar(false);
-      }
-    };
-
     // Add event listeners
     document.addEventListener('mousedown', handleClickOutside);
-    window.addEventListener('scroll', handleScroll);
 
     // Cleanup
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('scroll', handleScroll);
     };
   }, [showRightSidebar]);
 
@@ -228,15 +220,28 @@ export const BlogPost = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  // Track page view
+  // Track page view with 1-hour cooldown per article
   useEffect(() => {
     if (!slug || !post) return;
 
     const trackView = async () => {
       try {
-        await fetch(`/api/blog-data?slug=${encodeURIComponent(slug)}&action=view`, {
-          method: 'POST',
-        });
+        // Check if this article was viewed recently (within 1 hour)
+        const viewKey = `blog-view-${slug}`;
+        const lastViewTime = localStorage.getItem(viewKey);
+        const currentTime = Date.now();
+        const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+
+        // Only increment view count if:
+        // 1. No previous view recorded, OR
+        // 2. Previous view was more than 1 hour ago
+        if (!lastViewTime || (currentTime - parseInt(lastViewTime)) >= oneHour) {
+          await fetch(`/api/blog-data?slug=${encodeURIComponent(slug)}&action=view`, {
+            method: 'POST',
+          });
+          // Store the current timestamp for this article
+          localStorage.setItem(viewKey, currentTime.toString());
+        }
       } catch (error) {
         console.error('Failed to track view:', error);
       }

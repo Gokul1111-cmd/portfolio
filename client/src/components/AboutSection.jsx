@@ -222,6 +222,8 @@ export const AboutSection = () => {
                         src="/profile-logo.png"
                         alt="Gokul A - Full Stack Developer profile photo"
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full border-4 border-background flex items-center justify-center">
                         <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse" />
@@ -234,33 +236,12 @@ export const AboutSection = () => {
                     <h2 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">
                       Gokul A
                     </h2>
-                    <p className="text-primary text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+                    <p className="text-primary text-base sm:text-lg font-semibold mb-2">
                       Full Stack Developer
                     </p>
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                      {(aboutContent.achievements &&
-                      aboutContent.achievements.length
-                        ? aboutContent.achievements
-                        : achievements
-                      ).map((achievement, index) => (
-                        <div
-                          key={index}
-                          className={`p-2 sm:p-3 rounded-xl bg-background/50 border border-border transition-all duration-300 hover:scale-105 hover:border-primary/30 ${counter === index ? "bg-primary/10 border-primary/50" : ""}`}
-                        >
-                          <div className="flex items-center gap-2 justify-center md:justify-start">
-                            {achievement.icon}
-                            <div>
-                              <div className="font-bold text-sm sm:text-lg">
-                                {achievement.number}
-                                {achievement.suffix}
-                              </div>
-                              <div className="text-[10px] sm:text-xs text-muted-foreground">
-                                {achievement.label}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      Currently Accepting new Opportunities
                     </div>
                   </div>
                 </div>

@@ -61,8 +61,17 @@ export default async function handler(req, res) {
             const certsRef = adminDb.collection("certificates");
 
             if (req.method === "GET") {
-                const snapshot = await certsRef.orderBy("createdAt", "desc").get();
+                const snapshot = await certsRef.get();
                 const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+                // Sort by order field if it exists, otherwise by createdAt desc
+                items.sort((a, b) => {
+                    if (a.order !== undefined && b.order !== undefined) {
+                        return a.order - b.order;
+                    }
+                    if (a.order !== undefined) return -1;
+                    if (b.order !== undefined) return 1;
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
                 return res.status(200).json(items);
             }
 
@@ -81,7 +90,7 @@ export default async function handler(req, res) {
 
             if (req.method === "PUT") {
                 if (!id) return res.status(400).json({ error: "id is required" });
-                const { title, category, provider, fileName, url, type: certType, featured, tags } = req.body || {};
+                const { title, category, provider, fileName, url, type: certType, featured, tags, order } = req.body || {};
                 const updateData = { updatedAt: new Date() };
                 if (title !== undefined) updateData.title = title;
                 if (category !== undefined) updateData.category = category;
@@ -91,6 +100,7 @@ export default async function handler(req, res) {
                 if (certType !== undefined) updateData.type = certType;
                 if (featured !== undefined) updateData.featured = Boolean(featured);
                 if (tags !== undefined) updateData.tags = Array.isArray(tags) ? tags : [];
+                if (order !== undefined) updateData.order = order;
                 await certsRef.doc(id).update(updateData);
                 return res.status(200).json({ id, ...updateData });
             }

@@ -264,62 +264,80 @@ export const MyApproach = () => {
 
             <div className="space-y-8 md:space-y-12">
               <AnimatePresence>
-                {(approachContent.steps || []).map((step, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex gap-6 md:gap-12 ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}
-                  >
-                    <div className="flex-1">
-                      <motion.div
-                        className="bg-gradient-to-br from-card via-card to-card/80 border border-border rounded-2xl p-6 md:p-8 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 shadow-lg group"
-                        whileHover={{ scale: 1.03, y: -4 }}
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className="flex-shrink-0">
-                            <motion.div
-                              className="relative flex items-center justify-center h-16 w-16 rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg group-hover:shadow-xl group-hover:shadow-primary/50 transition-all"
-                              whileHover={{ rotate: 360 }}
-                              transition={{ duration: 0.6 }}
-                            >
-                              <span className="text-2xl font-bold text-white">
-                                {step.number}
-                              </span>
-                              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </motion.div>
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                              {step.title}
-                            </h3>
-                            <p className="text-muted-foreground leading-relaxed">
-                              {step.description}
-                            </p>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </div>
+                {(approachContent.steps || []).map((step, index) => {
+                  const displayNumber = step?.number ?? index + 1;
+                  const isEven = index % 2 === 0;
 
-                    <div className="hidden md:flex items-center justify-center flex-shrink-0">
-                      <motion.div
-                        initial={{ scale: 0, rotate: -180 }}
-                        whileInView={{ scale: 1, rotate: 0 }}
-                        transition={{ delay: index * 0.1 + 0.2, type: "spring", stiffness: 200 }}
-                        className="relative"
-                      >
-                        <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse blur-sm" />
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary/10 rounded-full animate-ping" />
-                        <div className="relative flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-primary to-primary/80 border-2 border-primary shadow-xl shadow-primary/50">
-                          <CheckCircle2 size={28} className="text-white" />
-                        </div>
-                      </motion.div>
-                    </div>
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`relative flex gap-6 md:gap-12 ${isEven ? "md:flex-row" : "md:flex-row-reverse"}`}
+                    >
+                      {/* Connector line from center spine to card on desktop */}
+                      <div
+                        className="hidden md:block absolute top-1/2 h-0.5 -translate-y-1/2"
+                        style={{
+                          left: "50%",
+                          width: "64px",
+                          transform: isEven ? "translateX(-64px)" : "translateX(0)",
+                          backgroundImage: isEven
+                            ? "linear-gradient(to right, rgba(168,85,247,0.45), transparent)"
+                            : "linear-gradient(to left, rgba(168,85,247,0.45), transparent)",
+                        }}
+                      />
 
-                    <div className="hidden md:block flex-1" />
-                  </motion.div>
-                ))}
+                      <div className="flex-1">
+                        <motion.div
+                          className="bg-gradient-to-br from-card via-card to-card/80 border border-border rounded-2xl p-6 md:p-8 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 shadow-lg group"
+                          whileHover={{ scale: 1.03, y: -4 }}
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className="flex-shrink-0">
+                              <motion.div
+                                className="relative flex items-center justify-center h-16 w-16 rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg group-hover:shadow-xl group-hover:shadow-primary/50 transition-all"
+                                whileHover={{ rotate: 360 }}
+                                transition={{ duration: 0.6 }}
+                              >
+                                <span className="text-2xl font-bold text-white">
+                                  {displayNumber}
+                                </span>
+                                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </motion.div>
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                                {step.title}
+                              </h3>
+                              <p className="text-muted-foreground leading-relaxed">
+                                {step.description}
+                              </p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </div>
+
+                      <div className="hidden md:flex items-center justify-center flex-shrink-0">
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          whileInView={{ scale: 1, rotate: 0 }}
+                          transition={{ delay: index * 0.1 + 0.2, type: "spring", stiffness: 200 }}
+                          className="relative"
+                        >
+                          <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse blur-sm" />
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary/10 rounded-full animate-ping" />
+                          <div className="relative flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-primary to-primary/80 border-2 border-primary shadow-xl shadow-primary/50">
+                            <CheckCircle2 size={28} className="text-white" />
+                          </div>
+                        </motion.div>
+                      </div>
+
+                      <div className="hidden md:block flex-1" />
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </div>
           </div>
@@ -334,14 +352,32 @@ export const MyApproach = () => {
             <div className="relative">
               <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-border" />
               <div className="space-y-8">
-                {timeline.map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.08 }}
-                    className={`flex flex-col md:flex-row md:items-stretch gap-4 md:gap-8 ${idx % 2 === 0 ? "" : "md:flex-row-reverse"}`}
-                  >
+                {timeline.map((item, idx) => {
+                  const isEven = idx % 2 === 0;
+
+                  return (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 16, x: isEven ? -40 : 40 }}
+                      whileInView={{ opacity: 1, y: 0, x: 0 }}
+                      transition={{ delay: idx * 0.08, duration: 0.45 }}
+                      className={`flex flex-col md:flex-row md:items-stretch gap-4 md:gap-8 ${isEven ? "" : "md:flex-row-reverse"}`}
+                    >
+                      {/* Connector line from spine to card */}
+                      <div
+                        className="hidden md:block absolute top-1/2 h-0.5 -translate-y-1/2 bg-gradient-to-r from-primary/40 to-transparent"
+                        style={{
+                          left: isEven ? "50%" : "auto",
+                          right: isEven ? "auto" : "50%",
+                          width: "48px",
+                          transformOrigin: isEven ? "left" : "right",
+                          transform: isEven ? "translateX(4px)" : "translateX(-4px)",
+                          backgroundImage: isEven
+                            ? "linear-gradient(to right, rgba(168,85,247,0.45), transparent)"
+                            : "linear-gradient(to left, rgba(168,85,247,0.45), transparent)",
+                        }}
+                      />
+
                     <div className="md:w-1/2 bg-card border border-border rounded-2xl p-6 shadow-sm">
                       <div className="flex items-center gap-3 mb-3">
                         <div className="h-10 w-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
@@ -402,7 +438,8 @@ export const MyApproach = () => {
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                );
+              })}
               </div>
             </div>
           </div>

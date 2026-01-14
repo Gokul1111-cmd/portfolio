@@ -178,6 +178,8 @@ const InfiniteScrollSkills = ({ skills }) => {
                   src={resolveIcon(skill)}
                   alt={`${skill.name} technology logo`}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
                     objectFit: "contain",
@@ -224,6 +226,8 @@ const InfiniteScrollSkills = ({ skills }) => {
                   src={resolveIcon(skill)}
                   alt={`${skill.name} technology logo`}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
                     objectFit: "contain",
@@ -409,6 +413,8 @@ export const SkillsSection = () => {
                           src={resolveIcon(skill)}
                           alt={`${skill.name} logo`}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                           style={{
                             transform: `scale(${clampIconSize(skill.iconSize || 100) / 100})`,
                             objectFit: "contain",

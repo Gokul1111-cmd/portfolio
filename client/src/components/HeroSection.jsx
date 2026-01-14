@@ -182,8 +182,7 @@ export const HeroSection = () => {
                 visible: { y: 0, opacity: 1, transition: { duration: 0.8 } },
               }}
             >
-              <Briefcase className="h-4 w-4" /> Currently Accepting new
-              Opportunities
+              <Briefcase className="h-4 w-4" /> {hero.availability}
             </motion.div>
 
             <motion.h1

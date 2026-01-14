@@ -80,16 +80,8 @@ export default async function handler(req, res) {
             if (!slug) return res.status(400).json({ error: "slug is required" });
             const collection = adminDb.collection("comments");
 
-            let snapshot;
-            try {
-                snapshot = await collection
-                    .where("slug", "==", slug)
-                    .orderBy("createdAtMs", "asc")
-                    .get();
-            } catch (primaryError) {
-                console.warn("comments GET primary query failed, retrying without order", primaryError.message);
-                snapshot = await collection.where("slug", "==", slug).get();
-            }
+            // Query without orderBy to avoid index requirement
+            const snapshot = await collection.where("slug", "==", slug).get();
 
             const comments = snapshot.docs.map((doc) => {
                 const data = doc.data();
@@ -99,8 +91,12 @@ export default async function handler(req, res) {
                     createdAt: data.createdAt?.toDate?.() instanceof Date
                         ? data.createdAt.toDate().toISOString()
                         : data.createdAt,
+                    createdAtMs: data.createdAtMs || 0,
                 };
             });
+
+            // Sort in JavaScript instead of Firestore
+            comments.sort((a, b) => (a.createdAtMs || 0) - (b.createdAtMs || 0));
 
             return res.status(200).json(comments);
         }

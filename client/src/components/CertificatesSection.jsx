@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { fetchStaticOrLive } from "../lib/staticData";
 
-// Updated fallback list from /public/Certificates (converted PDFs to images where applicable)
+// Updated fallback list from /public/Certificates (only remaining files after cleanup)
 const fallbackFiles = [
   "Academic Process Mining Fundamentals - Foundational - Badge.png",
   "Academic Process Mining Fundamentals.png",
@@ -22,19 +22,12 @@ const fallbackFiles = [
   "AI BUILDER_page-0001.jpg",
   "AI ON AZURE_page-0001.jpg",
   "ANALYTICS_page-0001.jpg",
-  "Angular7 for Beginners.png",
   "APACHE SPARK_page-0001.jpg",
   "Applying AI Principles with Google Cloud.png",
-  "Arduino vs Raspberry Pi.png",
   "Atlas_page-0001.jpg",
   "AUTOMATED ML IN AZURRE_page-0001.jpg",
   "AWS For Beginners.png",
   "Azure fundamentals_page-0001.jpg",
-  "Basics of python.png",
-  "Bitcon for Beginners.png",
-  "BUSINESS CARDS_page-0001.jpg",
-  "C Programming.png",
-  "Can u Guess.jpg",
   "Celonis Foundation.png",
   "CertificateOfCompletion_C Programming Basics Flow Control Variables and Pointers_page-0001.jpg",
   "CertificateOfCompletion_CSS Essential Training 2019_page-0001.jpg",
@@ -43,21 +36,13 @@ const fallbackFiles = [
   "cloud computing_page-0001.jpg",
   "Cloud Foundations - Advanced.png",
   "CLUSTERING MODEL WITH AZURE ML DESIGNER_page-0001.jpg",
-  "CLUSTERING MODEL WITH AZURE ML_page-0001.jpg",
   "COPILOT IN BING_page-0001.jpg",
-  "CSS.png",
   "Cyber crime_page-0001.jpg",
   "Deep Learning Onramp_page-0001.jpg",
   "DELTA LAKE_page-0001.jpg",
-  "Design App.png",
   "DETECT OBJECTS_page-0001.jpg",
-  "Diploma in Computer Application(DCA).jpg",
-  "Effective speaking and speaking skills_page-0001.jpg",
   "Ethical Hacking - Mobile Platforms and Network Architecture.png",
   "Explore automation development with UiPath Studio.jpg",
-  "Factorial  Program in C.png",
-  "First Learning Pathway and Quiz badge.png",
-  "Foundations - Badge.png",
   "FUNDAMENTALS OF GENERATIVE AI_page-0001.jpg",
   "Get Started with object detection badge.png",
   "Git certificate_page-0001.jpg",
@@ -67,12 +52,7 @@ const fallbackFiles = [
   "GOKUL A Internship_page-0001.jpg",
   "Google Developer program.jpg",
   "HackElite 2023 - Manakula Vinayagar College.jpg",
-  "HTML.png",
-  "Human Behaviour.jpeg",
-  "IEI - Student's chapter_page-0001.jpg",
   "IIT SPOKEN TUTORIAL JavaScript_page-0001.jpg",
-  "Introduction for Ethical Hacking.png",
-  "Introduction to Firewall.png",
   "Introduction to Generative AI.png",
   "Introduction to Industry 4.0 and Industrial Internet of Things.png",
   "Introduction to Information Security.png",
@@ -81,52 +61,31 @@ const fallbackFiles = [
   "INTRODUCTION TO MACHINE LEARNING_page-0001.jpg",
   "Introduction to Responsible Ai.png",
   "INTRODUNTION TO GITHUB COPILOT_page-0001.jpg",
-  "Javascript Basic_page-0001.jpg",
-  "KEY PHRASES_page-0001.jpg",
   "LAKEHOUSES_page-0001.jpg",
-  "LANGUAGE IDENTIFIER_page-0001.jpg",
-  "Learn C_page-0001.jpg",
-  "Learning.png",
-  "Lifestyle for the Environment Pledge.jpg",
   "Linux Training_page-0001.jpg",
-  "Loops for Beginners.png",
   "MACHINE LEARNIING MODELS_page-0001.jpg",
   "Machine Learning Onramp_page-0001.jpg",
   "Machine Learning with Tensorflow.jpg",
   "Master Chatgpt.png",
-  "MERI MAATI MERA DESH PROGRAMME.png",
   "MICROSOFT FABRIC_page-0001.jpg",
-  "My_Bharat_Registration_Certificate.png",
   "Network Security.png",
-  "NSS HUMAN RIGHTS COMMITMENT__page-0001.jpg",
-  "NSS MATHEMATICS COMMITMENT__page-0001.jpg",
-  "OSI Model Physical Layer.png",
   "POSTMAN API Fundamentals Student Expert Badge.png",
   "POSTMAN API Fundamentals Student Expert.png",
   "POWER AUTOMATE_page-0001.jpg",
   "PROCESS CUSTOM DOCUMENTS_page-0001.jpg",
   "PROCESS RECEIPTS_page-0001.jpg",
-  "Professionalism_page-0001.jpg",
-  "Programming Basics.png",
   "Prompt Design in Vertex AI.png",
   "Python Bootcamp Byts - Internship.jpg",
-  "RECOGNIZE TEXT_page-0001.jpg",
   "REGRESSION MODEL WITH AZURE ML DESIGNER_page-0001.jpg",
   "RESPONSIBLE AI_page-0001.jpg",
-  "ROAD SAFETY.jpg",
-  "SENTIMENT OF TEXT_page-0001.jpg",
   "Smart agrothon - Karpagam College of Engineering.jpg",
-  "Software Testing Tutorial.png",
   "TensorFlow Badge.png",
   "TEST ML MODELS_page-0001.jpg",
   "TRAIN CLASSIFICATION MODELS_page-0001.jpg",
   "TRAIN CLUSTERING MODELS_page-0001.jpg",
   "TRAIN ML MODELS_page-0001.jpg",
   "TRAIN REGRESSION MODELS_page-0001.jpg",
-  "Turbo C++.png",
-  "Types of Cyber Security.png",
   "VECTOR AI_page-0001.jpg",
-  "Visual Studio Online.png",
   "WITH PYTHON_page-0001.jpg",
   "Workshop kumaraguru cloud computing__page-0001.jpg",
 ];
@@ -410,28 +369,12 @@ const manualCertificateMapping = {
     title: "HTML Essential Training",
     category: "Web Development & APIs",
   },
-  "HTML.png": {
-    title: "HTML Certification Course",
-    category: "Web Development & APIs",
-  },
   "CertificateOfCompletion_CSS Essential Training 2019_page-0001.jpg": {
     title: "CSS Essential Training",
     category: "Web Development & APIs",
   },
-  "CSS.png": {
-    title: "CSS Certification Course",
-    category: "Web Development & APIs",
-  },
-  "Angular7 for Beginners.png": {
-    title: "Angular 7 for Beginners",
-    category: "Web Development & APIs",
-  },
   "IIT SPOKEN TUTORIAL JavaScript_page-0001.jpg": {
     title: "JavaScript Training",
-    category: "Web Development & APIs",
-  },
-  "Javascript Basic_page-0001.jpg": {
-    title: "JavaScript (Basic)",
     category: "Web Development & APIs",
   },
   "POSTMAN API Fundamentals Student Expert.png": {
@@ -444,8 +387,6 @@ const manualCertificateMapping = {
   },
 
   // ⌨️ Programming (C, C++, Python)
-  "C Programming.png": { title: "C Programming", category: "Programming" },
-  "Learn C_page-0001.jpg": { title: "Learn C", category: "Programming" },
   "CertificateOfCompletion_C Programming Basics Flow Control Variables and Pointers_page-0001.jpg":
   {
     title: "C Programming Basics: Flow Control, Variables, and Pointers",
@@ -453,23 +394,6 @@ const manualCertificateMapping = {
   },
   "CertificateOfCompletion_Master C Language Pointers_page-0001.jpg": {
     title: "Master C Language Pointers",
-    category: "Programming",
-  },
-  "Factorial  Program in C.png": {
-    title: "Factorial Program in C",
-    category: "Programming",
-  },
-  "Turbo C++.png": { title: "Turbo C++", category: "Programming" },
-  "Basics of python.png": {
-    title: "Basics of Python",
-    category: "Programming",
-  },
-  "Programming Basics.png": {
-    title: "Programming Basics",
-    category: "Programming",
-  },
-  "Loops for Beginners.png": {
-    title: "Loops for Beginners",
     category: "Programming",
   },
 
@@ -480,10 +404,6 @@ const manualCertificateMapping = {
   },
   "GIT.png": {
     title: "Git Certification Course",
-    category: "DevOps, IoT & Automation",
-  },
-  "Visual Studio Online.png": {
-    title: "Visual Studio Online",
     category: "DevOps, IoT & Automation",
   },
   "Linux Training_page-0001.jpg": {
@@ -501,21 +421,6 @@ const manualCertificateMapping = {
   "Introduction to Industry 4.0 and Industrial Internet of Things.png": {
     title: "Introduction to Industry 4.0 and Industrial Internet of Things",
     category: "DevOps, IoT & Automation",
-  },
-  "Arduino vs Raspberry Pi.png": {
-    title: "Arduino vs Raspberry Pi",
-    category: "DevOps, IoT & Automation",
-  },
-  "OSI Model Physical Layer.png": {
-    title: "OSI Model: Physical Layer",
-    category: "DevOps, IoT & Automation",
-  },
-
-  // 📱 Mobile, Design & Blockchain
-  "Design App.png": { title: "Design App", category: "Mobile & App Design" },
-  "Bitcon for Beginners.png": {
-    title: "Bitcoin for Beginners",
-    category: "Blockchain",
   },
 
   // 🏆 Competitions & Internships
@@ -535,73 +440,10 @@ const manualCertificateMapping = {
     title: "Smart Agrothon 2023 Participation",
     category: "Competitions",
   },
-  "Can u Guess.jpg": {
-    title: "Symposium Varunah-2K24 (Can u Guess Event)",
-    category: "Competitions",
-  },
-
-  // 🤝 Soft Skills & Volunteering
-  "Professionalism_page-0001.jpg": {
-    title: "Professionalism",
-    category: "Soft Skills",
-  },
-  "Effective speaking and speaking skills_page-0001.jpg": {
-    title: "Effective Speaking and Listening Skills",
-    category: "Soft Skills",
-  },
-  "Human Behaviour.jpeg": { title: "Human Behaviour", category: "Soft Skills" },
-  "Software Testing Tutorial.png": {
-    title: "Software Testing Tutorial",
-    category: "Software Testing",
-  },
-  "Lifestyle for the Environment Pledge.jpg": {
-    title: "Lifestyle for the Environment Pledge",
-    category: "Volunteering",
-  },
-  "MERI MAATI MERA DESH PROGRAMME.png": {
-    title: "Meri Maati Mera Desh Programme",
-    category: "Volunteering",
-  },
-  "ROAD SAFETY.jpg": {
-    title: "Road Safety Awareness",
-    category: "Volunteering",
-  },
-  "NSS MATHEMATICS COMMITMENT__page-0001.jpg": {
-    title: "National Mathematics Day Quiz - Commitment",
-    category: "Volunteering",
-  },
-  "NSS HUMAN RIGHTS COMMITMENT__page-0001.jpg": {
-    title: "World Human Rights Quiz Day - Commitment",
-    category: "Volunteering",
-  },
-  "My_Bharat_Registration_Certificate.png": {
-    title: "MY Bharat Registration Recognition",
-    category: "Volunteering",
-  },
-  "Diploma in Computer Application(DCA).jpg": {
-    title: "Diploma in Computer Application (DCA)",
-    category: "Certifications & Tools",
-  },
 
   // 🏅 Badges & Memberships
-  "IEI - Student's chapter_page-0001.jpg": {
-    title: "Certificate of Membership (IEI)",
-    category: "Badges & Memberships",
-  },
   "Google Developer program.jpg": {
     title: "Google Developer Program Membership",
-    category: "Badges & Memberships",
-  },
-  "First Learning Pathway and Quiz badge.png": {
-    title: "First Learning Pathway and Quiz Badge",
-    category: "Badges & Memberships",
-  },
-  "Learning.png": {
-    title: "Google Developer Learning Badge",
-    category: "Badges & Memberships",
-  },
-  "Foundations - Badge.png": {
-    title: "Celonis Foundations (Badge)",
     category: "Badges & Memberships",
   },
 };
@@ -614,14 +456,8 @@ const CATEGORY_ORDER_NEW = [
   "Web Development & APIs",
   "Programming",
   "DevOps, IoT & Automation",
-  "Blockchain",
-  "Mobile & App Design",
   "Competitions",
   "Internships",
-  "Soft Skills",
-  "Volunteering",
-  "Software Testing",
-  "Certifications & Tools",
   "Badges & Memberships",
 ];
 
@@ -786,8 +622,14 @@ export const CertificatesSection = () => {
   }, []);
 
   const filteredCertificates = useMemo(() => {
-    if (activeFilter === "all") return certificates;
-    return certificates.filter((cert) => ensureCategory(cert) === activeFilter);
+    let filtered = certificates;
+    
+    // Filter by category
+    if (activeFilter !== "all") {
+      filtered = filtered.filter((cert) => ensureCategory(cert) === activeFilter);
+    }
+    
+    return filtered;
   }, [certificates, activeFilter]);
 
   const featuredFromData = filteredCertificates.filter((c) => c.featured);
@@ -998,7 +840,7 @@ export const CertificatesSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
                 viewport={{ once: true }}
-                className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer"
+                className="bg-card border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer border-border"
                 onClick={() => openPreview(cert)}
               >
                 <CardMedia cert={cert} />

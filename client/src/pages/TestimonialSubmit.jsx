@@ -122,7 +122,7 @@ export const TestimonialSubmit = () => {
       setUploadingImage(true);
       setStatus({
         type: "info",
-        msg: "Uploading image to Firebase Storage...",
+        msg: "Uploading image...",
       });
 
       const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${file.name}`;
