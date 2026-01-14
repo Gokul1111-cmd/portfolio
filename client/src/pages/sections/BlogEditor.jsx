@@ -19,6 +19,8 @@ import {
   ArrowRight,
   Loader2,
   Linkedin,
+  Upload,
+  GripVertical,
 } from "lucide-react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebaseClient";
@@ -35,6 +37,10 @@ export const BlogEditor = () => {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const coverInputRef = useRef(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState("");
+  const imageInputRef = useRef(null);
+  const contentTextareaRef = useRef(null);
 
   // Editor form state
   const [formData, setFormData] = useState({
@@ -61,6 +67,9 @@ export const BlogEditor = () => {
 
   const [newTag, setNewTag] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const [showVisualEditor, setShowVisualEditor] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+  const [draggedImageIndex, setDraggedImageIndex] = useState(null);
   const [showAiDialog, setShowAiDialog] = useState(false);
   const [aiTopic, setAiTopic] = useState("");
   const [aiBrief, setAiBrief] = useState("");
@@ -216,6 +225,191 @@ export const BlogEditor = () => {
       ...prev,
       tags: prev.tags.filter((t) => t !== tag),
     }));
+  };
+
+  // Parse content blocks (text and images)
+  const parseContentBlocks = (content) => {
+    const blocks = [];
+    const parts = content.split(/(!\[[^\]]*\]\([^)]+\)(?:\{width:\d+\})?)/);
+    
+    parts.forEach((part) => {
+      if (part.trim()) {
+        const imageMatch = part.match(/^!\[([^\]]*)\]\(([^)]+)\)(?:\{width:(\d+)\})?$/);
+        if (imageMatch) {
+          blocks.push({
+            type: 'image',
+            alt: imageMatch[1],
+            url: imageMatch[2],
+            width: imageMatch[3] ? parseInt(imageMatch[3]) : 800,
+          });
+        } else {
+          blocks.push({ type: 'text', content: part });
+        }
+      }
+    });
+    return blocks;
+  };
+
+  const blocksToContent = (blocks) => {
+    return blocks.map(block => {
+      if (block.type === 'image') {
+        return `![${block.alt}](${block.url}){width:${block.width}}`;
+      }
+      return block.content;
+    }).join('');
+  };
+
+  const updateImageWidth = (index, newWidth) => {
+    const blocks = parseContentBlocks(formData.content);
+    let imageCount = 0;
+    blocks.forEach((block, i) => {
+      if (block.type === 'image') {
+        if (imageCount === index) {
+          blocks[i].width = Math.max(200, Math.min(1200, newWidth));
+        }
+        imageCount++;
+      }
+    });
+    setFormData({ ...formData, content: blocksToContent(blocks) });
+  };
+
+  const moveImage = (fromIndex, toIndex) => {
+    const blocks = parseContentBlocks(formData.content);
+    const imageBlocks = blocks.filter(b => b.type === 'image');
+    const textBlocks = blocks.filter(b => b.type === 'text');
+    
+    // Swap images
+    const [movedImage] = imageBlocks.splice(fromIndex, 1);
+    imageBlocks.splice(toIndex, 0, movedImage);
+    
+    // Rebuild content with images redistributed
+    const newBlocks = [];
+    let imageIndex = 0;
+    blocks.forEach(block => {
+      if (block.type === 'image') {
+        if (imageIndex < imageBlocks.length) {
+          newBlocks.push(imageBlocks[imageIndex++]);
+        }
+      } else {
+        newBlocks.push(block);
+      }
+    });
+    
+    setFormData({ ...formData, content: blocksToContent(newBlocks) });
+  };
+
+  const insertImageAtBlockIndex = (imageIndex, targetBlockIndex) => {
+    const blocks = parseContentBlocks(formData.content);
+    
+    // Find the image
+    let currentImageIndex = 0;
+    let imageBlock = null;
+    let imageBlockIndex = -1;
+    
+    blocks.forEach((block, idx) => {
+      if (block.type === 'image') {
+        if (currentImageIndex === imageIndex) {
+          imageBlock = block;
+          imageBlockIndex = idx;
+        }
+        currentImageIndex++;
+      }
+    });
+    
+    if (!imageBlock || imageBlockIndex === -1) return;
+    
+    // Remove from current position
+    blocks.splice(imageBlockIndex, 1);
+    
+    // Adjust target index if needed
+    let insertIndex = targetBlockIndex;
+    if (imageBlockIndex < targetBlockIndex) {
+      insertIndex--;
+    }
+    
+    // Insert at new position
+    blocks.splice(insertIndex, 0, imageBlock);
+    
+    setFormData({ ...formData, content: blocksToContent(blocks) });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setImageUploadError("Please select a valid image file");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setImageUploadError("Image must be less than 5MB");
+      return;
+    }
+
+    setUploadingImage(true);
+    setImageUploadError("");
+
+    try {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}-${file.name}`;
+      const slug = formData.slug || "article";
+      const storagePath = `blog-articles/${slug}/${fileName}`;
+      const fileRef = ref(storage, storagePath);
+
+      await uploadBytes(fileRef, file);
+      const downloadUrl = await getDownloadURL(fileRef);
+
+      // Insert markdown image syntax at cursor position in content with default width
+      const altText = file.name.split(".")[0].replace(/[-_]/g, " ");
+      const imageMarkdown = `![${altText}](${downloadUrl}){width:800}`;
+      const currentContent = formData.content || "";
+      
+      // Get cursor position from textarea
+      const textarea = contentTextareaRef.current;
+      let updatedContent;
+      
+      if (textarea) {
+        const cursorPos = textarea.selectionStart || 0;
+        const beforeCursor = currentContent.substring(0, cursorPos);
+        const afterCursor = currentContent.substring(cursorPos);
+        
+        // Insert image at cursor position with newlines
+        updatedContent = beforeCursor + "\n\n" + imageMarkdown + "\n\n" + afterCursor;
+        
+        // Set content and restore cursor position after the inserted image
+        setFormData((prev) => ({
+          ...prev,
+          content: updatedContent,
+        }));
+        
+        // Restore focus and set cursor position after the inserted image
+        setTimeout(() => {
+          if (textarea) {
+            textarea.focus();
+            const newCursorPos = cursorPos + imageMarkdown.length + 4; // +4 for \n\n before and after
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+          }
+        }, 0);
+      } else {
+        // Fallback: append to end if textarea ref not available
+        updatedContent = currentContent + "\n\n" + imageMarkdown + "\n\n";
+        setFormData((prev) => ({
+          ...prev,
+          content: updatedContent,
+        }));
+      }
+
+      console.log("Image uploaded successfully:", downloadUrl);
+    } catch (err) {
+      console.error("Image upload error:", err);
+      setImageUploadError("Failed to upload image. Please try again.");
+    } finally {
+      setUploadingImage(false);
+      if (imageInputRef.current) {
+        imageInputRef.current.value = "";
+      }
+    }
   };
 
   const handleSave = () => {
@@ -632,7 +826,24 @@ This is an excerpt from my latest blog post. Read the complete article with deta
             <div className="border bg-card rounded-xl p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Content</h3>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={() => imageInputRef.current?.click()}
+                    disabled={uploadingImage || !formData.slug}
+                    className="px-3 py-1 text-xs rounded-md border inline-flex items-center gap-1 hover:bg-primary/10 disabled:opacity-50 transition-colors"
+                    title="Upload and insert image into article"
+                  >
+                    {uploadingImage ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                    {uploadingImage ? "Uploading..." : "Insert Image"}
+                  </button>
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={uploadingImage}
+                  />
                   <button
                     onClick={handleAiImprove}
                     disabled={aiLoading || !formData.content.trim()}
@@ -655,18 +866,243 @@ This is an excerpt from my latest blog post. Read the complete article with deta
                   </div>
                 </div>
               </div>
+              {imageUploadError && (
+                <div className="p-3 bg-destructive/10 border border-destructive/30 rounded text-xs text-destructive">
+                  {imageUploadError}
+                </div>
+              )}
               
-              {showPreview ? (
-                <div className="prose dark:prose-invert max-w-none p-4 border rounded-md bg-background min-h-[400px]">
-                  {formData.content.split("\n\n").map((para, idx) => (
-                    <p key={idx}>{para}</p>
-                  ))}
+              {/* Editor Mode Toggle */}
+              <div className="flex gap-2 border-b">
+                <button
+                  onClick={() => setShowVisualEditor(false)}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    !showVisualEditor
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Markdown
+                </button>
+                <button
+                  onClick={() => setShowVisualEditor(true)}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    showVisualEditor
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Visual Editor
+                </button>
+              </div>
+              
+              {showVisualEditor ? (
+                <div className="border rounded-md bg-background min-h-[400px] p-4 space-y-4">
+                  {parseContentBlocks(formData.content).map((block, idx) => {
+                    if (block.type === 'image') {
+                      const imageIndex = parseContentBlocks(formData.content)
+                        .slice(0, idx)
+                        .filter(b => b.type === 'image').length;
+                      const isSelected = selectedImageIndex === imageIndex;
+                      const isDragging = draggedImageIndex === imageIndex;
+                      const isDragOver = draggedImageIndex !== null && draggedImageIndex !== imageIndex;
+                      
+                      return (
+                        <div key={idx} className="relative mb-6">
+                          {/* Large Drop Zone Indicator */}
+                          {isDragOver && (
+                            <div 
+                              className="absolute -inset-4 border-4 border-dashed border-primary rounded-xl bg-primary/20 animate-pulse z-40 flex items-center justify-center"
+                            >
+                              <div className="bg-primary text-white text-sm font-bold px-6 py-3 rounded-lg shadow-2xl flex items-center gap-2">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                </svg>
+                                DROP HERE TO PLACE IMAGE
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                </svg>
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div
+                            draggable
+                            onDragStart={(e) => {
+                              setDraggedImageIndex(imageIndex);
+                              e.dataTransfer.effectAllowed = 'move';
+                            }}
+                            onDragEnter={(e) => {
+                              e.preventDefault();
+                            }}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              e.dataTransfer.dropEffect = 'move';
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (draggedImageIndex !== null && draggedImageIndex !== imageIndex) {
+                                moveImage(draggedImageIndex, imageIndex);
+                              }
+                              setDraggedImageIndex(null);
+                            }}
+                            onDragEnd={() => setDraggedImageIndex(null)}
+                            onClick={(e) => {
+                              if (!e.target.closest('.resize-controls')) {
+                                setSelectedImageIndex(imageIndex);
+                              }
+                            }}
+                            className={`relative group cursor-move border-2 rounded-lg p-6 transition-all ${
+                              isDragging ? 'opacity-10 scale-75' : ''
+                            } ${
+                              isDragOver ? 'opacity-50' : ''
+                            } ${
+                              isSelected && !isDragging ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 bg-card'
+                            }`}
+                          >
+                            {/* Drag Handle - Always visible with animation */}
+                            <div
+                              className={`absolute top-2 left-2 bg-primary hover:bg-primary/80 p-2 rounded shadow-lg z-10 cursor-grab active:cursor-grabbing transition-all ${
+                                draggedImageIndex !== null && !isDragging ? 'animate-bounce' : ''
+                              }`}
+                              title="🖱️ Drag to reorder"
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              <GripVertical size={20} className="text-white" />
+                            </div>
+                            
+                            {/* Image Position Badge - Always visible during drag */}
+                            <div className={`absolute top-2 right-2 bg-primary text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg z-10 transition-opacity ${
+                              draggedImageIndex !== null ? 'opacity-100' : 'opacity-0'
+                            }`}>
+                              Image #{imageIndex + 1}
+                            </div>
+                            
+                            <img
+                              src={block.url}
+                              alt={block.alt}
+                              style={{ width: `${block.width}px`, maxWidth: '100%' }}
+                              className="rounded mx-auto shadow-sm"
+                              draggable="false"
+                            />
+                            
+                            {isSelected && !isDragging && (
+                              <div 
+                                className="resize-controls mt-4 flex items-center gap-3 justify-center bg-background/80 backdrop-blur p-4 rounded-lg border-2 border-primary/30 shadow-md"
+                                draggable="false"
+                                onDragStart={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                                onMouseDown={(e) => e.stopPropagation()}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <label className="text-sm font-medium flex items-center gap-3">
+                                  Width:
+                                  <input
+                                    type="range"
+                                    min="200"
+                                    max="1200"
+                                    step="50"
+                                    value={block.width}
+                                    onChange={(e) => updateImageWidth(imageIndex, parseInt(e.target.value))}
+                                    className="w-40 cursor-ew-resize"
+                                    draggable="false"
+                                    onDragStart={(e) => e.preventDefault()}
+                                  />
+                                  <input
+                                    type="number"
+                                    min="200"
+                                    max="1200"
+                                    value={block.width}
+                                    onChange={(e) => updateImageWidth(imageIndex, parseInt(e.target.value))}
+                                    className="w-24 px-3 py-2 text-sm border-2 rounded font-mono"
+                                    draggable="false"
+                                    onDragStart={(e) => e.preventDefault()}
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                  <span className="text-muted-foreground font-mono">px</span>
+                                </label>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    // Text blocks - make them droppable
+                    const isTextDragOver = draggedImageIndex !== null;
+                    return (
+                      <div 
+                        key={idx} 
+                        className="relative mb-4"
+                        onDragOver={(e) => {
+                          if (draggedImageIndex !== null) {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                          }
+                        }}
+                        onDrop={(e) => {
+                          if (draggedImageIndex !== null) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            insertImageAtBlockIndex(draggedImageIndex, idx);
+                            setDraggedImageIndex(null);
+                          }
+                        }}
+                      >
+                        {isTextDragOver && (
+                          <div className="absolute -inset-2 border-2 border-dashed border-green-500 rounded-lg bg-green-500/10 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                            <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                              DROP IMAGE HERE
+                            </span>
+                          </div>
+                        )}
+                        <div className={`prose dark:prose-invert max-w-none transition-opacity ${
+                          isTextDragOver ? 'opacity-50' : ''
+                        }`}>
+                          {block.content.split('\n\n').map((para, pIdx) => (
+                            <p key={pIdx} className="my-2 text-sm">{para}</p>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="text-xs text-muted-foreground text-center py-4 border-t">
+                    💡 Click images to resize • Drag images to reorder
+                  </div>
                 </div>
               ) : (
-                <textarea
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  placeholder="Write your article in Markdown...
+                <div
+                  className="relative"
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const files = e.dataTransfer.files;
+                    if (files && files[0]) {
+                      // Trigger the image upload handler
+                      const fakeEvent = { target: { files: [files[0]] } };
+                      handleImageUpload(fakeEvent);
+                    }
+                  }}
+                >
+                  <textarea
+                    ref={contentTextareaRef}
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    placeholder="Write your article in Markdown...
+
+💡 TIP: You can drag & drop images directly here!
+
+## Example Heading
+
+Your content here with **bold**, *italic*, and \`code\`.
 
 ## Example Heading
 
@@ -684,9 +1120,18 @@ const example = 'code block';
 1. Numbered
 2. Lists too
 "
-                  rows={20}
-                  className="w-full mt-1 px-3 py-2 rounded-md border bg-background font-mono text-sm"
-                />
+                    rows={20}
+                    className="w-full mt-1 px-3 py-2 rounded-md border bg-background font-mono text-sm"
+                  />
+                  {uploadingImage && (
+                    <div className="absolute inset-0 bg-primary/10 border-2 border-dashed border-primary rounded-md flex items-center justify-center pointer-events-none">
+                      <div className="bg-primary text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+                        <Loader2 className="animate-spin" size={20} />
+                        Uploading image...
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">

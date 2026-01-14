@@ -12,7 +12,6 @@ import {
   VolumeX,
   Github,
   Linkedin,
-  Globe,
   Award,
   FileText,
 } from "lucide-react";
@@ -204,25 +203,6 @@ export const Navbar = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Website Globe Button */}
-        <motion.a
-          href="https://avoliq.vercel.app"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={cn(
-            "p-1.5 sm:p-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md",
-            "text-green-600 hover:bg-green-100 dark:hover:bg-green-900/50",
-            "border border-gray-200 dark:border-gray-700 shadow-sm",
-            "flex items-center justify-center min-w-[36px] min-h-[36px]",
-          )}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          title="My Website"
-          aria-label="My Website"
-        >
-          <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
-        </motion.a>
-
         {/* GitHub Button */}
         <motion.a
           href="https://github.com/Gokul1111-cmd"
