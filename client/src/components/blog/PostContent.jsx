@@ -106,7 +106,7 @@ export const PostContent = forwardRef(({ post }, ref) => {
               key={idx}
               className="text-3xl md:text-4xl font-bold mt-16 mb-6 leading-[1.2] tracking-tight text-left"
             >
-              {paragraph.replace("## ", "")}
+              {renderInlineMarkdown(paragraph.replace("## ", ""))}
             </h2>
           );
         }
@@ -116,7 +116,7 @@ export const PostContent = forwardRef(({ post }, ref) => {
               key={idx}
               className="text-2xl md:text-3xl font-bold mt-12 mb-5 leading-[1.3] tracking-tight text-left"
             >
-              {paragraph.replace("### ", "")}
+              {renderInlineMarkdown(paragraph.replace("### ", ""))}
             </h3>
           );
         }
@@ -126,7 +126,7 @@ export const PostContent = forwardRef(({ post }, ref) => {
               key={idx}
               className="border-l-4 border-primary pl-6 md:pl-8 pr-4 py-4 italic my-8 md:my-10 text-lg md:text-xl leading-relaxed text-muted-foreground bg-muted/30 rounded-r-lg"
             >
-              {paragraph.replace("> ", "")}
+              {renderInlineMarkdown(paragraph.replace("> ", ""))}
             </blockquote>
           );
         }
@@ -143,7 +143,7 @@ export const PostContent = forwardRef(({ post }, ref) => {
           return (
             <ul key={idx} className="list-disc pl-6 space-y-3 my-8 text-lg leading-relaxed">
               {items.map((item, i) => (
-                <li key={i}>{item}</li>
+                <li key={i}>{renderInlineMarkdown(item)}</li>
               ))}
             </ul>
           );
@@ -160,7 +160,7 @@ export const PostContent = forwardRef(({ post }, ref) => {
                         .filter((c) => c.trim())
                         .map((cell, j) => (
                           <td key={j} className="p-2 border">
-                            {cell.trim()}
+                            {renderInlineMarkdown(cell.trim())}
                           </td>
                         ))}
                     </tr>
@@ -175,7 +175,7 @@ export const PostContent = forwardRef(({ post }, ref) => {
           return (
             <ol key={idx} className="list-decimal pl-6 space-y-3 my-8 text-lg leading-relaxed">
               {items.map((item, i) => (
-                <li key={i}>{item.replace(/^\d+\. /, "")}</li>
+                <li key={i}>{renderInlineMarkdown(item.replace(/^\d+\. /, ""))}</li>
               ))}
             </ol>
           );

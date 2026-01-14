@@ -161,7 +161,7 @@ export const StickySidebar = ({
                   }`}
               >
                 {(() => {
-                  const totalLikes = post.likes + (liked || selectedReaction ? 1 : 0);
+                  const totalLikes = post.likes || 0;
                   const showStack = totalLikes > 1;
 
                   return (

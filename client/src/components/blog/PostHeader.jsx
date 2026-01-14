@@ -14,6 +14,49 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
+// Helper function to render inline markdown
+const renderInlineMarkdown = (text) => {
+  const parts = [];
+  let remaining = text;
+  let key = 0;
+
+  while (remaining.length > 0) {
+    // Match bold: **text**
+    const boldMatch = remaining.match(/^\*\*([^*]+)\*\*/);
+    if (boldMatch) {
+      parts.push(<strong key={key++}>{boldMatch[1]}</strong>);
+      remaining = remaining.slice(boldMatch[0].length);
+      continue;
+    }
+
+    // Match italic: *text*
+    const italicMatch = remaining.match(/^\*([^*]+)\*/);
+    if (italicMatch) {
+      parts.push(<em key={key++}>{italicMatch[1]}</em>);
+      remaining = remaining.slice(italicMatch[0].length);
+      continue;
+    }
+
+    // Match inline code: `code`
+    const codeMatch = remaining.match(/^`([^`]+)`/);
+    if (codeMatch) {
+      parts.push(
+        <code key={key++} className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+          {codeMatch[1]}
+        </code>
+      );
+      remaining = remaining.slice(codeMatch[0].length);
+      continue;
+    }
+
+    // No match, add the next character as plain text
+    parts.push(remaining[0]);
+    remaining = remaining.slice(1);
+  }
+
+  return parts;
+};
+
 const REACTION_STYLES = {
   "👍": "bg-blue-500/10 border-blue-500 text-blue-500",
   "👏": "bg-amber-500/10 border-amber-500 text-amber-500",
@@ -72,11 +115,11 @@ export const PostHeader = ({
               </button>
             )}
             <h1 className="flex-1 min-w-0 text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight text-left">
-              {post.title}
+              {renderInlineMarkdown(post.title)}
             </h1>
           </div>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed text-left">
-            {post.excerpt}
+            {renderInlineMarkdown(post.excerpt)}
           </p>
 
           <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
@@ -146,7 +189,7 @@ export const PostHeader = ({
                   }`}
               >
                 {(() => {
-                  const totalLikes = post.likes + (liked || selectedReaction ? 1 : 0);
+                  const totalLikes = post.likes || 0;
                   const showStack = totalLikes > 1;
 
                   return (

@@ -327,6 +327,7 @@ export const BlogPost = () => {
   const handleReactionSelect = async (emoji) => {
     setSelectedReaction(emoji);
     const wasLiked = liked;
+    const previousLikes = post.likes || 0;
     setLiked(true);
     setReactionPickerOpen(false);
 
@@ -340,17 +341,34 @@ export const BlogPost = () => {
 
     // Persist like to database (only if not already liked)
     if (!wasLiked) {
+      // Optimistically update the likes count
+      setPost(prev => ({
+        ...prev,
+        likes: previousLikes + 1
+      }));
+
       try {
-        await fetch(`/api/blog-data?slug=${slug}&action=like`, {
+        const response = await fetch(`/api/blog-data?slug=${slug}&action=like`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ increment: true })
         });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Update with actual count from server
+          setPost(prev => ({
+            ...prev,
+            likes: data.likes
+          }));
+        }
       } catch (err) {
         console.warn("Like tracking failed:", err);
-        // If it was just a local reaction update, we don't revert 'liked'
-        // unless it's a new like that failed.
-        // But since we just updated the reaction locally, keeping it 'liked' visually is fine.
+        // Revert the optimistic update on error
+        setPost(prev => ({
+          ...prev,
+          likes: previousLikes
+        }));
       }
     }
   };
@@ -358,9 +376,16 @@ export const BlogPost = () => {
   const handleLikeToggle = async () => {
     if (!slug) return;
     const newLiked = !liked;
+    const previousLikes = post.likes || 0;
     setLiked(newLiked);
 
-    // Optimistic: Update localStorage immediately
+    // Optimistically update post likes count
+    setPost(prev => ({
+      ...prev,
+      likes: newLiked ? previousLikes + 1 : Math.max(0, previousLikes - 1)
+    }));
+
+    // Update localStorage immediately
     try {
       if (newLiked) {
         localStorage.setItem(`blog-liked-${slug}`, "true");
@@ -375,15 +400,28 @@ export const BlogPost = () => {
 
     // Persist to database
     try {
-      await fetch(`/api/blog-data?slug=${slug}&action=like`, {
+      const response = await fetch(`/api/blog-data?slug=${slug}&action=like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ increment: newLiked })
       });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Update with actual count from server
+        setPost(prev => ({
+          ...prev,
+          likes: data.likes
+        }));
+      }
     } catch (err) {
       console.warn("Like toggle failed:", err);
       // Revert on error
       setLiked(!newLiked);
+      setPost(prev => ({
+        ...prev,
+        likes: previousLikes
+      }));
       // Revert localStorage
       try {
         if (newLiked) {
