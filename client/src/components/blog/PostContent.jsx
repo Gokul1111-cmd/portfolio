@@ -2,24 +2,75 @@ import { forwardRef } from "react";
 import PropTypes from "prop-types";
 
 export const PostContent = forwardRef(({ post }, ref) => {
-  // Helper function to render inline markdown (bold, italic, code, links, images)
+  // Helper function to render inline markdown (bold, italic, code, links, images, videos)
   const renderInlineMarkdown = (text) => {
     const parts = [];
     let remaining = text;
     let key = 0;
 
     while (remaining.length > 0) {
+      // Match videos with optional width: @video[alt](url){width:500}
+      const videoMatch = remaining.match(/^@video\[([^\]]*)\]\(([^)]+)\)(?:\{width:(\d+)\})?/);
+      if (videoMatch) {
+        const width = videoMatch[3] ? parseInt(videoMatch[3]) : 600;
+        const url = videoMatch[2];
+        const isGiphy = url.includes('giphy.com');
+        const isTenor = url.includes('tenor.com');
+        
+        // Handle Giphy/Tenor embeds
+        if (isGiphy && url.includes('/embed/')) {
+          parts.push(
+            <div
+              key={key++}
+              style={{ width: `${width}px`, maxWidth: '100%' }}
+              className="relative mx-auto my-6 md:my-8 rounded-lg overflow-hidden shadow-lg"
+            >
+              <iframe
+                src={url}
+                width="100%"
+                height="360"
+                frameBorder="0"
+                className="giphy-embed"
+                allowFullScreen
+                title={videoMatch[1] || 'GIF'}
+              />
+            </div>
+          );
+        } else {
+          // Regular video file
+          parts.push(
+            <video
+              key={key++}
+              controls
+              loop
+              muted
+              playsInline
+              style={{ width: `${width}px`, maxWidth: '100%' }}
+              className="h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block"
+            >
+              <source src={url} type={url.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
+              Your browser doesn't support video.
+            </video>
+          );
+        }
+        remaining = remaining.slice(videoMatch[0].length);
+        continue;
+      }
+
       // Match images with optional width: ![alt](url){width:500}
       const imageMatch = remaining.match(/^!\[([^\]]*)\]\(([^)]+)\)(?:\{width:(\d+)\})?/);
       if (imageMatch) {
         const width = imageMatch[3] ? parseInt(imageMatch[3]) : 800;
+        const url = imageMatch[2];
+        const isGif = url.toLowerCase().endsWith('.gif');
+        
         parts.push(
           <img
             key={key++}
-            src={imageMatch[2]}
+            src={url}
             alt={imageMatch[1]}
             style={{ width: `${width}px`, maxWidth: '100%' }}
-            className="h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block"
+            className={`h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block ${isGif ? 'gif-image' : ''}`}
             loading="lazy"
           />
         );
@@ -84,17 +135,66 @@ export const PostContent = forwardRef(({ post }, ref) => {
   return (
     <article ref={ref} className="max-w-[820px] w-full text-left">
       {post.content.split("\n\n").map((paragraph, idx) => {
+        // Check if paragraph is standalone video with optional width
+        const standaloneVideoMatch = paragraph.trim().match(/^@video\[([^\]]*)\]\(([^)]+)\)(?:\{width:(\d+)\})?$/);
+        if (standaloneVideoMatch) {
+          const width = standaloneVideoMatch[3] ? parseInt(standaloneVideoMatch[3]) : 600;
+          const url = standaloneVideoMatch[2];
+          const isGiphy = url.includes('giphy.com');
+          const isTenor = url.includes('tenor.com');
+          
+          // Handle Giphy/Tenor embeds
+          if (isGiphy && url.includes('/embed/')) {
+            return (
+              <div
+                key={idx}
+                style={{ width: `${width}px`, maxWidth: '100%' }}
+                className="relative mx-auto my-6 md:my-8 rounded-lg overflow-hidden shadow-lg"
+              >
+                <iframe
+                  src={url}
+                  width="100%"
+                  height="360"
+                  frameBorder="0"
+                  className="giphy-embed"
+                  allowFullScreen
+                  title={standaloneVideoMatch[1] || 'GIF'}
+                />
+              </div>
+            );
+          }
+          
+          // Regular video file
+          return (
+            <video
+              key={idx}
+              controls
+              loop
+              muted
+              playsInline
+              style={{ width: `${width}px`, maxWidth: '100%' }}
+              className="h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block"
+            >
+              <source src={url} type={url.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
+              Your browser doesn't support video.
+            </video>
+          );
+        }
+
         // Check if paragraph is standalone image with optional width
         const standaloneImageMatch = paragraph.trim().match(/^!\[([^\]]*)\]\(([^)]+)\)(?:\{width:(\d+)\})?$/);
         if (standaloneImageMatch) {
           const width = standaloneImageMatch[3] ? parseInt(standaloneImageMatch[3]) : 800;
+          const url = standaloneImageMatch[2];
+          const isGif = url.toLowerCase().endsWith('.gif');
+          
           return (
             <img
               key={idx}
-              src={standaloneImageMatch[2]}
+              src={url}
               alt={standaloneImageMatch[1]}
               style={{ width: `${width}px`, maxWidth: '100%' }}
-              className="h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block"
+              className={`h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block ${isGif ? 'gif-image' : ''}`}
               loading="lazy"
             />
           );
