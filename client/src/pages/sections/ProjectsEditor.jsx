@@ -612,7 +612,7 @@ export const ProjectsEditor = () => {
                 />
                 {newSkill.status === "Live" && !newSkill.demoUrl && (
                   <p className="text-xs text-amber-600 mt-1">
-                    ⚠️ Add a demo URL to show the "Live Demo" button on the public page
+                    ⚠️ Add a demo URL to show the &quot;Live Demo&quot; button on the public page
                   </p>
                 )}
               </div>

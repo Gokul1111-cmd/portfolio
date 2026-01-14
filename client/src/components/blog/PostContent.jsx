@@ -12,10 +12,8 @@ export const PostContent = forwardRef(({ post }, ref) => {
       // Match videos with optional width: @video[alt](url){width:500}
       const videoMatch = remaining.match(/^@video\[([^\]]*)\]\(([^)]+)\)(?:\{width:(\d+)\})?/);
       if (videoMatch) {
-        const width = videoMatch[3] ? parseInt(videoMatch[3]) : 600;
         const url = videoMatch[2];
         const isGiphy = url.includes('giphy.com');
-        const isTenor = url.includes('tenor.com');
         
         // Handle Giphy/Tenor embeds
         if (isGiphy && url.includes('/embed/')) {
@@ -49,7 +47,7 @@ export const PostContent = forwardRef(({ post }, ref) => {
               className="rounded-lg my-6 md:my-8 shadow-lg mx-auto block max-h-[400px] md:max-h-[600px]"
             >
               <source src={url} type={url.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
-              Your browser doesn't support video.
+              Your browser doesn&apos;t support video.
             </video>
           );
         }
@@ -60,7 +58,6 @@ export const PostContent = forwardRef(({ post }, ref) => {
       // Match images with optional width: ![alt](url){width:500}
       const imageMatch = remaining.match(/^!\[([^\]]*)\]\(([^)]+)\)(?:\{width:(\d+)\})?/);
       if (imageMatch) {
-        const width = imageMatch[3] ? parseInt(imageMatch[3]) : 800;
         const url = imageMatch[2];
         const isGif = url.toLowerCase().endsWith('.gif');
         
@@ -174,7 +171,7 @@ export const PostContent = forwardRef(({ post }, ref) => {
               className="rounded-lg my-6 md:my-8 shadow-lg mx-auto block max-h-[400px] md:max-h-[600px]"
             >
               <source src={url} type={url.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
-              Your browser doesn't support video.
+              Your browser doesn&apos;t support video.
             </video>
           );
         }

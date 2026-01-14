@@ -16,7 +16,6 @@ import { fetchStaticOrLive } from "../lib/staticData";
 export const AboutSection = () => {
   const [activeTab, setActiveTab] = useState("personal");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [counter, setCounter] = useState(0);
   const [aboutContent, setAboutContent] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -33,13 +32,6 @@ export const AboutSection = () => {
     techStack: [],
     features: [],
   };
-
-  const achievements = [
-    { number: "8+", label: "Projects", icon: "🚀" },
-    { number: "0", label: "Years Exp", icon: "💼" },
-    { number: "Fresh Graduate", label: "Status", icon: "🎓" },
-    { number: "100%", label: "Motivated", icon: "⚡" },
-  ];
 
   const techStack = [
     {
@@ -93,14 +85,6 @@ export const AboutSection = () => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(
-      () => setCounter((prev) => (prev + 1) % 4),
-      2000,
-    );
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

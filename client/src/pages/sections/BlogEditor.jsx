@@ -279,7 +279,6 @@ export const BlogEditor = () => {
   const moveImage = (fromIndex, toIndex) => {
     const blocks = parseContentBlocks(formData.content);
     const imageBlocks = blocks.filter(b => b.type === 'image');
-    const textBlocks = blocks.filter(b => b.type === 'text');
     
     // Swap images
     const [movedImage] = imageBlocks.splice(fromIndex, 1);
