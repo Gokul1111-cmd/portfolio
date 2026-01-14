@@ -114,27 +114,29 @@ export const RightSidebar = forwardRef((
   );
 
   return (
-    <div
-      ref={ref}
-      className={`hidden lg:flex fixed right-0 top-0 w-[400px] h-screen border-l bg-background/95 backdrop-blur-sm z-40 overflow-y-auto transition-transform duration-300 ease-out flex-col ${
-        !showRightSidebar ? "translate-x-full" : "translate-x-0"
-      }`}
-    >
+    <>
       {/* Desktop version */}
-      <div className="flex flex-col h-full p-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg md:text-xl font-bold">Comments</h3>
-          <button
-            onClick={() => setShowRightSidebar(false)}
-            className="p-2 hover:bg-muted rounded-md transition-colors"
-          >
-            <X size={20} />
-          </button>
-        </div>
+      <div
+        ref={ref}
+        className={`hidden lg:flex fixed right-0 top-0 w-[400px] h-screen border-l bg-background/95 backdrop-blur-sm z-40 overflow-y-auto transition-transform duration-300 ease-out flex-col ${
+          !showRightSidebar ? "translate-x-full" : "translate-x-0"
+        }`}
+      >
+        <div className="flex flex-col h-full p-8 space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg md:text-xl font-bold">Comments</h3>
+            <button
+              onClick={() => setShowRightSidebar(false)}
+              className="p-2 hover:bg-muted rounded-md transition-colors"
+            >
+              <X size={20} />
+            </button>
+          </div>
 
-        <div className="space-y-6">
-          <CommentForm />
-          <CommentsList />
+          <div className="space-y-6">
+            <CommentForm />
+            <CommentsList />
+          </div>
         </div>
       </div>
 
@@ -142,10 +144,10 @@ export const RightSidebar = forwardRef((
       {showRightSidebar && (
         <>
           <div
-            className="fixed inset-0 bg-black/30 lg:hidden -z-10"
+            className="fixed inset-0 bg-black/30 lg:hidden z-40"
             onClick={() => setShowRightSidebar(false)}
           />
-          <div className="fixed inset-0 lg:hidden flex flex-col z-40">
+          <div className="fixed inset-0 lg:hidden flex flex-col z-50">
             <div className="bg-background/95 backdrop-blur-sm overflow-y-auto flex-1 p-6 md:p-8 space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg md:text-xl font-bold">Comments</h3>
@@ -165,7 +167,7 @@ export const RightSidebar = forwardRef((
           </div>
         </>
       )}
-    </div>
+    </>
   );
 });
 
