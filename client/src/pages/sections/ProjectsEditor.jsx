@@ -207,6 +207,7 @@ const defaultProjectState = {
   tags: "",
   highlights: "",
   featured: false,
+  accentColor: "from-blue-500 to-cyan-600",
 };
 
 export const ProjectsEditor = () => {
@@ -342,6 +343,7 @@ export const ProjectsEditor = () => {
         ? project.highlights.join(", ")
         : project.highlights || "",
       featured: project.featured || false,
+      accentColor: project.accentColor || "from-blue-500 to-cyan-600",
     });
   };
 
@@ -595,14 +597,25 @@ export const ProjectsEditor = () => {
                 </p>
               </div>
 
-              <input
-                placeholder="Demo URL"
-                value={newSkill.demoUrl}
-                onChange={(e) =>
-                  setNewSkill({ ...newSkill, demoUrl: e.target.value })
-                }
-                className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
-              />
+              <div>
+                <label className="text-xs font-semibold text-foreground block mb-1">
+                  Demo URL {newSkill.status === "Live" && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  placeholder="https://example.com (required for Live projects)"
+                  value={newSkill.demoUrl}
+                  onChange={(e) =>
+                    setNewSkill({ ...newSkill, demoUrl: e.target.value })
+                  }
+                  className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
+                  required={newSkill.status === "Live"}
+                />
+                {newSkill.status === "Live" && !newSkill.demoUrl && (
+                  <p className="text-xs text-amber-600 mt-1">
+                    ⚠️ Add a demo URL to show the "Live Demo" button on the public page
+                  </p>
+                )}
+              </div>
 
               <input
                 placeholder="GitHub URL"
