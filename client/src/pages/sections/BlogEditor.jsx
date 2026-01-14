@@ -40,6 +40,9 @@ export const BlogEditor = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageUploadError, setImageUploadError] = useState("");
   const imageInputRef = useRef(null);
+  const videoInputRef = useRef(null);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoUploadError, setVideoUploadError] = useState("");
   const contentTextareaRef = useRef(null);
 
   // Editor form state
@@ -410,6 +413,121 @@ export const BlogEditor = () => {
         imageInputRef.current.value = "";
       }
     }
+  };
+
+  // Handle video upload (MP4, WebM) and GIF upload
+  const handleVideoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['video/mp4', 'video/webm', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      setVideoUploadError('Please upload MP4, WebM, or GIF files only');
+      return;
+    }
+
+    // Validate file size (max 50MB for videos, 10MB for GIFs)
+    const maxSize = file.type === 'image/gif' ? 10 * 1024 * 1024 : 50 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setVideoUploadError(`File too large. Max size: ${file.type === 'image/gif' ? '10MB' : '50MB'}`);
+      return;
+    }
+
+    setUploadingVideo(true);
+    setVideoUploadError('');
+
+    try {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}-${file.name}`;
+      const slug = formData.slug || 'article';
+      const storagePath = `blog-articles/${slug}/${fileName}`;
+      const fileRef = ref(storage, storagePath);
+
+      await uploadBytes(fileRef, file);
+      const downloadUrl = await getDownloadURL(fileRef);
+
+      // Insert video or GIF markdown at cursor
+      const altText = file.name.split('.')[0].replace(/[-_]/g, ' ');
+      const isGif = file.type === 'image/gif';
+      const mediaMarkdown = isGif 
+        ? `![${altText}](${downloadUrl}){width:500}`
+        : `@video[${altText}](${downloadUrl}){width:600}`;
+      
+      const currentContent = formData.content || '';
+      const textarea = contentTextareaRef.current;
+      let updatedContent;
+      
+      if (textarea) {
+        const cursorPos = textarea.selectionStart || 0;
+        const beforeCursor = currentContent.substring(0, cursorPos);
+        const afterCursor = currentContent.substring(cursorPos);
+        updatedContent = beforeCursor + '\n\n' + mediaMarkdown + '\n\n' + afterCursor;
+        
+        setFormData((prev) => ({ ...prev, content: updatedContent }));
+        
+        setTimeout(() => {
+          if (textarea) {
+            textarea.focus();
+            const newCursorPos = cursorPos + mediaMarkdown.length + 4;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+          }
+        }, 0);
+      } else {
+        updatedContent = currentContent + '\n\n' + mediaMarkdown + '\n\n';
+        setFormData((prev) => ({ ...prev, content: updatedContent }));
+      }
+
+      console.log(`${isGif ? 'GIF' : 'Video'} uploaded successfully:`, downloadUrl);
+    } catch (err) {
+      console.error('Video/GIF upload error:', err);
+      setVideoUploadError('Failed to upload. Please try again.');
+    } finally {
+      setUploadingVideo(false);
+      if (videoInputRef.current) {
+        videoInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Quick insert markdown helpers
+  const insertMarkdown = (syntax) => {
+    const textarea = contentTextareaRef.current;
+    if (!textarea) return;
+
+    const cursorPos = textarea.selectionStart || 0;
+    const currentContent = formData.content || '';
+    const beforeCursor = currentContent.substring(0, cursorPos);
+    const afterCursor = currentContent.substring(cursorPos);
+    
+    let insertText = '';
+    let cursorOffset = 0;
+    
+    switch(syntax) {
+      case 'giphy':
+        insertText = '@video[GIF description](https://giphy.com/embed/YOUR_GIPHY_ID){width:450}';
+        cursorOffset = 53; // Position cursor at YOUR_GIPHY_ID
+        break;
+      case 'video-url':
+        insertText = '@video[Video description](https://example.com/video.mp4){width:600}';
+        cursorOffset = 23; // Position cursor at URL
+        break;
+      case 'gif-url':
+        insertText = '![GIF description](https://example.com/meme.gif){width:400}';
+        cursorOffset = 19; // Position cursor at URL
+        break;
+      default:
+        return;
+    }
+    
+    const updatedContent = beforeCursor + '\n\n' + insertText + '\n\n' + afterCursor;
+    setFormData((prev) => ({ ...prev, content: updatedContent }));
+    
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = cursorPos + 2 + cursorOffset;
+      textarea.setSelectionRange(newCursorPos, newCursorPos + (syntax === 'giphy' ? 13 : syntax === 'video-url' ? 30 : 28));
+    }, 0);
   };
 
   const handleSave = () => {
@@ -845,6 +963,55 @@ This is an excerpt from my latest blog post. Read the complete article with deta
                     disabled={uploadingImage}
                   />
                   <button
+                    onClick={() => videoInputRef.current?.click()}
+                    disabled={uploadingVideo || !formData.slug}
+                    className="px-3 py-1 text-xs rounded-md border inline-flex items-center gap-1 hover:bg-primary/10 disabled:opacity-50 transition-colors"
+                    title="Upload video/GIF (MP4, WebM, GIF)"
+                  >
+                    {uploadingVideo ? <Loader2 size={12} className="animate-spin" /> : <ImageIcon size={12} />}
+                    {uploadingVideo ? "Uploading..." : "Insert Video/GIF"}
+                  </button>
+                  <input
+                    ref={videoInputRef}
+                    type="file"
+                    accept="video/mp4,video/webm,image/gif"
+                    onChange={handleVideoUpload}
+                    className="hidden"
+                    disabled={uploadingVideo}
+                  />
+                  <div className="relative group">
+                    <button
+                      className="px-3 py-1 text-xs rounded-md border inline-flex items-center gap-1 hover:bg-primary/10 transition-colors"
+                      title="Quick insert media from URL"
+                    >
+                      <Plus size={12} />
+                      URL Insert
+                    </button>
+                    <div className="absolute top-full left-0 mt-1 bg-card border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 min-w-[200px]">
+                      <button
+                        onClick={() => insertMarkdown('giphy')}
+                        className="w-full px-4 py-2 text-left text-xs hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <Sparkles size={12} />
+                        Giphy Embed
+                      </button>
+                      <button
+                        onClick={() => insertMarkdown('video-url')}
+                        className="w-full px-4 py-2 text-left text-xs hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <ImageIcon size={12} />
+                        Video URL
+                      </button>
+                      <button
+                        onClick={() => insertMarkdown('gif-url')}
+                        className="w-full px-4 py-2 text-left text-xs hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <ImageIcon size={12} />
+                        GIF URL
+                      </button>
+                    </div>
+                  </div>
+                  <button
                     onClick={handleAiImprove}
                     disabled={aiLoading || !formData.content.trim()}
                     className="px-3 py-1 text-xs rounded-md border inline-flex items-center gap-1 hover:bg-primary/10 disabled:opacity-50"
@@ -869,6 +1036,11 @@ This is an excerpt from my latest blog post. Read the complete article with deta
               {imageUploadError && (
                 <div className="p-3 bg-destructive/10 border border-destructive/30 rounded text-xs text-destructive">
                   {imageUploadError}
+                </div>
+              )}
+              {videoUploadError && (
+                <div className="p-3 bg-destructive/10 border border-destructive/30 rounded text-xs text-destructive">
+                  {videoUploadError}
                 </div>
               )}
               
