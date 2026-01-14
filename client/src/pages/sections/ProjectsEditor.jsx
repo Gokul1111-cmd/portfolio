@@ -24,6 +24,7 @@ const accentByCategory = {
   "Restaurant Management": "from-amber-500 to-orange-600",
   "Project Management": "from-green-500 to-emerald-600",
   "Food & Recipe": "from-violet-500 to-purple-600",
+  "Cybersecurity": "from-red-500 to-rose-600",
 };
 
 const categoryColors = {
@@ -37,6 +38,8 @@ const categoryColors = {
     "from-rose-500/20 to-pink-600/20 text-rose-600 border-rose-500/30",
   "Food & Recipe":
     "from-violet-500/20 to-purple-600/20 text-violet-600 border-violet-500/30",
+  "Cybersecurity":
+    "from-red-500/20 to-rose-600/20 text-red-600 border-red-500/30",
   "IoT Application":
     "from-orange-500/20 to-red-600/20 text-orange-600 border-orange-500/30",
   "Web Design":
@@ -509,6 +512,7 @@ export const ProjectsEditor = () => {
                 <option>Restaurant Management</option>
                 <option>Project Management</option>
                 <option>Food & Recipe</option>
+                <option>Cybersecurity</option>
               </select>
 
               <input
