@@ -620,21 +620,21 @@ export const BlogPost = () => {
 
       <main
         className={`transition-[margin] duration-300 ease-out ${showStickySidebar ? "lg:ml-[400px]" : ""
-          } ${showRightSidebar ? "lg:mr-[400px]" : ""} max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16`}
+          } ${showRightSidebar ? "lg:mr-[400px]" : ""} max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-8 md:py-12 lg:py-16`}
       >
-        <div className="rounded-2xl overflow-hidden border bg-card shadow-lg mb-12 md:mb-16">
+        <div className="rounded-2xl overflow-hidden border bg-card shadow-lg mb-8 md:mb-12 lg:mb-16">
           <img
             src={post.coverImage}
             alt={post.title}
-            className="w-full h-[360px] md:h-[480px] object-cover"
+            className="w-full h-[240px] sm:h-[360px] md:h-[480px] object-cover"
             loading="eager"
             decoding="async"
           />
         </div>
 
         {seriesPosts.length > 1 && (
-          <div className="mb-12 md:mb-16 p-6 md:p-8 border bg-card rounded-xl">
-            <div className="font-semibold mb-4">📚 {post.series} Series</div>
+          <div className="mb-8 md:mb-12 lg:mb-16 p-4 md:p-6 lg:p-8 border bg-card rounded-xl">
+            <div className="font-semibold mb-4 text-base md:text-lg">📚 {post.series} Series</div>
             <div className="space-y-2">
               {seriesPosts.map((p) => (
                 <div
@@ -658,9 +658,9 @@ export const BlogPost = () => {
 
         <NewsletterCTA />
 
-        <div id="comments-section" className="my-16 md:my-20 space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xl font-bold">
+        <div id="comments-section" className="my-8 md:my-16 lg:my-20 space-y-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-2 text-lg md:text-xl font-bold">
               <MessageCircle size={24} />
               Comments ({comments.length || post.comments || 0})
             </div>
@@ -673,15 +673,15 @@ export const BlogPost = () => {
 
           {!loadingComments && comments.length > 0 && (
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Comments ({comments.length})</h3>
+              <h3 className="font-semibold text-base md:text-lg">Comments ({comments.length})</h3>
               {comments.map((comment) => (
-                <div key={comment.id} className="p-6 border bg-card rounded-xl space-y-3">
+                <div key={comment.id} className="p-4 md:p-6 border bg-card rounded-xl space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold flex-shrink-0">
                       {comment.author[0].toUpperCase()}
                     </div>
-                    <div>
-                      <div className="font-semibold">{comment.author}</div>
+                    <div className="min-w-0">
+                      <div className="font-semibold text-sm truncate">{comment.author}</div>
                       <div className="text-xs text-muted-foreground">
                         {new Date(comment.timestamp || comment.createdAt).toLocaleDateString("en-US", {
                           month: "short",
@@ -691,13 +691,13 @@ export const BlogPost = () => {
                       </div>
                     </div>
                   </div>
-                  <p className="text-base leading-relaxed">{comment.text}</p>
+                  <p className="text-sm md:text-base leading-relaxed">{comment.text}</p>
                 </div>
               ))}
             </div>
           )}
 
-          <div className="p-8 border bg-card rounded-xl text-center space-y-3">
+          <div className="p-4 md:p-8 border bg-card rounded-xl text-center space-y-3">
             <MessageCircle size={48} className="mx-auto text-muted-foreground/50" />
             <p className="text-muted-foreground">Start a conversation! Leave a comment above.</p>
             <p className="text-sm text-muted-foreground">

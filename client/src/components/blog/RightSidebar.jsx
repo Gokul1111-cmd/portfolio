@@ -25,15 +25,21 @@ export const RightSidebar = forwardRef((
   return (
     <div
       ref={ref}
-      className={`hidden lg:block fixed right-0 top-0 w-[400px] h-screen border-l bg-background/95 backdrop-blur-sm z-40 transform-gpu transition-transform duration-300 ${showRightSidebar ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
-        }`}
+      className={`fixed inset-0 lg:fixed lg:right-0 lg:top-0 lg:w-[400px] lg:h-screen lg:border-l bg-background/95 backdrop-blur-sm z-40 lg:z-40 ${showRightSidebar ? 'opacity-100 visible' : 'opacity-0 invisible lg:opacity-100 lg:visible'} lg:opacity-100 lg:visible transition-opacity lg:transition-none duration-300 overflow-y-auto`}
     >
-      <div className="h-full overflow-y-auto p-8 space-y-6">
+      {/* Mobile overlay */}
+      <div
+        className="fixed inset-0 bg-black/30 lg:hidden -z-10"
+        onClick={() => setShowRightSidebar(false)}
+      />
+      
+      {/* Content container */}
+      <div className="h-full overflow-y-auto p-6 md:p-8 lg:p-8 space-y-6 max-w-full lg:max-w-none">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold">Comments</h3>
+          <h3 className="text-lg md:text-xl font-bold">Comments</h3>
           <button
             onClick={() => setShowRightSidebar(false)}
-            className="p-2 hover:bg-muted rounded-md transition-colors"
+            className="p-2 hover:bg-muted rounded-md transition-colors lg:flex"
           >
             <X size={20} />
           </button>
@@ -53,14 +59,14 @@ export const RightSidebar = forwardRef((
                 <p className="text-xs text-muted-foreground">Saved for future comments on all posts.</p>
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 text-sm text-muted-foreground">
                 <div className="inline-flex items-center gap-2">
                   <User size={16} />
                   Commenting as <span className="font-semibold text-foreground">{guestName}</span>
                 </div>
                 <button
                   onClick={() => setIsEditingName(true)}
-                  className="text-xs px-2 py-1 rounded-md border bg-card hover:bg-muted"
+                  className="text-xs px-2 py-1 rounded-md border bg-card hover:bg-muted w-fit"
                 >
                   Edit name
                 </button>
@@ -71,7 +77,7 @@ export const RightSidebar = forwardRef((
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               placeholder="Share your thoughts..."
-              className="w-full px-4 py-3 rounded-md border bg-background min-h-32 text-sm"
+              className="w-full px-4 py-3 rounded-md border bg-background min-h-32 text-sm resize-none"
             />
             {commentError && (
               <div className="text-xs text-red-500">{commentError}</div>
@@ -80,7 +86,7 @@ export const RightSidebar = forwardRef((
               <button
                 onClick={() => submitComment()}
                 disabled={!commentText.trim() || submittingComment}
-                className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50"
+                className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50 flex-1 md:flex-none"
               >
                 {submittingComment ? "Posting..." : "Post Comment"}
               </button>
@@ -106,11 +112,11 @@ export const RightSidebar = forwardRef((
               {comments.map((comment) => (
                 <div key={comment.id} className="p-4 border bg-card rounded-lg space-y-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white text-xs font-bold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                       {comment.author[0].toUpperCase()}
                     </div>
-                    <div>
-                      <div className="text-xs font-semibold">{comment.author}</div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold truncate">{comment.author}</div>
                       <div className="text-xs text-muted-foreground">
                         {new Date(comment.timestamp || comment.createdAt).toLocaleDateString("en-US", {
                           month: "short",

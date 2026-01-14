@@ -22,7 +22,7 @@ export const PostContent = forwardRef(({ post }, ref) => {
           parts.push(
             <div
               key={key++}
-              style={{ width: `${width}px`, maxWidth: '100%' }}
+              style={{ maxWidth: '100%' }}
               className="relative mx-auto my-6 md:my-8 rounded-lg overflow-hidden shadow-lg"
             >
               <iframe
@@ -45,8 +45,8 @@ export const PostContent = forwardRef(({ post }, ref) => {
               loop
               muted
               playsInline
-              style={{ width: `${width}px`, maxWidth: '100%' }}
-              className="h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block"
+              style={{ maxWidth: '100%', width: 'auto', height: 'auto' }}
+              className="rounded-lg my-6 md:my-8 shadow-lg mx-auto block max-h-[400px] md:max-h-[600px]"
             >
               <source src={url} type={url.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
               Your browser doesn't support video.
@@ -69,8 +69,8 @@ export const PostContent = forwardRef(({ post }, ref) => {
             key={key++}
             src={url}
             alt={imageMatch[1]}
-            style={{ width: `${width}px`, maxWidth: '100%' }}
-            className={`h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block ${isGif ? 'gif-image' : ''}`}
+            style={{ maxWidth: '100%', width: 'auto', height: 'auto' }}
+            className={`rounded-lg my-6 md:my-8 shadow-lg mx-auto block max-h-[400px] md:max-h-[600px] ${isGif ? 'gif-image' : ''}`}
             loading="lazy"
           />
         );
@@ -138,17 +138,15 @@ export const PostContent = forwardRef(({ post }, ref) => {
         // Check if paragraph is standalone video with optional width
         const standaloneVideoMatch = paragraph.trim().match(/^@video\[([^\]]*)\]\(([^)]+)\)(?:\{width:(\d+)\})?$/);
         if (standaloneVideoMatch) {
-          const width = standaloneVideoMatch[3] ? parseInt(standaloneVideoMatch[3]) : 600;
           const url = standaloneVideoMatch[2];
           const isGiphy = url.includes('giphy.com');
-          const isTenor = url.includes('tenor.com');
           
           // Handle Giphy/Tenor embeds
           if (isGiphy && url.includes('/embed/')) {
             return (
               <div
                 key={idx}
-                style={{ width: `${width}px`, maxWidth: '100%' }}
+                style={{ maxWidth: '100%' }}
                 className="relative mx-auto my-6 md:my-8 rounded-lg overflow-hidden shadow-lg"
               >
                 <iframe
@@ -172,8 +170,8 @@ export const PostContent = forwardRef(({ post }, ref) => {
               loop
               muted
               playsInline
-              style={{ width: `${width}px`, maxWidth: '100%' }}
-              className="h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block"
+              style={{ maxWidth: '100%', width: 'auto', height: 'auto' }}
+              className="rounded-lg my-6 md:my-8 shadow-lg mx-auto block max-h-[400px] md:max-h-[600px]"
             >
               <source src={url} type={url.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
               Your browser doesn't support video.
@@ -184,7 +182,6 @@ export const PostContent = forwardRef(({ post }, ref) => {
         // Check if paragraph is standalone image with optional width
         const standaloneImageMatch = paragraph.trim().match(/^!\[([^\]]*)\]\(([^)]+)\)(?:\{width:(\d+)\})?$/);
         if (standaloneImageMatch) {
-          const width = standaloneImageMatch[3] ? parseInt(standaloneImageMatch[3]) : 800;
           const url = standaloneImageMatch[2];
           const isGif = url.toLowerCase().endsWith('.gif');
           
@@ -193,8 +190,8 @@ export const PostContent = forwardRef(({ post }, ref) => {
               key={idx}
               src={url}
               alt={standaloneImageMatch[1]}
-              style={{ width: `${width}px`, maxWidth: '100%' }}
-              className={`h-auto rounded-lg my-6 md:my-8 shadow-lg mx-auto block ${isGif ? 'gif-image' : ''}`}
+              style={{ maxWidth: '100%', width: 'auto', height: 'auto' }}
+              className={`rounded-lg my-6 md:my-8 shadow-lg mx-auto block max-h-[400px] md:max-h-[600px] ${isGif ? 'gif-image' : ''}`}
               loading="lazy"
             />
           );
