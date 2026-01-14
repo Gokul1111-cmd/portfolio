@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Crop,
+  Loader2,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
@@ -48,6 +49,8 @@ export const SkillsEditor = () => {
   });
   const [dragActive, setDragActive] = useState(false);
   const [showCropModal, setShowCropModal] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
   const [imageToCrop, setImageToCrop] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0, width: 200, height: 200 });
   const [isDragging, setIsDragging] = useState(false);
@@ -90,6 +93,7 @@ export const SkillsEditor = () => {
       category: newSkill.category.trim(),
       iconSize: clampIconSize(newSkill.iconSize || 100),
     };
+    setSaving(true);
     try {
       const res = await fetch("/api/portfolio-data?type=skills", {
         method: "POST",
@@ -107,23 +111,33 @@ export const SkillsEditor = () => {
           iconSize: 100,
         });
         alert("Added!");
+      } else {
+        alert("Failed to add skill");
       }
     } catch (error) {
       console.error("Failed to add skill", error);
       alert("Failed to add");
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete?")) return;
+    setDeleting(id);
     try {
       const res = await fetch(`/api/portfolio-data?type=skills&id=${id}`, { method: "DELETE" });
       if (res.ok) {
         setSkills(skills.filter((s) => s.id !== id));
         alert("Deleted!");
+      } else {
+        alert("Failed to delete");
       }
     } catch (error) {
       console.error("Delete failed", error);
+      alert("Failed to delete");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -161,6 +175,7 @@ export const SkillsEditor = () => {
       category: newSkill.category.trim(),
       iconSize: clampIconSize(newSkill.iconSize || 100),
     };
+    setSaving(true);
     try {
       const res = await fetch(`/api/portfolio-data?type=skills&id=${editingSkill.id}`, {
         method: "PUT",
@@ -176,10 +191,14 @@ export const SkillsEditor = () => {
         );
         cancelEdit();
         alert("Updated!");
+      } else {
+        alert("Failed to update");
       }
     } catch (error) {
       console.error("Update failed", error);
       alert("Failed to update");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -567,9 +586,15 @@ export const SkillsEditor = () => {
 
               <button
                 type="submit"
-                className="w-full px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 text-sm"
+                disabled={saving}
+                className="w-full px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm transition-opacity"
               >
-                {editingSkill ? (
+                {saving ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    {editingSkill ? 'Updating...' : 'Adding...'}
+                  </>
+                ) : editingSkill ? (
                   <>
                     <Save size={16} /> Update
                   </>
@@ -645,9 +670,14 @@ export const SkillsEditor = () => {
                             e.stopPropagation();
                             handleDelete(skill.id);
                           }}
-                          className="p-1 rounded hover:bg-destructive/10 text-destructive"
+                          disabled={deleting === skill.id}
+                          className="p-1 rounded hover:bg-destructive/10 text-destructive disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
                         >
-                          <Trash2 size={14} />
+                          {deleting === skill.id ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={14} />
+                          )}
                         </button>
                       </div>
                     </div>

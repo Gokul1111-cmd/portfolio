@@ -11,6 +11,7 @@ import {
   Eye,
   Github,
   Star,
+  Loader2,
 } from "lucide-react";
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
@@ -217,6 +218,8 @@ export const ProjectsEditor = () => {
   const [newSkill, setNewSkill] = useState(defaultProjectState);
   const [imageDragActive, setImageDragActive] = useState(false);
   const [videoDragActive, setVideoDragActive] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
     fetchProjects();
@@ -251,6 +254,7 @@ export const ProjectsEditor = () => {
       return;
     }
 
+    setSaving(true);
     try {
       const tagsArray = newSkill.tags
         .split(",")
@@ -261,38 +265,61 @@ export const ProjectsEditor = () => {
         .map((t) => t.trim())
         .filter(Boolean);
 
+      const payload = {
+        ...newSkill,
+        tags: tagsArray,
+        highlights: highlightsArray,
+      };
+      
+      console.log("[ProjectsEditor] Creating project with payload:", payload);
+
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...newSkill,
-          tags: tagsArray,
-          highlights: highlightsArray,
-        }),
+        body: JSON.stringify(payload),
       });
 
+      console.log("[ProjectsEditor] POST response status:", res.status);
+      const responseData = await res.json();
+      console.log("[ProjectsEditor] POST response data:", responseData);
+
       if (res.ok) {
-        const data = await res.json();
-        setProjects([data, ...projects]);
+        setProjects([responseData, ...projects]);
         setNewSkill(defaultProjectState);
         alert("Project added!");
+      } else {
+        console.error("[ProjectsEditor] POST failed:", responseData);
+        alert(`Failed to add project: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error("Add failed", error);
-      alert("Failed to add project");
+      console.error("[ProjectsEditor] Add exception:", error);
+      alert(`Failed to add project: ${error.message}`);
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this project?")) return;
+    setDeleting(id);
     try {
+      console.log("[ProjectsEditor] Deleting project:", id);
       const res = await fetch(`/api/projects?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      console.log("[ProjectsEditor] DELETE response:", res.status, data);
+      
       if (res.ok) {
         setProjects(projects.filter((p) => p.id !== id));
         alert("Deleted!");
+      } else {
+        console.error("[ProjectsEditor] DELETE failed:", data);
+        alert(`Failed to delete: ${data.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error("Delete failed", error);
+      console.error("[ProjectsEditor] Delete exception:", error);
+      alert(`Failed to delete: ${error.message}`);
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -376,6 +403,7 @@ export const ProjectsEditor = () => {
       return;
     }
 
+    setSaving(true);
     try {
       const tagsArray = newSkill.tags
         .split(",")
@@ -386,29 +414,41 @@ export const ProjectsEditor = () => {
         .map((t) => t.trim())
         .filter(Boolean);
 
+      const payload = {
+        ...newSkill,
+        tags: tagsArray,
+        highlights: highlightsArray,
+      };
+      
+      console.log("[ProjectsEditor] Updating project:", editingProject.id, payload);
+
       const res = await fetch(`/api/projects?id=${editingProject.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...newSkill,
-          tags: tagsArray,
-          highlights: highlightsArray,
-        }),
+        body: JSON.stringify(payload),
       });
 
+      console.log("[ProjectsEditor] PUT response status:", res.status);
+      const responseData = await res.json();
+      console.log("[ProjectsEditor] PUT response data:", responseData);
+
       if (res.ok) {
-        const updatedProject = await res.json();
         setProjects(
           projects.map((p) =>
-            p.id === editingProject.id ? updatedProject : p,
+            p.id === editingProject.id ? { ...p, ...responseData } : p,
           ),
         );
         cancelEdit();
         alert("Project updated!");
+      } else {
+        console.error("[ProjectsEditor] PUT failed:", responseData);
+        alert(`Failed to update project: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error("Update failed", error);
-      alert("Failed to update project");
+      console.error("[ProjectsEditor] Update exception:", error);
+      alert(`Failed to update project: ${error.message}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -449,7 +489,17 @@ export const ProjectsEditor = () => {
         </div>
 
         {/* Right - Form Section */}
-        <div>
+        <div className="relative">
+          {saving && (
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 rounded-xl flex items-center justify-center">
+              <div className="text-center">
+                <Loader2 size={32} className="animate-spin text-primary mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  {editingProject ? 'Updating project...' : 'Creating project...'}
+                </p>
+              </div>
+            </div>
+          )}
           <div className="bg-card border border-border rounded-xl p-5 shadow-lg sticky top-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold flex items-center gap-2">
@@ -477,6 +527,7 @@ export const ProjectsEditor = () => {
               onSubmit={editingProject ? handleUpdate : handleAdd}
               className="space-y-4 text-sm max-h-[70vh] overflow-y-auto pr-2"
             >
+              <fieldset disabled={saving} className="space-y-4">
               <input
                 placeholder="Title"
                 required
@@ -484,7 +535,7 @@ export const ProjectsEditor = () => {
                 onChange={(e) =>
                   setNewSkill({ ...newSkill, title: e.target.value })
                 }
-                className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary"
+                className="w-full p-2 rounded-md bg-background border border-border outline-none focus:border-primary disabled:opacity-60"
               />
 
               <textarea
@@ -631,12 +682,19 @@ export const ProjectsEditor = () => {
                 />
                 <span className="text-xs">Featured</span>
               </label>
+              </fieldset>
 
               <button
                 type="submit"
-                className="w-full px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 text-sm"
+                disabled={saving}
+                className="w-full px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm transition-opacity"
               >
-                {editingProject ? (
+                {saving ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    {editingProject ? 'Updating...' : 'Adding...'}
+                  </>
+                ) : editingProject ? (
                   <>
                     <Save size={16} /> Update
                   </>
@@ -696,9 +754,14 @@ export const ProjectsEditor = () => {
                           e.stopPropagation();
                           handleDelete(project.id);
                         }}
-                        className="p-1 rounded hover:bg-destructive/10 text-destructive"
+                        disabled={deleting === project.id}
+                        className="p-1 rounded hover:bg-destructive/10 text-destructive disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
                       >
-                        <Trash2 size={16} />
+                        {deleting === project.id ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={16} />
+                        )}
                       </button>
                     </div>
                   </div>

@@ -9,6 +9,7 @@ import {
   Pencil,
   X,
   Quote,
+  Loader2,
 } from "lucide-react";
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
@@ -96,6 +97,8 @@ export const TestimonialsEditor = () => {
     image: "",
   });
   const [imageDragActive, setImageDragActive] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
 
   const handleImageFile = (file) => {
     if (!file) return;
@@ -158,6 +161,7 @@ export const TestimonialsEditor = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete?")) return;
+    setDeleting(id);
     try {
       const res = await fetch(`/api/portfolio-data?type=testimonials&id=${id}`, {
         method: "DELETE",
@@ -165,9 +169,14 @@ export const TestimonialsEditor = () => {
       if (res.ok) {
         setTestimonials(testimonials.filter((t) => t.id !== id));
         alert("Deleted!");
+      } else {
+        alert("Failed to delete");
       }
     } catch (error) {
       console.error("Delete failed", error);
+      alert("Failed to delete");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -189,6 +198,7 @@ export const TestimonialsEditor = () => {
       alert("Fill all required fields");
       return;
     }
+    setSaving(true);
     try {
       const res = await fetch(`/api/portfolio-data?type=testimonials&id=${editingTestimonial.id}`, {
         method: "PUT",
@@ -204,10 +214,14 @@ export const TestimonialsEditor = () => {
         );
         cancelEdit();
         alert("Updated!");
+      } else {
+        alert("Failed to update");
       }
     } catch (error) {
       console.error("Update failed", error);
       alert("Failed to update");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -364,11 +378,20 @@ export const TestimonialsEditor = () => {
               </div>
               <button
                 type="submit"
-                disabled={!editingTestimonial}
-                className="w-full px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 text-sm"
+                disabled={!editingTestimonial || saving}
+                className="w-full px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm transition-opacity"
               >
-                <Save size={16} />{" "}
-                {editingTestimonial ? "Update" : "Select a testimonial to edit"}
+                {saving ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    {editingTestimonial ? "Update" : "Select a testimonial to edit"}
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -422,9 +445,14 @@ export const TestimonialsEditor = () => {
                           e.stopPropagation();
                           handleDelete(testimonial.id);
                         }}
-                        className="p-1 rounded hover:bg-destructive/10 text-destructive"
+                        disabled={deleting === testimonial.id}
+                        className="p-1 rounded hover:bg-destructive/10 text-destructive disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
                       >
-                        <Trash2 size={16} />
+                        {deleting === testimonial.id ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={16} />
+                        )}
                       </button>
                     </div>
                   </div>
