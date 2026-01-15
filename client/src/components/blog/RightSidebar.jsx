@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { User, X } from "lucide-react";
-import { forwardRef } from "react";
+import { forwardRef, useMemo } from "react";
 
 export const RightSidebar = forwardRef((
   {
@@ -22,7 +22,7 @@ export const RightSidebar = forwardRef((
 ) => {
   const showNameInput = isEditingName || !guestName;
 
-  const CommentForm = () => (
+  const CommentForm = useMemo(() => (
     <div className="space-y-3">
       {showNameInput ? (
         <div className="space-y-2">
@@ -80,9 +80,9 @@ export const RightSidebar = forwardRef((
         ))}
       </div>
     </div>
-  );
+  ), [showNameInput, guestName, setGuestName, setIsEditingName, commentInputRef, commentText, setCommentText, submitComment, commentError, submittingComment]);
 
-  const CommentsList = () => (
+  const CommentsList = useMemo(() => (
     comments.length > 0 && (
       <div className="space-y-4 pt-4 border-t">
         <h4 className="text-sm font-semibold text-muted-foreground">
@@ -111,7 +111,7 @@ export const RightSidebar = forwardRef((
         ))}
       </div>
     )
-  );
+  ), [comments]);
 
   return (
     <>
@@ -134,8 +134,8 @@ export const RightSidebar = forwardRef((
           </div>
 
           <div className="space-y-6">
-            <CommentForm />
-            <CommentsList />
+            {CommentForm}
+            {CommentsList}
           </div>
         </div>
       </div>
@@ -147,8 +147,13 @@ export const RightSidebar = forwardRef((
             className="fixed inset-0 bg-black/30 lg:hidden z-40"
             onClick={() => setShowRightSidebar(false)}
           />
-          <div className="fixed inset-0 lg:hidden flex flex-col z-50">
-            <div className="bg-background/95 backdrop-blur-sm overflow-y-auto flex-1 p-6 md:p-8 space-y-6">
+          <div 
+            className="fixed inset-0 lg:hidden flex flex-col z-50 pointer-events-none"
+          >
+            <div 
+              className="bg-background/95 backdrop-blur-sm overflow-y-auto flex-1 p-6 md:p-8 space-y-6 pointer-events-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center justify-between">
                 <h3 className="text-lg md:text-xl font-bold">Comments</h3>
                 <button
@@ -160,8 +165,8 @@ export const RightSidebar = forwardRef((
               </div>
 
               <div className="space-y-6">
-                <CommentForm />
-                <CommentsList />
+                {CommentForm}
+                {CommentsList}
               </div>
             </div>
           </div>

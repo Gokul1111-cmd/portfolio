@@ -139,7 +139,11 @@ export const BlogPost = () => {
     const handleClickOutside = (event) => {
       if (!showRightSidebar) return;
 
-      // Check if click is outside the sidebar
+      // Check if click is on mobile sidebar content (has pointer-events-auto class)
+      const isMobileSidebar = event.target.closest('.pointer-events-auto');
+      if (isMobileSidebar) return;
+
+      // Check if click is outside the desktop sidebar
       if (rightSidebarRef.current && !rightSidebarRef.current.contains(event.target)) {
         // Also check if the click is not on a comment button (to prevent immediate close)
         const isCommentButton = event.target.closest('[data-comment-trigger]');
@@ -200,17 +204,9 @@ export const BlogPost = () => {
       // Don't auto-close sidebar on scroll - let user close it manually
     };
 
-    const handleArticleClick = (e) => {
-      if (showRightSidebar && articleRef.current?.contains(e.target)) {
-        setShowRightSidebar(false);
-      }
-    };
-
-    document.addEventListener("click", handleArticleClick, true);
     window.addEventListener("scroll", handleScroll);
 
     return () => {
-      document.removeEventListener("click", handleArticleClick, true);
       window.removeEventListener("scroll", handleScroll);
     };
   }, [slug, showRightSidebar]);
