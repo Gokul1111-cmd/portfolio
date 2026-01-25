@@ -7,6 +7,7 @@ import { AdminDashboard } from "./pages/AdminDashboard"; // NEW
 import { TestimonialSubmit } from "./pages/TestimonialSubmit";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import JourneyDetail from "./pages/JourneyDetail";
 import { NotFound } from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 import WelcomeScreen from "@/components/WelcomeScreen";
@@ -44,6 +45,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          <Route path="/journey/:journeyId" element={<JourneyDetail />} />
           {/* NEW ROUTES */}
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminDashboard />} />

@@ -16,6 +16,7 @@ import {
   Award,
   CloudUpload,
   FileText,
+  BookOpen,
 } from "lucide-react";
 
 // Import section editor components
@@ -31,6 +32,7 @@ import { TimelineEditor } from "./sections/TimelineEditor";
 import { CertificatesEditor } from "./sections/CertificatesEditor";
 import { SyncSettings } from "./sections/SyncSettings";
 import { BlogEditor } from "./sections/BlogEditor";
+import AdminEngineeringJourney from "@/components/AdminEngineeringJourney";
 
 const navigationItems = [
   { id: "hero", label: "Hero", icon: Sparkles },
@@ -42,6 +44,7 @@ const navigationItems = [
   { id: "testimonials", label: "Testimonials", icon: MessageSquare },
   { id: "certificates", label: "Certificates", icon: Award },
   { id: "blog", label: "Blog", icon: FileText },
+  { id: "journey", label: "Engineering Journey", icon: BookOpen },
   { id: "contact", label: "Contact", icon: Mail },
   { id: "site", label: "Site Settings", icon: Settings },
   { id: "sync", label: "Sync", icon: CloudUpload },
@@ -57,6 +60,7 @@ const sectionComponents = {
   testimonials: TestimonialsEditor,
   certificates: CertificatesEditor,
   blog: BlogEditor,
+  journey: AdminEngineeringJourney,
   contact: ContactEditor,
   site: SiteSettingsEditor,
   sync: SyncSettings,

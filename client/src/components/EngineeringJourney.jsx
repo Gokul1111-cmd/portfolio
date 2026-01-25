@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+import { getJourneyPhases, getJourneyEntries } from '@/services/engineeringJourneyService';
+
 /**
  * EngineeringJourney Component
  * 
@@ -100,16 +103,46 @@ const fallbackEntries = [
 // ============================================================================
 
 export const EngineeringJourney = () => {
-  // CMS Data placeholders (will be populated from admin panel later)
-  const cmsPhases = null;
-  const cmsEntries = null;
+  const [phases, setPhases] = useState(null);
+  const [entries, setEntries] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // =========================================================================
-  // Data Resolution Logic
-  // Fallback to local data if CMS data is unavailable
+  // Fetch data from Firebase on mount
   // =========================================================================
-  const phases = cmsPhases?.length ? cmsPhases : fallbackPhases;
-  const entries = cmsEntries?.length ? cmsEntries : fallbackEntries;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [firestorePhases, firestoreEntries] = await Promise.all([
+          getJourneyPhases(),
+          getJourneyEntries(),
+        ]);
+
+        // Use Firebase data if available, fallback to local data
+        setPhases(firestorePhases?.length ? firestorePhases : fallbackPhases);
+        setEntries(firestoreEntries?.length ? firestoreEntries : fallbackEntries);
+
+        console.log('[EngineeringJourney] Data loaded successfully', {
+          phasesCount: firestorePhases?.length || fallbackPhases.length,
+          entriesCount: firestoreEntries?.length || fallbackEntries.length,
+        });
+      } catch (err) {
+        console.warn('[EngineeringJourney] Error fetching from Firebase, using fallback:', err);
+        // Use fallback data if Firebase fails
+        setPhases(fallbackPhases);
+        setEntries(fallbackEntries);
+        setError('Using offline data. Firebase connection unavailable.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // =========================================================================
   // Helper Functions
@@ -153,15 +186,20 @@ export const EngineeringJourney = () => {
   // =========================================================================
 
   /**
-   * Render a single entry card
+   * Render a single entry card with all available fields
    */
   const renderEntryCard = (entry) => (
-    <div key={entry.id} className="entry-card">
+    <div key={entry.id || entry.docId} className="entry-card">
       <div className="entry-header">
         <h4 className="entry-title">{entry.title}</h4>
-        <span className={`entry-status ${getStatusColor(entry.status)}`}>
-          {entry.status}
-        </span>
+        <div className="entry-badges">
+          <span className={`entry-status ${getStatusColor(entry.status)}`}>
+            {entry.status}
+          </span>
+          {entry.type && (
+            <span className="entry-type-badge">{entry.type}</span>
+          )}
+        </div>
       </div>
 
       <div className="entry-domain">
@@ -180,6 +218,22 @@ export const EngineeringJourney = () => {
         </div>
       )}
 
+      {entry.links && entry.links.length > 0 && (
+        <div className="entry-links">
+          {entry.links.map((link, idx) => (
+            <a
+              key={idx}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="entry-link"
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      )}
+
       {entry.githubLink && (
         <a
           href={entry.githubLink}
@@ -189,6 +243,26 @@ export const EngineeringJourney = () => {
         >
           View on GitHub
         </a>
+      )}
+
+      {entry.artifacts && entry.artifacts.length > 0 && (
+        <div className="entry-artifacts">
+          <strong>Artifacts:</strong>
+          <ul className="artifacts-list">
+            {entry.artifacts.map((artifact, idx) => (
+              <li key={idx}>
+                <a
+                  href={artifact.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="artifact-link"
+                >
+                  {artifact.type} →
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
@@ -282,9 +356,31 @@ export const EngineeringJourney = () => {
   // MAIN RENDER
   // =========================================================================
 
+  // Loading state
+  if (loading) {
+    return (
+      <section className="engineering-journey-section">
+        <div className="section-container">
+          <div className="loading-state">
+            <p>Loading your engineering journey...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state (non-blocking - still show fallback data)
+  const errorMessage = error ? (
+    <div className="error-banner">
+      ℹ️ {error}
+    </div>
+  ) : null;
+
   return (
     <section className="engineering-journey-section">
       <div className="section-container">
+        {errorMessage}
+        
         <header className="section-header">
           <h2 className="section-title">Engineering Journey</h2>
           <p className="section-subtitle">
@@ -293,9 +389,13 @@ export const EngineeringJourney = () => {
           </p>
         </header>
 
-        <div className="phases-grid">
-          {phases.map((phase) => renderPhase(phase))}
-        </div>
+        {phases && phases.length > 0 ? (
+          <div className="phases-grid">
+            {phases.map((phase) => renderPhase(phase))}
+          </div>
+        ) : (
+          <p className="no-data">No phases available yet.</p>
+        )}
       </div>
     </section>
   );
