@@ -1,21 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 
-// Logger utility (only logs in development)
+// Logger utility (silenced by default to avoid console spam)
 const isDev = import.meta.env.DEV;
+const enableDebugLogs = false; // flip to true locally if you need cursor debug traces
+const shouldLogDebug = isDev && enableDebugLogs;
 const logger = {
   log: (message, data = {}) => {
-    if (isDev) console.log(`[CustomCursor] ${message}`, data);
+    if (shouldLogDebug) console.log(`[CustomCursor] ${message}`, data);
   },
   error: (message, error) => {
+    // Keep errors visible even when debug logs are off
     console.error(`[CustomCursor ERROR] ${message}`, error);
   },
   warn: (message, data = {}) => {
-    if (isDev) console.warn(`[CustomCursor WARNING] ${message}`, data);
+    if (shouldLogDebug) console.warn(`[CustomCursor WARNING] ${message}`, data);
   }
 };
 
 // Module load diagnostics (helps detect if Chrome isn't loading this file)
-if (isDev) {
+if (shouldLogDebug) {
   try {
     console.log('[CustomCursor] Module loaded', {
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'n/a',

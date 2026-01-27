@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Cloud, Code, Shield, Database, CheckCircle, Clock, Calendar } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Cloud, Code, Shield, Database, CheckCircle, Clock, Calendar, ChevronRight, Terminal, Network, Cpu, GitBranch } from 'lucide-react';
 import { getJourneyById, getPhasesByJourney, getEntriesByPhase } from '@/services/engineeringJourneyService';
 
 /**
@@ -19,6 +19,25 @@ const iconMap = {
   database: Database,
 };
 
+const focusAreaIconMap = {
+  Linux: Terminal,
+  Networking: Network,
+  Programming: Code,
+  Git: GitBranch,
+  Cloud: Cloud,
+  Docker: Database,
+  Kubernetes: Database,
+  'CI/CD': Cpu,
+  Terraform: Code,
+  Ansible: Code,
+  Security: Shield,
+  Monitoring: Cpu,
+  Python: Code,
+  JavaScript: Code,
+  // Fallback
+  default: Code,
+};
+
 const statusColors = {
   Completed: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
   'In Progress': 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300',
@@ -28,13 +47,30 @@ const statusColors = {
 export const JourneyDetail = () => {
   const { journeyId } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [journey, setJourney] = useState(null);
   const [phases, setPhases] = useState([]);
   const [allEntries, setAllEntries] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedPhase, setSelectedPhase] = useState(null);
+  
+  // Get state from URL params or defaults
+  const selectedPhase = searchParams.get('phase') || null;
+  const selectedFocusArea = searchParams.get('focus') || null;
+
+  // Helper to update URL params
+  const updateParams = useCallback((updates) => {
+    const newParams = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value);
+      } else {
+        newParams.delete(key);
+      }
+    });
+    setSearchParams(newParams);
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     const fetchJourneyData = async () => {
@@ -55,9 +91,9 @@ export const JourneyDetail = () => {
         const phasesData = await getPhasesByJourney(journeyId);
         setPhases(phasesData);
 
-        // Set initial selected phase
-        if (phasesData.length > 0) {
-          setSelectedPhase(phasesData[0].id);
+        // Set initial selected phase from URL or first phase
+        if (phasesData.length > 0 && !selectedPhase) {
+          updateParams({ phase: phasesData[0].id });
         }
 
         // Fetch entries for all phases
@@ -79,7 +115,7 @@ export const JourneyDetail = () => {
     };
 
     fetchJourneyData();
-  }, [journeyId]);
+  }, [journeyId, selectedPhase, updateParams]);
 
   if (loading) {
     return (
@@ -113,62 +149,83 @@ export const JourneyDetail = () => {
 
   const selectedPhaseData = phases.find(p => p.id === selectedPhase);
   const phaseEntries = selectedPhaseData ? (allEntries[selectedPhaseData.id] || []) : [];
-  const completedEntries = phaseEntries.filter((entry) => entry.status === 'Completed');
-  const inProgressEntries = phaseEntries.filter((entry) => entry.status === 'In Progress');
-  const plannedEntries = phaseEntries.filter((entry) => entry.status === 'Planned');
+  
+  // Filter entries by focus area if one is selected
+  const filteredEntries = selectedFocusArea 
+    ? phaseEntries.filter(entry => entry.domain === selectedFocusArea)
+    : phaseEntries;
+  
+  const completedEntries = filteredEntries.filter((entry) => entry.status === 'Completed');
+  const inProgressEntries = filteredEntries.filter((entry) => entry.status === 'In Progress');
+  const plannedEntries = filteredEntries.filter((entry) => entry.status === 'Planned');
+
+  // Calculate stats for focus areas
+  const getFocusAreaStats = (focusArea) => {
+    const areaEntries = phaseEntries.filter(e => e.domain === focusArea);
+    return {
+      total: areaEntries.length,
+      completed: areaEntries.filter(e => e.status === 'Completed').length,
+      inProgress: areaEntries.filter(e => e.status === 'In Progress').length,
+      planned: areaEntries.filter(e => e.status === 'Planned').length,
+    };
+  };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 mb-8 transition-colors"
-        >
-          <ArrowLeft size={20} />
-          <span>Back to All Journeys</span>
-        </button>
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      {/* Sticky Header - highest z-index */}
+      <div className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          {/* Back Button */}
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 mb-4 transition-colors"
+          >
+            <ArrowLeft size={20} />
+            <span>Back to All Journeys</span>
+          </button>
 
-        {/* Journey Header */}
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-2xl p-6 mb-8 border border-purple-200 dark:border-purple-800">
-          <div className="flex items-start gap-4">
-            <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg">
-              <Icon className="w-10 h-10 text-purple-600 dark:text-purple-400" />
+          {/* Journey Header - Compact Version */}
+          <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 p-2.5 rounded-xl flex-shrink-0">
+              <Icon className="w-7 h-7 text-purple-600 dark:text-purple-400" />
             </div>
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">
                 {journey.title}
               </h1>
-              <p className="text-base text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
                 {journey.description}
               </p>
+            </div>
+            <div className="hidden sm:flex items-center gap-4 text-sm flex-shrink-0">
+              <span className="font-semibold text-purple-600 dark:text-purple-400 whitespace-nowrap">
+                {journey.overallProgress}% Complete
+              </span>
+              <span className="text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                {journey.completedPhases}/{journey.totalPhases} Phases
+              </span>
+            </div>
+          </div>
 
-              {/* Progress Bar */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-semibold text-purple-600 dark:text-purple-400">
-                    Overall Progress: {journey.overallProgress}%
-                  </span>
-                  <span className="text-gray-600 dark:text-gray-400">
-                    {journey.completedPhases}/{journey.totalPhases} Phases Completed
-                  </span>
-                </div>
-                <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-500"
-                    style={{ width: `${journey.overallProgress}%` }}
-                  />
-                </div>
-              </div>
+          {/* Progress Bar */}
+          <div className="mt-3">
+            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-purple-600 to-blue-600 transition-all duration-500"
+                style={{ width: `${journey.overallProgress}%` }}
+              />
             </div>
           </div>
         </div>
+      </div>
 
+      {/* Main Content Area - with proper padding to account for sticky header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Sidebar: Roadmap/Phases */}
+          {/* Left Sidebar: Roadmap/Phases - Fixed Position */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sticky top-24">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 lg:sticky lg:top-28 lg:z-40 lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <span className="w-1 h-6 bg-purple-600 rounded-full"></span>
                 Roadmap
@@ -184,7 +241,7 @@ export const JourneyDetail = () => {
                   return (
                     <button
                       key={phase.id}
-                      onClick={() => setSelectedPhase(phase.id)}
+                      onClick={() => updateParams({ phase: phase.id, focus: null })}
                       className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                         isActive
                           ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
@@ -236,94 +293,191 @@ export const JourneyDetail = () => {
             </div>
           </div>
 
-          {/* Right Content: Accomplishments/Entries */}
+          {/* Right Content: Focus Areas or Entries - Scrollable */}
           <div className="lg:col-span-2">
             {selectedPhaseData && (
               <div className="space-y-6">
+                {/* Breadcrumb Navigation - Sticky with proper z-index */}
+                <div className="sticky top-24 z-30 bg-white dark:bg-gray-900 py-3 px-4 sm:px-0 -mx-4 sm:mx-0 border-b sm:border-0 border-gray-200 dark:border-gray-700 sm:bg-transparent sm:py-0">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <button
+                    onClick={() => updateParams({ phase: null, focus: null })}
+                    className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
+                    All Phases
+                  </button>
+                  <ChevronRight size={16} />
+                  <button
+                    onClick={() => updateParams({ focus: null })}
+                    className={`transition-colors ${
+                      selectedFocusArea 
+                        ? 'hover:text-purple-600 dark:hover:text-purple-400' 
+                        : 'text-purple-600 dark:text-purple-400 font-semibold'
+                    }`}
+                  >
+                    {selectedPhaseData.title.replace(/^Phase \d+ — /, '')}
+                  </button>
+                  {selectedFocusArea && (
+                    <>
+                      <ChevronRight size={16} />
+                      <span className="text-purple-600 dark:text-purple-400 font-semibold">
+                        {selectedFocusArea}
+                      </span>
+                    </>
+                  )}
+                  </div>
+                </div>
+
                 {/* Phase Details Header */}
                 <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {selectedPhaseData.title}
+                      {selectedFocusArea || selectedPhaseData.title}
                     </h2>
                     <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[selectedPhaseData.status]}`}>
                       {selectedPhaseData.status}
                     </span>
                   </div>
                   
-                  {/* Focus Areas */}
-                  <div>
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Focus Areas:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedPhaseData.focusAreas.map((area, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium"
-                        >
-                          {area}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Accomplishments Section */}
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <span className="w-1 h-6 bg-green-600 rounded-full"></span>
-                    Accomplishments
-                  </h3>
-                  
-                  {phaseEntries.length === 0 ? (
-                    <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center">
-                      <p className="text-gray-500 dark:text-gray-400">No entries yet for this phase</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {completedEntries.length > 0 && (
-                        <div>
-                          <h4 className="flex items-center gap-2 text-sm font-semibold text-green-700 dark:text-green-400 mb-3">
-                            <CheckCircle size={16} />
-                            Completed ({completedEntries.length})
-                          </h4>
-                          <div className="space-y-3">
-                            {completedEntries.map((entry) => (
-                              <EntryCard key={entry.id} entry={entry} />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {inProgressEntries.length > 0 && (
-                        <div>
-                          <h4 className="flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-400 mb-3">
-                            <Clock size={16} />
-                            In Progress ({inProgressEntries.length})
-                          </h4>
-                          <div className="space-y-3">
-                            {inProgressEntries.map((entry) => (
-                              <EntryCard key={entry.id} entry={entry} />
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {plannedEntries.length > 0 && (
-                        <div>
-                          <h4 className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-400 mb-3">
-                            <Calendar size={16} />
-                            Planned ({plannedEntries.length})
-                          </h4>
-                          <div className="space-y-3">
-                            {plannedEntries.map((entry) => (
-                              <EntryCard key={entry.id} entry={entry} />
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                  {!selectedFocusArea && (
+                    <div>
+                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        Select a focus area to explore:
+                      </p>
                     </div>
                   )}
                 </div>
+
+                {/* Focus Area Cards or Entries */}
+                {!selectedFocusArea ? (
+                  // Show focus area cards
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {selectedPhaseData.focusAreas.map((focusArea) => {
+                      const stats = getFocusAreaStats(focusArea);
+                      const FocusIcon = focusAreaIconMap[focusArea] || focusAreaIconMap.default;
+                      const progress = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
+                      
+                      return (
+                        <button
+                          key={focusArea}
+                          onClick={() => updateParams({ focus: focusArea })}
+                          className="group bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl p-6 text-left transition-all hover:shadow-lg"
+                        >
+                          <div className="flex items-start gap-4 mb-4">
+                            <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg group-hover:scale-110 transition-transform">
+                              <FocusIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                                {focusArea}
+                              </h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {stats.total} {stats.total === 1 ? 'item' : 'items'}
+                              </p>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" />
+                          </div>
+
+                          {/* Progress Bar */}
+                          <div className="mb-3">
+                            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-purple-600 to-blue-600 transition-all"
+                                style={{ width: `${progress}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Status Pills */}
+                          <div className="flex items-center gap-2 text-xs">
+                            {stats.completed > 0 && (
+                              <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full font-medium">
+                                ✓ {stats.completed}
+                              </span>
+                            )}
+                            {stats.inProgress > 0 && (
+                              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full font-medium">
+                                ⏳ {stats.inProgress}
+                              </span>
+                            )}
+                            {stats.planned > 0 && (
+                              <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400 rounded-full font-medium">
+                                ◯ {stats.planned}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  // Show entries for selected focus area
+                  <div>
+                    {/* Back to Focus Areas */}
+                    <button
+                      onClick={() => updateParams({ focus: null })}
+                      className="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400 hover:underline mb-4"
+                    >
+                      <ArrowLeft size={16} />
+                      Back to Focus Areas
+                    </button>
+
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <span className="w-1 h-6 bg-green-600 rounded-full"></span>
+                      {selectedFocusArea} Learning Path
+                    </h3>
+                    
+                    {filteredEntries.length === 0 ? (
+                      <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center">
+                        <p className="text-gray-500 dark:text-gray-400">No entries yet for {selectedFocusArea}</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {completedEntries.length > 0 && (
+                          <div>
+                            <h4 className="flex items-center gap-2 text-sm font-semibold text-green-700 dark:text-green-400 mb-3">
+                              <CheckCircle size={16} />
+                              Completed ({completedEntries.length})
+                            </h4>
+                            <div className="space-y-3">
+                              {completedEntries.map((entry) => (
+                                <EntryCard key={entry.id} entry={entry} />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {inProgressEntries.length > 0 && (
+                          <div>
+                            <h4 className="flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-400 mb-3">
+                              <Clock size={16} />
+                              In Progress ({inProgressEntries.length})
+                            </h4>
+                            <div className="space-y-3">
+                              {inProgressEntries.map((entry) => (
+                                <EntryCard key={entry.id} entry={entry} />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {plannedEntries.length > 0 && (
+                          <div>
+                            <h4 className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-400 mb-3">
+                              <Calendar size={16} />
+                              Planned ({plannedEntries.length})
+                            </h4>
+                            <div className="space-y-3">
+                              {plannedEntries.map((entry) => (
+                                <EntryCard key={entry.id} entry={entry} />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

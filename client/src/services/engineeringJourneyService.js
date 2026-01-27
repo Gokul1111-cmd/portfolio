@@ -4,8 +4,13 @@ import {
   orderBy,
   where,
   getDocs,
+  getDoc,
   addDoc,
   serverTimestamp,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebaseJourney';
 
@@ -97,8 +102,7 @@ export const getJourneyById = async (journeyId) => {
     const q = query(
       collection(db, JOURNEYS_COLLECTION),
       where('id', '==', journeyId),
-      where('isPublic', '==', true),
-      orderBy('order', 'asc')
+      where('isPublic', '==', true)
     );
     const snapshot = await getDocs(q);
     if (snapshot.empty) return null;
@@ -249,8 +253,9 @@ export const createJourney = async (journey) => {
       }
     }
 
+    const journeyId = journey.id || journey.path || `journey-${Date.now()}`;
     const journeyData = {
-      id: journey.id || `journey-${Date.now()}`,
+      id: journeyId,
       title: journey.title.trim(),
       description: journey.description.trim(),
       icon: journey.icon.trim(),
@@ -264,11 +269,12 @@ export const createJourney = async (journey) => {
       updatedAt: serverTimestamp(),
     };
 
-    const docRef = await addDoc(collection(db, JOURNEYS_COLLECTION), journeyData);
+    const docRef = doc(db, JOURNEYS_COLLECTION, journeyId);
+    await setDoc(docRef, journeyData);
 
-    console.log('[engineeringJourneyService] Journey created successfully:', docRef.id);
+    console.log('[engineeringJourneyService] Journey created successfully:', journeyId);
 
-    return { ...journeyData, docId: docRef.id };
+    return { ...journeyData, docId: journeyId };
   } catch (error) {
     console.error('[engineeringJourneyService] Error creating journey:', error);
     throw error;
@@ -326,8 +332,9 @@ export const createJourneyEntry = async (entry) => {
     // =====================================================================
     // CONSTRUCT ENTRY OBJECT
     // =====================================================================
+    const entryId = entry.id || `entry-${Date.now()}`;
     const entryData = {
-      id: entry.id || `entry-${Date.now()}`,
+      id: entryId,
       title: entry.title.trim(),
       phaseId: entry.phaseId.trim(),
       domain: entry.domain.trim(),
@@ -356,13 +363,14 @@ export const createJourneyEntry = async (entry) => {
     // =====================================================================
 
     // Save to Firestore
-    const docRef = await addDoc(collection(db, ENTRIES_COLLECTION), entryData);
+    const docRef = doc(db, ENTRIES_COLLECTION, entryId);
+    await setDoc(docRef, entryData);
 
-    console.log('[engineeringJourneyService] Entry created successfully:', docRef.id);
+    console.log('[engineeringJourneyService] Entry created successfully:', entryId);
 
     return {
       ...entryData,
-      docId: docRef.id,
+      docId: entryId,
     };
   } catch (error) {
     console.error('[engineeringJourneyService] Error creating entry:', error);
@@ -392,8 +400,9 @@ export const createJourneyPhase = async (phase) => {
       }
     }
 
+    const phaseId = phase.id || `phase-${Date.now()}`;
     const phaseData = {
-      id: phase.id || `phase-${Date.now()}`,
+      id: phaseId,
       title: phase.title.trim(),
       journeyId: phase.journeyId.trim(),
       status: phase.status,
@@ -405,16 +414,213 @@ export const createJourneyPhase = async (phase) => {
       updatedAt: serverTimestamp(),
     };
 
-    const docRef = await addDoc(collection(db, PHASES_COLLECTION), phaseData);
+    const docRef = doc(db, PHASES_COLLECTION, phaseId);
+    await setDoc(docRef, phaseData);
 
-    console.log('[engineeringJourneyService] Phase created successfully:', docRef.id);
+    console.log('[engineeringJourneyService] Phase created successfully:', phaseId);
 
     return {
       ...phaseData,
-      docId: docRef.id,
+      docId: phaseId,
     };
   } catch (error) {
     console.error('[engineeringJourneyService] Error creating phase:', error);
+    throw error;
+  }
+};
+
+// ============================================================================
+// UPDATE OPERATIONS
+// ============================================================================
+
+/**
+ * Update an existing journey
+ * @param {string} journeyId - The journey docId
+ * @param {Object} updates - Fields to update
+ * @returns {Promise<Object>} Updated journey object
+ */
+export const updateJourney = async (journeyId, updates) => {
+  try {
+    const journeyRef = doc(db, JOURNEYS_COLLECTION, journeyId);
+    const updateData = {
+      ...updates,
+      updatedAt: serverTimestamp(),
+    };
+    await updateDoc(journeyRef, updateData);
+    
+    // Fetch and return full document
+    const updatedDoc = await getDoc(journeyRef);
+    if (updatedDoc.exists()) {
+      console.log('[engineeringJourneyService] Journey updated successfully:', journeyId);
+      return {
+        ...updatedDoc.data(),
+        docId: journeyId,
+      };
+    }
+    throw new Error('Document not found after update');
+  } catch (error) {
+    console.error('[engineeringJourneyService] Error updating journey:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update an existing journey phase
+ * @param {string} phaseId - The phase docId
+ * @param {Object} updates - Fields to update
+ * @returns {Promise<Object>} Updated phase object
+ */
+export const updateJourneyPhase = async (phaseId, updates) => {
+  try {
+    const phaseRef = doc(db, PHASES_COLLECTION, phaseId);
+    const updateData = {
+      ...updates,
+      focusAreas: Array.isArray(updates.focusAreas) ? updates.focusAreas : (updates.focusAreas || []).split(',').map(f => f.trim()).filter(Boolean),
+      updatedAt: serverTimestamp(),
+    };
+    await updateDoc(phaseRef, updateData);
+    
+    // Fetch and return full document
+    const updatedDoc = await getDoc(phaseRef);
+    if (updatedDoc.exists()) {
+      console.log('[engineeringJourneyService] Phase updated successfully:', phaseId);
+      return {
+        ...updatedDoc.data(),
+        docId: phaseId,
+      };
+    }
+    throw new Error('Document not found after update');
+  } catch (error) {
+    console.error('[engineeringJourneyService] Error updating phase:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update an existing journey entry
+ * @param {string} entryId - The entry docId
+ * @param {Object} updates - Fields to update
+ * @returns {Promise<Object>} Updated entry object
+ */
+export const updateJourneyEntry = async (entryId, updates) => {
+  try {
+    const entryRef = doc(db, ENTRIES_COLLECTION, entryId);
+    const updateData = {
+      ...updates,
+      techStack: Array.isArray(updates.techStack) ? updates.techStack : (updates.techStack || []).split(',').map(t => t.trim()).filter(Boolean),
+      updatedAt: serverTimestamp(),
+    };
+    await updateDoc(entryRef, updateData);
+    
+    // Fetch and return full document
+    const updatedDoc = await getDoc(entryRef);
+    if (updatedDoc.exists()) {
+      console.log('[engineeringJourneyService] Entry updated successfully:', entryId);
+      return {
+        ...updatedDoc.data(),
+        docId: entryId,
+      };
+    }
+    throw new Error('Document not found after update');
+  } catch (error) {
+    console.error('[engineeringJourneyService] Error updating entry:', error);
+    throw error;
+  }
+};
+
+// ============================================================================
+// DELETE OPERATIONS
+// ============================================================================
+
+/**
+ * Delete a journey and all its associated phases and entries (cascade delete)
+ * @param {string} journeyId - The journey docId
+ * @returns {Promise<void>}
+ */
+export const deleteJourney = async (journeyId) => {
+  try {
+    // First get the journey to find its internal ID
+    const journeyRef = doc(db, JOURNEYS_COLLECTION, journeyId);
+    const journeyDoc = await getDoc(journeyRef);
+    
+    if (!journeyDoc.exists()) {
+      throw new Error('Journey not found');
+    }
+    
+    const journeyInternalId = journeyDoc.data().id;
+    
+    // Get all phases for this journey
+    const phasesQuery = query(
+      collection(db, PHASES_COLLECTION),
+      where('journeyId', '==', journeyInternalId)
+    );
+    const phasesSnapshot = await getDocs(phasesQuery);
+    
+    // Delete all phases and their entries
+    for (const phaseDoc of phasesSnapshot.docs) {
+      await deleteJourneyPhase(phaseDoc.id);
+    }
+    
+    // Finally delete the journey itself
+    await deleteDoc(journeyRef);
+    console.log('[engineeringJourneyService] Journey and all associated data deleted:', journeyId);
+  } catch (error) {
+    console.error('[engineeringJourneyService] Error deleting journey:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a journey phase and all its associated entries (cascade delete)
+ * @param {string} phaseId - The phase docId
+ * @returns {Promise<void>}
+ */
+export const deleteJourneyPhase = async (phaseId) => {
+  try {
+    // First get the phase to find its internal ID
+    const phaseRef = doc(db, PHASES_COLLECTION, phaseId);
+    const phaseDoc = await getDoc(phaseRef);
+    
+    if (!phaseDoc.exists()) {
+      throw new Error('Phase not found');
+    }
+    
+    const phaseInternalId = phaseDoc.data().id;
+    
+    // Get all entries for this phase
+    const entriesQuery = query(
+      collection(db, ENTRIES_COLLECTION),
+      where('phaseId', '==', phaseInternalId)
+    );
+    const entriesSnapshot = await getDocs(entriesQuery);
+    
+    // Delete all entries
+    const deletePromises = entriesSnapshot.docs.map(entryDoc => 
+      deleteJourneyEntry(entryDoc.id)
+    );
+    await Promise.all(deletePromises);
+    
+    // Finally delete the phase itself
+    await deleteDoc(phaseRef);
+    console.log('[engineeringJourneyService] Phase and all entries deleted:', phaseId);
+  } catch (error) {
+    console.error('[engineeringJourneyService] Error deleting phase:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a journey entry
+ * @param {string} entryId - The entry docId
+ * @returns {Promise<void>}
+ */
+export const deleteJourneyEntry = async (entryId) => {
+  try {
+    const entryRef = doc(db, ENTRIES_COLLECTION, entryId);
+    await deleteDoc(entryRef);
+    console.log('[engineeringJourneyService] Entry deleted successfully:', entryId);
+  } catch (error) {
+    console.error('[engineeringJourneyService] Error deleting entry:', error);
     throw error;
   }
 };

@@ -61,3 +61,20 @@ Firebase configuration files are located in `/config/firebase/`:
 - `storage.rules` - Firebase Storage security rules
 - `firestore-seed.json` - Sample data structure
 - `cors.json` - CORS configuration for Firebase Storage
+ - `firestore.indexes.json` - Composite indexes for queries (deployable)
+
+### Deploy composite indexes
+
+To avoid "The query requires an index" errors in development and production, deploy the predefined composite indexes:
+
+```bash
+# From the /client directory (requires Firebase CLI and project set)
+firebase deploy --only firestore:indexes
+```
+
+This publishes indexes for:
+- `journeys`: `isPublic` + `order`
+- `journeyPhases`: `journeyId` + `order`
+- `journeyEntries`: `phaseId` + `isPublic` + `order`
+
+You can also click the one-click links shown in console errors; deploying via CLI ensures they’re reproducible across environments.

@@ -7,6 +7,7 @@ import { AdminDashboard } from "./pages/AdminDashboard"; // NEW
 import { TestimonialSubmit } from "./pages/TestimonialSubmit";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import SectionRedirect from "./pages/JourneyPage";
 import JourneyDetail from "./pages/JourneyDetail";
 import { NotFound } from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
@@ -45,6 +46,18 @@ function App() {
           <Route index element={<Home />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
+          
+          {/* Section redirect routes - allows sharing specific sections */}
+          <Route path="/hero" element={<SectionRedirect sectionId="hero" />} />
+          <Route path="/about" element={<SectionRedirect sectionId="about" />} />
+          <Route path="/skills" element={<SectionRedirect sectionId="skills" />} />
+          <Route path="/certificates" element={<SectionRedirect sectionId="certificates" />} />
+          <Route path="/approach" element={<SectionRedirect sectionId="approach" />} />
+          <Route path="/projects" element={<SectionRedirect sectionId="projects" />} />
+          <Route path="/journey" element={<SectionRedirect sectionId="journey" />} />
+          <Route path="/testimonials" element={<SectionRedirect sectionId="testimonials" />} />
+          <Route path="/contact" element={<SectionRedirect sectionId="contact" />} />
+          
           <Route path="/journey/:journeyId" element={<JourneyDetail />} />
           {/* NEW ROUTES */}
           <Route path="/login" element={<Login />} />

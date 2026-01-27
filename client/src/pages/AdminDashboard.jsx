@@ -32,7 +32,7 @@ import { TimelineEditor } from "./sections/TimelineEditor";
 import { CertificatesEditor } from "./sections/CertificatesEditor";
 import { SyncSettings } from "./sections/SyncSettings";
 import { BlogEditor } from "./sections/BlogEditor";
-import AdminEngineeringJourney from "@/components/AdminEngineeringJourney";
+import AdminEngineeringJourneyV2 from "@/components/AdminEngineeringJourneyV2";
 
 const navigationItems = [
   { id: "hero", label: "Hero", icon: Sparkles },
@@ -60,7 +60,7 @@ const sectionComponents = {
   testimonials: TestimonialsEditor,
   certificates: CertificatesEditor,
   blog: BlogEditor,
-  journey: AdminEngineeringJourney,
+  journey: AdminEngineeringJourneyV2,
   contact: ContactEditor,
   site: SiteSettingsEditor,
   sync: SyncSettings,
@@ -103,8 +103,8 @@ export const AdminDashboard = () => {
 
       <div className="flex">
         {/* Sidebar Navigation - Fixed on md+; hidden on mobile */}
-        <aside className="hidden md:block md:w-64 border-r border-border bg-card/30 p-6 md:fixed md:left-0 md:top-16 md:h-[calc(100vh-64px)]">
-          <div className="space-y-2">
+        <aside className="hidden md:block md:w-64 border-r border-border bg-card/30 p-6 md:fixed md:left-0 md:top-16 md:h-[calc(100vh-64px)] overflow-y-auto">
+          <div className="space-y-1">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -131,15 +131,15 @@ export const AdminDashboard = () => {
         </aside>
 
         {/* Main Content - Scrollable; full-width on mobile */}
-        <main className="md:ml-64 md:w-[calc(100%-256px)] w-full overflow-y-auto h-[calc(100vh-64px)]">
-          <div className="p-4 sm:p-6 md:p-8 pb-20">
+        <main className="md:ml-64 w-full overflow-y-auto h-[calc(100vh-64px)]">
+          <div className="p-4 sm:p-6 md:p-8 pb-20 max-w-7xl mx-auto">
             {/* Mobile Section Switcher */}
-            <div className="md:hidden mb-6">
-              <label className="block text-sm text-muted-foreground mb-2">Section</label>
+            <div className="md:hidden mb-6 sticky top-0 bg-background/95 backdrop-blur-sm z-10 -mx-4 px-4 py-3 border-b border-border">
+              <label className="block text-sm font-medium text-foreground mb-2">Current Section</label>
               <select
                 value={activeSection}
                 onChange={(e) => setActiveSection(e.target.value)}
-                className="w-full p-2 rounded-md bg-card border border-border"
+                className="w-full p-3 rounded-lg bg-card border-2 border-border focus:border-primary outline-none transition-colors text-foreground font-medium"
               >
                 {navigationItems.map((item) => (
                   <option key={item.id} value={item.id}>{item.label}</option>

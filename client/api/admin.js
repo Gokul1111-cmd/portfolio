@@ -27,7 +27,9 @@ export default async function handler(req, res) {
                 testimonials: () => adminDb.collection("testimonials").orderBy("createdAt", "desc"),
             };
 
-            const CONTENT_KEYS = ["hero", "about", "approach", "contact", "site", "timeline"];
+            // Timeline content is stored under the "approach" doc (careerTimeline field),
+            // so we do not have a separate "timeline" document to fetch.
+            const CONTENT_KEYS = ["hero", "about", "approach", "contact", "site"];
 
             const fetchCollection = async (name) => {
                 try {
