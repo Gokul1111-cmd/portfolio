@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 /**
  * SectionRedirect - Redirects to home page and scrolls to specific section
@@ -26,6 +27,10 @@ export const SectionRedirect = ({ sectionId }) => {
   }, [navigate, targetSection]);
 
   return null;
+};
+
+SectionRedirect.propTypes = {
+  sectionId: PropTypes.string,
 };
 
 export default SectionRedirect;
