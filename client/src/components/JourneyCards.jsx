@@ -126,7 +126,7 @@ export const JourneyCards = () => {
     <section id="journey" className="engineering-journey-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Engineering Journey
           </h2>
@@ -137,7 +137,7 @@ export const JourneyCards = () => {
         </div>
 
         {/* Journey Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {journeys.map((journey) => {
             const Icon = iconMap[journey.icon] || Code;
             const colors = colorMap[journey.color] || colorMap.blue;
@@ -204,7 +204,7 @@ export const JourneyCards = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="mt-12 text-center">
+        <div className="mt-8 text-center">
           <p className="text-gray-600 dark:text-gray-400">
             Click any journey to explore phases, projects, and learning milestones
           </p>

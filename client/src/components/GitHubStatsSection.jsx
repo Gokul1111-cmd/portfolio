@@ -113,6 +113,18 @@ export function GitHubStatsSection() {
         // Calculate average values
         const avgStarsPerRepo = originalRepos.length > 0 ? Math.round(totalStars / originalRepos.length) : 0;
 
+        // Fetch contribution data
+        const contributionResponse = await fetch(
+          `https://github-contributions-api.jogruber.de/v4/${username}?y=last`
+        );
+        const contributionData = await contributionResponse.json();
+        const contributionItems = Array.isArray(contributionData?.contributions)
+          ? contributionData.contributions
+          : [];
+        const contributionTotal = typeof contributionData?.total?.lastYear === "number"
+          ? contributionData.total.lastYear
+          : contributionItems.reduce((sum, item) => sum + (item.count || 0), 0);
+
         setData({
           profile: {
             name: userData.name,
@@ -154,6 +166,10 @@ export function GitHubStatsSection() {
             },
           },
           topRepos,
+          contributions: {
+            total: contributionTotal,
+            items: contributionItems,
+          },
         });
       } catch (err) {
         console.error("GitHub Stats Error:", err);
@@ -198,7 +214,7 @@ export function GitHubStatsSection() {
     );
   }
 
-  const { profile, stats, topRepos } = data;
+  const { profile, stats, contributions } = data;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -231,22 +247,155 @@ export function GitHubStatsSection() {
           <Icon className="w-5 h-5" />
           <span className="text-sm font-medium opacity-75">{label}</span>
         </div>
-        <div className="text-3xl font-bold">{typeof value === 'number' ? value.toLocaleString() : value}{suffix}</div>
+        <div className="text-3xl font-bold">{typeof value === "number" ? value.toLocaleString() : value}{suffix}</div>
       </div>
     </motion.div>
   );
 
+  const primaryStats = [
+    {
+      icon: Code2,
+      label: "Public Repositories",
+      value: stats.totalRepos,
+      color: "bg-gradient-to-br from-blue-600 to-blue-700 text-blue-50",
+    },
+    {
+      icon: Star,
+      label: "Total Stars",
+      value: stats.totalStars,
+      color: "bg-gradient-to-br from-yellow-600 to-yellow-700 text-yellow-50",
+    },
+    {
+      icon: GitFork,
+      label: "Total Forks",
+      value: stats.totalForks,
+      color: "bg-gradient-to-br from-purple-600 to-purple-700 text-purple-50",
+    },
+    {
+      icon: Users,
+      label: "Followers",
+      value: stats.followers,
+      color: "bg-gradient-to-br from-green-600 to-green-700 text-green-50",
+    },
+  ].filter((item) => typeof item.value === "number" && item.value > 0);
+
+  const secondaryStats = [
+    {
+      icon: Eye,
+      label: "Total Watchers",
+      value: stats.totalWatchers,
+      color: "bg-gradient-to-br from-cyan-600 to-cyan-700 text-cyan-50",
+    },
+    {
+      icon: FileText,
+      label: "Open Issues",
+      value: stats.totalOpenIssues,
+      color: "bg-gradient-to-br from-red-600 to-red-700 text-red-50",
+    },
+    {
+      icon: Award,
+      label: "Original Repos",
+      value: stats.originalRepos,
+      color: "bg-gradient-to-br from-indigo-600 to-indigo-700 text-indigo-50",
+    },
+    {
+      icon: GitFork,
+      label: "Forked Repos",
+      value: stats.forkedRepos,
+      color: "bg-gradient-to-br from-orange-600 to-orange-700 text-orange-50",
+    },
+    {
+      icon: Zap,
+      label: "Avg Stars/Repo",
+      value: stats.avgStarsPerRepo,
+      color: "bg-gradient-to-br from-pink-600 to-pink-700 text-pink-50",
+    },
+  ].filter((item) => typeof item.value === "number" && item.value > 0);
+
+  const highlights = [
+    {
+      title: "Most Starred",
+      name: stats.mostStarredRepo?.name,
+      value: stats.mostStarredRepo?.stars ? `${stats.mostStarredRepo.stars} stars` : null,
+      icon: Star,
+      color: "yellow",
+    },
+    {
+      title: "Most Forked",
+      name: stats.mostForkedRepo?.name,
+      value: stats.mostForkedRepo?.forks ? `${stats.mostForkedRepo.forks} forks` : null,
+      icon: GitFork,
+      color: "purple",
+    },
+    {
+      title: "Largest Repo",
+      name: stats.largestRepo?.name,
+      value: stats.largestRepo?.size ? `${Math.round(stats.largestRepo.size / 1024)} MB` : null,
+      icon: Code2,
+      color: "blue",
+    },
+  ].filter((item) => item.name && item.value);
+
+  const buildContributionGrid = (items) => {
+    if (!Array.isArray(items) || items.length === 0) {
+      return { weeks: [], monthLabels: [] };
+    }
+
+    const sorted = [...items].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    const start = new Date(sorted[0].date);
+    start.setDate(start.getDate() - start.getDay());
+
+    const end = new Date(sorted[sorted.length - 1].date);
+    end.setDate(end.getDate() + (6 - end.getDay()));
+
+    const dayMap = new Map(sorted.map((item) => [item.date, item]));
+
+    const weeks = [];
+    const monthLabels = [];
+    const cursor = new Date(start);
+
+    while (cursor <= end) {
+      const week = [];
+      monthLabels.push(cursor.getMonth());
+      for (let i = 0; i < 7; i += 1) {
+        const iso = cursor.toISOString().slice(0, 10);
+        week.push(dayMap.get(iso) || { date: iso, count: 0, level: 0 });
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      weeks.push(week);
+    }
+
+    return { weeks, monthLabels };
+  };
+
+  const { weeks: contributionWeeks, monthLabels } = buildContributionGrid(
+    contributions?.items || []
+  );
+
   return (
-    <section id="github" className="relative min-h-screen py-20 md:py-32 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+    <section id="github" className="relative py-12 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
       <div className="max-w-7xl mx-auto px-4">
+        {/* Section Title */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-6 text-center"
+        >
+          <h2 className="text-4xl font-bold text-white">GitHub</h2>
+        </motion.div>
+
         {/* Header with Profile */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-16"
+          className="mb-8"
         >
-          <div className="flex flex-col sm:flex-row items-center gap-6 mb-8 bg-slate-800/30 border border-slate-700/50 rounded-lg p-8">
+          <div className="flex flex-col sm:flex-row items-center gap-6 mb-0 bg-slate-800/30 border border-slate-700/50 rounded-lg p-6">
             <img
               src={profile.avatar}
               alt={profile.name}
@@ -276,300 +425,155 @@ export function GitHubStatsSection() {
           </div>
         </motion.div>
 
-        {/* Primary Stats Grid (2 rows) */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-        >
-          <StatCard
-            icon={Code2}
-            label="Public Repositories"
-            value={stats.totalRepos}
-            color="bg-gradient-to-br from-blue-600 to-blue-700 text-blue-50"
-          />
-          <StatCard
-            icon={Star}
-            label="Total Stars"
-            value={stats.totalStars}
-            color="bg-gradient-to-br from-yellow-600 to-yellow-700 text-yellow-50"
-          />
-          <StatCard
-            icon={GitFork}
-            label="Total Forks"
-            value={stats.totalForks}
-            color="bg-gradient-to-br from-purple-600 to-purple-700 text-purple-50"
-          />
-          <StatCard
-            icon={Users}
-            label="Followers"
-            value={stats.followers}
-            color="bg-gradient-to-br from-green-600 to-green-700 text-green-50"
-          />
-        </motion.div>
-
-        {/* Secondary Stats Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-12"
-        >
-          <StatCard
-            icon={Eye}
-            label="Total Watchers"
-            value={stats.totalWatchers}
-            color="bg-gradient-to-br from-cyan-600 to-cyan-700 text-cyan-50"
-          />
-          <StatCard
-            icon={FileText}
-            label="Open Issues"
-            value={stats.totalOpenIssues}
-            color="bg-gradient-to-br from-red-600 to-red-700 text-red-50"
-          />
-          <StatCard
-            icon={Award}
-            label="Original Repos"
-            value={stats.originalRepos}
-            color="bg-gradient-to-br from-indigo-600 to-indigo-700 text-indigo-50"
-          />
-          <StatCard
-            icon={GitFork}
-            label="Forked Repos"
-            value={stats.forkedRepos}
-            color="bg-gradient-to-br from-orange-600 to-orange-700 text-orange-50"
-          />
-          <StatCard
-            icon={Zap}
-            label="Avg Stars/Repo"
-            value={stats.avgStarsPerRepo}
-            color="bg-gradient-to-br from-pink-600 to-pink-700 text-pink-50"
-          />
-        </motion.div>
-
-        {/* Highlights Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12"
-        >
-          <motion.div
-            variants={itemVariants}
-            className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-6 hover:border-yellow-500/50 transition-colors"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <Star className="w-5 h-5 text-yellow-400" />
-              <h4 className="font-semibold text-white">Most Starred</h4>
-            </div>
-            <a
-              href={`https://github.com/Gokul1111-cmd/${stats.mostStarredRepo.name}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-2"
-            >
-              {stats.mostStarredRepo.name}
-              <ExternalLink className="w-3 h-3" />
-            </a>
-            <p className="text-sm text-slate-400 mt-2">{stats.mostStarredRepo.stars} stars</p>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-6 hover:border-purple-500/50 transition-colors"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <GitFork className="w-5 h-5 text-purple-400" />
-              <h4 className="font-semibold text-white">Most Forked</h4>
-            </div>
-            <a
-              href={`https://github.com/Gokul1111-cmd/${stats.mostForkedRepo.name}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-2"
-            >
-              {stats.mostForkedRepo.name}
-              <ExternalLink className="w-3 h-3" />
-            </a>
-            <p className="text-sm text-slate-400 mt-2">{stats.mostForkedRepo.forks} forks</p>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-6 hover:border-blue-500/50 transition-colors"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <Code2 className="w-5 h-5 text-blue-400" />
-              <h4 className="font-semibold text-white">Largest Repo</h4>
-            </div>
-            <a
-              href={`https://github.com/Gokul1111-cmd/${stats.largestRepo.name}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-2"
-            >
-              {stats.largestRepo.name}
-              <ExternalLink className="w-3 h-3" />
-            </a>
-            <p className="text-sm text-slate-400 mt-2">{Math.round(stats.largestRepo.size / 1024)} MB</p>
-          </motion.div>
-        </motion.div>
-
-        {/* Top Languages with Details */}
-        <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mb-12 rounded-lg bg-slate-800/30 border border-slate-700/50 p-8"
-        >
-          <div className="flex items-center gap-2 mb-8">
-            <Code2 className="w-5 h-5 text-blue-400" />
-            <h3 className="text-2xl font-bold text-white">Top Languages</h3>
-          </div>
-          <div className="space-y-3">
-            {stats.topLanguages.map((lang, idx) => {
-              const percentage = Math.round((lang.count / stats.originalRepos) * 100);
-              return (
-                <motion.div
-                  key={lang.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                >
-                  <div className="flex justify-between mb-2">
-                    <span className="font-medium text-white">{lang.name}</span>
-                    <span className="text-sm text-slate-400">{lang.count} repos ({percentage}%)</span>
-                  </div>
-                  <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${percentage}%` }}
-                      transition={{ duration: 0.8, delay: idx * 0.05 }}
-                      className="h-full bg-gradient-to-r from-blue-400 to-purple-500"
-                    />
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-
-        {/* Top Repositories - Extended View */}
-        <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <div className="flex items-center gap-2 mb-8">
-            <Github className="w-5 h-5 text-blue-400" />
-            <h3 className="text-2xl font-bold text-white">Top {topRepos.length} Repositories</h3>
-          </div>
+        {/* Primary Stats Grid - Only non-zero values */}
+        {primaryStats.length > 0 && (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
           >
-            {topRepos.map((repo, idx) => (
-              <motion.a
-                key={repo.name}
-                href={repo.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                variants={itemVariants}
-                whileHover={{ y: -5 }}
-                className="group relative overflow-hidden rounded-lg bg-slate-800/30 border border-slate-700/50 hover:border-blue-500/50 p-6 transition-colors"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-transparent to-purple-500 opacity-0 group-hover:opacity-10 transition-opacity" />
-                <div className="relative z-10">
-                  <div className="flex items-start justify-between mb-3">
-                    <h4 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors flex-1 break-words">
-                      {repo.name}
-                    </h4>
-                    <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-colors flex-shrink-0 ml-2" />
-                  </div>
-
-                  {repo.description && (
-                    <p className="text-sm text-slate-400 mb-4 line-clamp-2">
-                      {repo.description}
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap gap-2 mb-4 text-xs">
-                    {repo.language && (
-                      <span className="px-2 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                        {repo.language}
-                      </span>
-                    )}
-                    {repo.license && (
-                      <span className="px-2 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                        {repo.license}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 mb-4 text-xs text-slate-300">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 text-yellow-400" />
-                      {repo.stars}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <GitFork className="w-3 h-3 text-blue-400" />
-                      {repo.forks}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Eye className="w-3 h-3 text-cyan-400" />
-                      {repo.watchers}
-                    </div>
-                    {repo.openIssues > 0 && (
-                      <div className="flex items-center gap-1">
-                        <FileText className="w-3 h-3 text-red-400" />
-                        {repo.openIssues}
-                      </div>
-                    )}
-                  </div>
-
-                  {repo.size > 0 && (
-                    <div className="text-xs text-slate-400 mb-3">
-                      Size: {Math.round(repo.size / 1024)} MB
-                    </div>
-                  )}
-
-                  {repo.topics && repo.topics.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {repo.topics.slice(0, 3).map((topic) => (
-                        <span key={topic} className="text-xs px-2 py-1 rounded bg-slate-700/50 text-slate-300">
-                          {topic}
-                        </span>
-                      ))}
-                      {repo.topics.length > 3 && (
-                        <span className="text-xs px-2 py-1 rounded bg-slate-700/50 text-slate-400">
-                          +{repo.topics.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="h-1 w-full bg-slate-700 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${Math.min((repo.stars / (stats.totalStars || 1)) * 100, 100)}%` }}
-                      transition={{ duration: 1 }}
-                      className="h-full bg-gradient-to-r from-yellow-400 to-orange-400"
-                    />
-                  </div>
-                </div>
-              </motion.a>
+            {primaryStats.map((stat) => (
+              <StatCard key={stat.label} {...stat} />
             ))}
           </motion.div>
-        </motion.div>
+        )}
+
+        {/* Secondary Stats Grid - Only non-zero values */}
+        {secondaryStats.length > 0 && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${Math.min(secondaryStats.length, 5)} gap-4 mb-8`}
+          >
+            {secondaryStats.map((stat) => (
+              <StatCard key={stat.label} {...stat} />
+            ))}
+          </motion.div>
+        )}
+
+        {/* Highlights Grid - Only non-zero values */}
+        {highlights.length > 0 && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+          >
+            {highlights.map((highlight) => (
+              <motion.div
+                key={highlight.title}
+                variants={itemVariants}
+                className={`bg-slate-800/30 border border-slate-700/50 rounded-lg p-6 hover:border-${highlight.color}-500/50 transition-colors`}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <highlight.icon className={`w-5 h-5 text-${highlight.color}-400`} />
+                  <h4 className="font-semibold text-white">{highlight.title}</h4>
+                </div>
+                <a
+                  href={`https://github.com/Gokul1111-cmd/${highlight.name}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-2"
+                >
+                  {highlight.name}
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+                <p className="text-sm text-slate-400 mt-2">{highlight.value}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Contribution Graph */}
+        {contributions && contributions.total && contributionWeeks.length > 0 && (
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mb-8 rounded-lg bg-slate-800/30 border border-slate-700/50 p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-blue-400" />
+                <h3 className="text-2xl font-bold text-white">Contribution Activity</h3>
+              </div>
+              <span className="text-sm text-slate-400">
+                {contributions.total.toLocaleString()} contributions in the last year
+              </span>
+            </div>
+            <div className="overflow-x-auto">
+              <div className="inline-flex flex-col gap-1 min-w-full">
+                {/* Week days labels */}
+                <div className="flex gap-1">
+                  <div className="w-8"></div>
+                  {contributionWeeks.map((week, idx) => {
+                    const month = monthLabels[idx];
+                    const prevMonth = idx > 0 ? monthLabels[idx - 1] : null;
+                    const showLabel = idx === 0 || month !== prevMonth;
+                    return showLabel ? (
+                      <div key={week[0].date} className="text-xs text-slate-400 w-3">
+                        {new Date(week[0].date).toLocaleDateString("en-US", { month: "short" })}
+                      </div>
+                    ) : (
+                      <div key={week[0].date} className="w-3"></div>
+                    );
+                  })}
+                </div>
+                {/* Contribution grid */}
+                {[
+                  { label: "Mon", index: 1 },
+                  { label: "Wed", index: 3 },
+                  { label: "Fri", index: 5 },
+                ].map((row) => (
+                  <div key={row.label} className="flex gap-1 items-center">
+                    <span className="text-xs text-slate-400 w-8">{row.label}</span>
+                    <div className="flex gap-1">
+                      {contributionWeeks.map((week) => {
+                        const contribution = week[row.index] || { count: 0, level: 0, date: "" };
+                        const level = contribution.level;
+                        const colors = {
+                          0: "bg-slate-700/30",
+                          1: "bg-green-900/50",
+                          2: "bg-green-700/70",
+                          3: "bg-green-500",
+                          4: "bg-green-400",
+                        };
+                        return (
+                          <motion.div
+                            key={`${row.label}-${contribution.date}`}
+                            initial={{ scale: 0 }}
+                            whileInView={{ scale: 1 }}
+                            transition={{ delay: 0.001 }}
+                            whileHover={{ scale: 1.5 }}
+                            title={`${contribution.count} contributions on ${contribution.date}`}
+                            className={`w-3 h-3 rounded-sm ${colors[level] || colors[0]} cursor-pointer transition-transform`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 mt-4 text-xs text-slate-400">
+                <span>Less</span>
+                <div className="flex gap-1">
+                  <div className="w-3 h-3 rounded-sm bg-slate-700/30"></div>
+                  <div className="w-3 h-3 rounded-sm bg-green-900/50"></div>
+                  <div className="w-3 h-3 rounded-sm bg-green-700/70"></div>
+                  <div className="w-3 h-3 rounded-sm bg-green-500"></div>
+                  <div className="w-3 h-3 rounded-sm bg-green-400"></div>
+                </div>
+                <span>More</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* GitHub Profile Link */}
         <motion.div
@@ -577,7 +581,7 @@ export function GitHubStatsSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="mt-16 text-center"
+          className="mt-10 text-center"
         >
           <a
             href={profile.profileUrl}

@@ -217,7 +217,7 @@
    ============================================================================ */
 
 .engineering-journey-section {
-  @apply py-20 px-4;
+  @apply py-12 px-4;
 }
 
 .section-container {
@@ -225,7 +225,7 @@
 }
 
 .section-header {
-  @apply mb-16 text-center;
+  @apply mb-10 text-center;
 }
 
 .section-header .section-title {
