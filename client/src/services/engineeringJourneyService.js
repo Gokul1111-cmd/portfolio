@@ -29,6 +29,43 @@ const PHASES_COLLECTION = 'journeyPhases';
 const ENTRIES_COLLECTION = 'journeyEntries';
 
 // ============================================================================
+// IN-MEMORY CACHE
+// ============================================================================
+
+const journeyCache = new Map(); // Map<journeyId, cachedData>
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+/**
+ * Get cached journey data if it exists and is still fresh
+ * @param {string} journeyId 
+ * @returns {Object|null}
+ */
+const getCachedJourney = (journeyId) => {
+  const cached = journeyCache.get(journeyId);
+  if (!cached) return null;
+  
+  const now = Date.now();
+  if (now - cached.timestamp > CACHE_TTL) {
+    journeyCache.delete(journeyId);
+    return null;
+  }
+  
+  return cached.data;
+};
+
+/**
+ * Cache journey data
+ * @param {string} journeyId 
+ * @param {Object} data 
+ */
+const setCachedJourney = (journeyId, data) => {
+  journeyCache.set(journeyId, {
+    data,
+    timestamp: Date.now(),
+  });
+};
+
+// ============================================================================
 // FETCH OPERATIONS
 // ============================================================================
 
@@ -195,6 +232,104 @@ export const getEntriesByPhase = async (phaseId) => {
     return entries;
   } catch (error) {
     console.error(`[engineeringJourneyService] Error fetching entries for phase ${phaseId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch complete journey data in a single optimized call
+ * Loads journey + all phases + all entries in parallel for instant navigation
+ * Uses in-memory caching to prevent reloading when navigating between journeys
+ * 
+ * @param {string} journeyId - The journey ID (internal id field, not docId)
+ * @returns {Promise<Object>} Object with { journey, phases, entriesByPhase }
+ * @throws {Error} If Firestore query fails
+ */
+export const getCompleteJourney = async (journeyId) => {
+  try {
+    // Check cache first - if we have fresh data, return it immediately
+    const cached = getCachedJourney(journeyId);
+    if (cached) {
+      console.log(`[engineeringJourneyService] Using cached journey data for ${journeyId}`);
+      return cached;
+    }
+
+    // First, fetch the journey by its internal id field to get the docId
+    const journeyQuery = query(
+      collection(db, JOURNEYS_COLLECTION),
+      where('id', '==', journeyId),
+      where('isPublic', '==', true)
+    );
+    const journeySnapshot = await getDocs(journeyQuery);
+    if (journeySnapshot.empty) {
+      throw new Error('Journey not found');
+    }
+    const journeyDoc = journeySnapshot.docs[0];
+    const journeyData = journeyDoc.data();
+
+    // Now fetch phases, entries, and any additional data in parallel
+    const [phasesSnapshot, entriesSnapshot] = await Promise.all([
+      getDocs(query(
+        collection(db, PHASES_COLLECTION),
+        where('journeyId', '==', journeyData.id), // Use internal id
+        orderBy('order', 'asc')
+      )),
+      getDocs(query(
+        collection(db, ENTRIES_COLLECTION),
+        orderBy('order', 'asc')
+      ))
+    ]);
+
+    const journey = {
+      ...journeyData,
+      docId: journeyDoc.id,
+    };
+
+    const phases = [];
+    phasesSnapshot.forEach((doc) => {
+      phases.push({
+        ...doc.data(),
+        docId: doc.id,
+      });
+    });
+
+    // Group entries by phase ID for instant filtering
+    const entriesByPhase = {};
+    entriesSnapshot.forEach((doc) => {
+      const entry = {
+        ...doc.data(),
+        docId: doc.id,
+      };
+      const phaseId = entry.phaseId;
+      if (!entriesByPhase[phaseId]) {
+        entriesByPhase[phaseId] = [];
+      }
+      entriesByPhase[phaseId].push(entry);
+    });
+
+    // Filter only entries that belong to phases in this journey
+    const phaseIds = new Set(phases.map(p => p.id));
+    const filteredEntriesByPhase = {};
+    Object.keys(entriesByPhase).forEach(phaseId => {
+      if (phaseIds.has(phaseId)) {
+        filteredEntriesByPhase[phaseId] = entriesByPhase[phaseId];
+      }
+    });
+
+    const result = {
+      journey,
+      phases,
+      entriesByPhase: filteredEntriesByPhase,
+    };
+
+    // Cache the result for future navigation
+    setCachedJourney(journeyId, result);
+
+    console.log(`[engineeringJourneyService] Complete journey data loaded: ${phases.length} phases, ${Object.values(filteredEntriesByPhase).flat().length} entries`);
+
+    return result;
+  } catch (error) {
+    console.error(`[engineeringJourneyService] Error fetching complete journey ${journeyId}:`, error);
     throw error;
   }
 };

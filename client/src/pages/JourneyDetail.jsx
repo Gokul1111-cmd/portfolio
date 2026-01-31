@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Cloud, Code, Shield, Database, CheckCircle, Clock, Calendar, ChevronRight, Terminal, Network, Cpu, GitBranch } from 'lucide-react';
-import { getJourneyById, getPhasesByJourney, getEntriesByPhase } from '@/services/engineeringJourneyService';
+import { getCompleteJourney } from '@/services/engineeringJourneyService';
 
 /**
  * JourneyDetail Component
@@ -10,6 +10,11 @@ import { getJourneyById, getPhasesByJourney, getEntriesByPhase } from '@/service
  * - Journey header with progress
  * - All phases within the journey
  * - Entries/domains grouped by phase and status
+ * 
+ * PERFORMANCE OPTIMIZATION:
+ * - Loads ALL data once on mount (journey + phases + entries)
+ * - Phase/focus area switching is CLIENT-SIDE only (no API calls)
+ * - Results in instant navigation and lower Firestore costs
  */
 
 const iconMap = {
@@ -78,33 +83,17 @@ export const JourneyDetail = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch journey
-        const journeyData = await getJourneyById(journeyId);
-        if (!journeyData) {
-          setError('Journey not found');
-          setLoading(false);
-          return;
-        }
+        // Single optimized call - loads everything at once
+        const { journey: journeyData, phases: phasesData, entriesByPhase } = await getCompleteJourney(journeyId);
+        
         setJourney(journeyData);
-
-        // Fetch phases for this journey
-        const phasesData = await getPhasesByJourney(journeyId);
         setPhases(phasesData);
+        setAllEntries(entriesByPhase);
 
         // Set initial selected phase from URL or first phase
         if (phasesData.length > 0 && !selectedPhase) {
           updateParams({ phase: phasesData[0].id });
         }
-
-        // Fetch entries for all phases
-        const entriesMap = {};
-        await Promise.all(
-          phasesData.map(async (phase) => {
-            const entries = await getEntriesByPhase(phase.id);
-            entriesMap[phase.id] = entries;
-          })
-        );
-        setAllEntries(entriesMap);
 
         setLoading(false);
       } catch (err) {
@@ -115,13 +104,34 @@ export const JourneyDetail = () => {
     };
 
     fetchJourneyData();
-  }, [journeyId, selectedPhase, updateParams]);
+    // Only run on initial mount or when journeyId changes - NOT when selectedPhase changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [journeyId, updateParams]); // Removed selectedPhase from dependencies
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Loading Journey...</h2>
+      <div className="min-h-screen bg-white dark:bg-gray-900">
+        {/* Skeleton header */}
+        <div className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-md">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4 animate-pulse"></div>
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse flex-shrink-0"></div>
+              <div className="flex-1">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Skeleton content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            ))}
+          </div>
         </div>
       </div>
     );
