@@ -107,8 +107,8 @@ export function GitHubStatsSection() {
 
   if (loading) {
     return (
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 to-slate-800">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative min-h-screen py-20 md:py-32 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-center h-64">
             <motion.div
               animate={{ rotate: 360 }}
@@ -124,8 +124,8 @@ export function GitHubStatsSection() {
 
   if (error || !data) {
     return (
-      <section id="github" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 to-slate-800">
-        <div className="max-w-6xl mx-auto">
+      <section id="github" className="relative min-h-screen py-20 md:py-32 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <Github className="w-12 h-12 text-slate-400 mx-auto mb-4" />
@@ -176,8 +176,8 @@ export function GitHubStatsSection() {
   );
 
   return (
-    <section id="github" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 to-slate-800">
-      <div className="max-w-6xl mx-auto">
+    <section id="github" className="relative min-h-screen py-20 md:py-32 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
