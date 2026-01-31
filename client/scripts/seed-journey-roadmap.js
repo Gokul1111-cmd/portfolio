@@ -892,7 +892,7 @@ const entries = [
     phaseId: 'devops',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'Blue/Green Deployment Project',
-    domain: 'CI/CD',
+    domain: 'Blue/Green Deployment',
     status: 'Planned',
     type: 'project',
     description:
@@ -908,7 +908,7 @@ const entries = [
     phaseId: 'devops',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'Canary Deployment Lab',
-    domain: 'CI/CD',
+    domain: 'Canary Deployment',
     status: 'Planned',
     type: 'lab',
     description:
