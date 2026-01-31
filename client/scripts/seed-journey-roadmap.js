@@ -1044,7 +1044,7 @@ const entries = [
     phaseId: 'devops',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'Secure Cloud Platform Capstone',
-    domain: 'Platform Engineering',
+    domain: 'Kubernetes',
     status: 'Planned',
     type: 'project',
     description:
@@ -1592,7 +1592,7 @@ const entries = [
     phaseId: 'sre',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'Disaster Recovery Restore Simulation',
-    domain: 'SRE',
+    domain: 'Incident Response',
     status: 'Planned',
     type: 'lab',
     description:
@@ -1608,7 +1608,7 @@ const entries = [
     phaseId: 'sre',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'Major Incident Simulation Project',
-    domain: 'SRE',
+    domain: 'Incident Response',
     status: 'Planned',
     type: 'project',
     description:
