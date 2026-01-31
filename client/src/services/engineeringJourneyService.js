@@ -98,10 +98,11 @@ export const getJourneyPhases = async () => {
 
 /**
  * Fetch all journeys ordered by `order` field
+ * Includes calculated progress fields (completedPhases, totalPhases, overallProgress)
  *
  * @param {Object} options - filter options
  * @param {boolean} options.publicOnly - when true, returns only public journeys
- * @returns {Promise<Array>} Array of journey objects
+ * @returns {Promise<Array>} Array of journey objects with progress data
  */
 export const getJourneys = async (options = { publicOnly: true }) => {
   const { publicOnly } = options;
@@ -121,7 +122,34 @@ export const getJourneys = async (options = { publicOnly: true }) => {
     // Sort client-side instead of using orderBy to avoid index
     journeys.sort((a, b) => (a.order || 0) - (b.order || 0));
     
-    return journeys;
+    // Fetch phases to calculate progress for each journey
+    const phasesSnapshot = await getDocs(collection(db, PHASES_COLLECTION));
+    const phasesByJourney = {};
+    phasesSnapshot.forEach((doc) => {
+      const phase = doc.data();
+      const journeyId = phase.journeyId;
+      if (!phasesByJourney[journeyId]) {
+        phasesByJourney[journeyId] = [];
+      }
+      phasesByJourney[journeyId].push(phase);
+    });
+
+    // Add progress calculations to each journey
+    const journeysWithProgress = journeys.map((journey) => {
+      const journeyPhases = phasesByJourney[journey.id] || [];
+      const completedPhases = journeyPhases.filter(p => p.status === 'Completed').length;
+      const totalPhases = journeyPhases.length;
+      const overallProgress = totalPhases > 0 ? Math.round((completedPhases / totalPhases) * 100) : 0;
+      
+      return {
+        ...journey,
+        completedPhases,
+        totalPhases,
+        overallProgress,
+      };
+    });
+
+    return journeysWithProgress;
   } catch (error) {
     console.error('[engineeringJourneyService] Error fetching journeys:', error);
     throw error;
@@ -316,9 +344,29 @@ export const getCompleteJourney = async (journeyId) => {
       }
     });
 
+    // Add modulesCompleted to each phase by counting completed entries
+    const phasesWithCompletion = phases.map(phase => {
+      const phaseEntries = filteredEntriesByPhase[phase.id] || [];
+      const modulesCompleted = phaseEntries.filter(e => e.status === 'Completed').length;
+      return {
+        ...phase,
+        modulesCompleted,
+      };
+    });
+
+    // Calculate journey progress
+    const completedPhases = phases.filter(p => p.status === 'Completed').length;
+    const totalPhases = phases.length;
+    const overallProgress = totalPhases > 0 ? Math.round((completedPhases / totalPhases) * 100) : 0;
+
     const result = {
-      journey,
-      phases,
+      journey: {
+        ...journey,
+        completedPhases,
+        totalPhases,
+        overallProgress,
+      },
+      phases: phasesWithCompletion,
       entriesByPhase: filteredEntriesByPhase,
     };
 

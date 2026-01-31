@@ -254,10 +254,8 @@ const entries = [
     order: 9,
     links: [{ label: 'Linux Foundation', url: 'https://www.linuxfoundation.org/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'Linux Foundation',
-      issueDate: null,
-    },
+    issuer: 'Linux Foundation',
+    issueDate: null,
   },
   {
     id: 'entry-github-foundations',
@@ -273,10 +271,8 @@ const entries = [
     order: 10,
     links: [{ label: 'GitHub Certifications', url: 'https://github.com/certifications' }],
     artifacts: [],
-    metadata: {
-      issuer: 'GitHub',
-      issueDate: null,
-    },
+    issuer: 'GitHub',
+    issueDate: null,
   },
   {
     id: 'entry-syscall-tracing-lab',
@@ -546,10 +542,8 @@ const entries = [
     order: 27,
     links: [{ label: 'Cisco Learning Network', url: 'https://learningnetwork.cisco.com/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'Cisco',
-      issueDate: null,
-    },
+    issuer: 'Cisco',
+    issueDate: null,
   },
   {
     id: 'entry-aws-fundamentals',
@@ -646,10 +640,8 @@ const entries = [
     order: 6,
     links: [{ label: 'AWS Certification', url: 'https://aws.amazon.com/certification/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'Amazon Web Services',
-      issueDate: null,
-    },
+    issuer: 'Amazon Web Services',
+    issueDate: null,
   },
   {
     id: 'entry-compliance-drift-detection',
@@ -682,10 +674,8 @@ const entries = [
     order: 8,
     links: [{ label: 'AWS Certification', url: 'https://aws.amazon.com/certification/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'Amazon Web Services',
-      issueDate: null,
-    },
+    issuer: 'Amazon Web Services',
+    issueDate: null,
   },
   {
     id: 'entry-ec2-autoscaling-project',
@@ -784,10 +774,8 @@ const entries = [
     order: 5,
     links: [{ label: 'HashiCorp Certifications', url: 'https://www.hashicorp.com/certification' }],
     artifacts: [],
-    metadata: {
-      issuer: 'HashiCorp',
-      issueDate: null,
-    },
+    issuer: 'HashiCorp',
+    issueDate: null,
   },
   {
     id: 'entry-failure-scenarios',
@@ -982,10 +970,8 @@ const entries = [
     order: 7,
     links: [{ label: 'CNCF Certifications', url: 'https://www.cncf.io/certification/cka/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'CNCF',
-      issueDate: null,
-    },
+    issuer: 'CNCF',
+    issueDate: null,
   },
   {
     id: 'entry-cks-cert',
@@ -1002,10 +988,8 @@ const entries = [
     order: 8,
     links: [{ label: 'CNCF CKS', url: 'https://www.cncf.io/certification/cks/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'CNCF',
-      issueDate: null,
-    },
+    issuer: 'CNCF',
+    issueDate: null,
   },
   {
     id: 'entry-breach-simulation',
@@ -1070,10 +1054,8 @@ const entries = [
     order: 12,
     links: [{ label: 'GitHub Certifications', url: 'https://github.com/certifications' }],
     artifacts: [],
-    metadata: {
-      issuer: 'GitHub',
-      issueDate: null,
-    },
+    issuer: 'GitHub',
+    issueDate: null,
   },
   {
     id: 'entry-jenkins-cert',
@@ -1090,10 +1072,8 @@ const entries = [
     order: 13,
     links: [{ label: 'Jenkins Certification', url: 'https://www.jenkins.io/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'Jenkins',
-      issueDate: null,
-    },
+    issuer: 'Jenkins',
+    issueDate: null,
   },
   {
     id: 'entry-docker-certified-associate',
@@ -1110,10 +1090,8 @@ const entries = [
     order: 14,
     links: [{ label: 'Docker Certifications', url: 'https://docker.com/certification/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'Docker',
-      issueDate: null,
-    },
+    issuer: 'Docker',
+    issueDate: null,
   },
   {
     id: 'entry-helm-chart-project',
@@ -1276,10 +1254,8 @@ const entries = [
     order: 7,
     links: [],
     artifacts: [],
-    metadata: {
-      issuer: 'Various',
-      issueDate: null,
-    },
+    issuer: 'Various',
+    issueDate: null,
   },
   {
     id: 'entry-aws-security-cert',
@@ -1296,10 +1272,8 @@ const entries = [
     order: 8,
     links: [{ label: 'AWS Security Specialty', url: 'https://aws.amazon.com/certification/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'Amazon Web Services',
-      issueDate: null,
-    },
+    issuer: 'Amazon Web Services',
+    issueDate: null,
   },
   {
     id: 'entry-runtime-attack-simulation',
@@ -1412,10 +1386,8 @@ const entries = [
     order: 15,
     links: [{ label: 'CompTIA Security+', url: 'https://www.comptia.org/certifications/security' }],
     artifacts: [],
-    metadata: {
-      issuer: 'CompTIA',
-      issueDate: null,
-    },
+    issuer: 'CompTIA',
+    issueDate: null,
   },
   {
     id: 'entry-container-forensics-lab',
@@ -1546,10 +1518,8 @@ const entries = [
     order: 7,
     links: [{ label: 'Security Blue Team', url: 'https://securityblue.team/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'Security Blue Team',
-      issueDate: null,
-    },
+    issuer: 'Security Blue Team',
+    issueDate: null,
   },
   {
     id: 'entry-finops-cert',
@@ -1566,10 +1536,8 @@ const entries = [
     order: 8,
     links: [{ label: 'FinOps Foundation', url: 'https://www.finops.org/' }],
     artifacts: [],
-    metadata: {
-      issuer: 'FinOps Foundation',
-      issueDate: null,
-    },
+    issuer: 'FinOps Foundation',
+    issueDate: null,
   },
   {
     id: 'entry-aws-ir-automation',
@@ -2019,13 +1987,10 @@ function validateEntry(entry) {
     });
   }
 
-  // Validate certifications have metadata
-  if (entry.type === 'certification' && !entry.metadata) {
-    errors.push(`Certification missing metadata (id: ${entry.id})`);
-  }
-  if (entry.metadata) {
-    if (!entry.metadata.issuer) errors.push(`Metadata missing issuer (id: ${entry.id})`);
-    if (!('issueDate' in entry.metadata)) errors.push(`Metadata missing issueDate (id: ${entry.id})`);
+  // Validate certifications have issuer and issueDate (flattened structure)
+  if (entry.type === 'certification') {
+    if (!entry.issuer) errors.push(`Certification missing issuer (id: ${entry.id})`);
+    if (!('issueDate' in entry)) errors.push(`Certification missing issueDate (id: ${entry.id})`);
   }
 
   return {
