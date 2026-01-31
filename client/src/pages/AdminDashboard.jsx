@@ -32,7 +32,7 @@ import { TimelineEditor } from "./sections/TimelineEditor";
 import { CertificatesEditor } from "./sections/CertificatesEditor";
 import { SyncSettings } from "./sections/SyncSettings";
 import { BlogEditor } from "./sections/BlogEditor";
-import AdminEngineeringJourneyV2 from "@/components/AdminEngineeringJourneyV2";
+import AdminEngineeringJourneyV3 from "@/components/AdminEngineeringJourneyV3";
 
 const navigationItems = [
   { id: "hero", label: "Hero", icon: Sparkles },
@@ -60,7 +60,7 @@ const sectionComponents = {
   testimonials: TestimonialsEditor,
   certificates: CertificatesEditor,
   blog: BlogEditor,
-  journey: AdminEngineeringJourneyV2,
+  journey: AdminEngineeringJourneyV3,
   contact: ContactEditor,
   site: SiteSettingsEditor,
   sync: SyncSettings,
