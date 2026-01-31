@@ -245,7 +245,7 @@ const entries = [
     phaseId: 'foundations',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'LFS101x: Introduction to Linux',
-    domain: 'Linux',
+    domain: 'Linux Administration',
     status: 'Planned',
     type: 'certification',
     description: 'Linux Foundation introductory course covering Linux essentials.',
@@ -283,7 +283,7 @@ const entries = [
     phaseId: 'foundations',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'System Call Tracing Lab',
-    domain: 'Linux',
+    domain: 'Linux Administration',
     status: 'Planned',
     type: 'lab',
     description: 'Use strace and ltrace to trace system calls and library calls for debugging and security analysis.',
@@ -810,7 +810,7 @@ const entries = [
     phaseId: 'iac',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'Reproducible Builds Project',
-    domain: 'Security',
+    domain: 'Supply Chain Security',
     status: 'Planned',
     type: 'project',
     description:
@@ -826,7 +826,7 @@ const entries = [
     phaseId: 'iac',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'Dependency Pinning Exercise',
-    domain: 'Security',
+    domain: 'Supply Chain Security',
     status: 'Planned',
     type: 'exercise',
     description:
@@ -842,7 +842,7 @@ const entries = [
     phaseId: 'iac',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'Artifact Provenance Pipeline',
-    domain: 'Security',
+    domain: 'Supply Chain Security',
     status: 'Planned',
     type: 'project',
     description:
@@ -2106,6 +2106,36 @@ function checkDuplicateIds() {
 }
 
 /**
+ * Validate entry domains match their phase focusAreas
+ * @returns {Object} { valid: boolean, errors: string[] }
+ */
+function validateDomainFocusAreaMatch() {
+  const errors = [];
+  
+  // Create phase focusAreas lookup
+  const phaseFocusAreas = {};
+  phases.forEach((phase) => {
+    phaseFocusAreas[phase.id] = phase.focusAreas || [];
+  });
+
+  // Validate each entry's domain exists in its phase focusAreas
+  entries.forEach((entry) => {
+    const validDomains = phaseFocusAreas[entry.phaseId] || [];
+    
+    if (!validDomains.includes(entry.domain)) {
+      errors.push(
+        `Entry "${entry.id}" has domain "${entry.domain}" which is not in phase "${entry.phaseId}" focusAreas: [${validDomains.join(', ')}]`
+      );
+    }
+  });
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
  * Validate all data before seeding
  * @returns {Object} { valid: boolean, warnings: string[], errors: string[] }
  */
@@ -2146,6 +2176,12 @@ function validateAllData() {
   const duplicateValidation = checkDuplicateIds();
   if (!duplicateValidation.valid) {
     errors.push(...duplicateValidation.errors);
+  }
+
+  // Validate domain/focusArea matching
+  const domainValidation = validateDomainFocusAreaMatch();
+  if (!domainValidation.valid) {
+    errors.push(...domainValidation.errors);
   }
 
   // Warn about status distribution
