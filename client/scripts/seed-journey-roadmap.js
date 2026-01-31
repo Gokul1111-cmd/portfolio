@@ -473,7 +473,7 @@ const entries = [
     phaseId: 'foundations',
     journeyId: 'cloud-devops-security-roadmap',
     title: 'Release Tagging & Rollback Automation',
-    domain: 'Git',
+    domain: 'Version Control',
     status: 'Planned',
     type: 'project',
     description:
