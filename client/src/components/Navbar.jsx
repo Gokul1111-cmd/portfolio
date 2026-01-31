@@ -65,6 +65,7 @@ export const Navbar = () => {
     { name: "Skills", href: "#skills", icon: Code },
     { name: "Certificates", href: "#certificates", icon: Award },
     { name: "Projects", href: "#projects", icon: Briefcase },
+    { name: "GitHub", href: "#github", icon: Github },
     { name: "Contact", href: "#contact", icon: Mail },
     { name: "Blog", href: "/blog", icon: FileText },
   ]);
@@ -80,6 +81,7 @@ export const Navbar = () => {
     Skills: Code,
     Certificates: Award,
     Projects: Briefcase,
+    GitHub: Github,
     Contact: Mail,
     Blog: FileText,
   };

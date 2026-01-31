@@ -7,6 +7,7 @@ import { CertificatesSection } from "../components/CertificatesSection";
 import { MyApproach } from "../components/MyApproach";
 import { ProjectsSection } from "../components/ProjectsSection";
 import { JourneyCards } from "../components/JourneyCards";
+import { GitHubStatsSection } from "../components/GitHubStatsSection";
 import { BlogSection } from "../components/BlogSection";
 import { TestimonialSection } from "../components/Testimonial";
 import { ContactSection } from "../components/ContactSection";
@@ -65,6 +66,7 @@ export const Home = () => {
         <MyApproach />
         <ProjectsSection />
         <JourneyCards />
+        <GitHubStatsSection />
         <BlogSection />
         <TestimonialSection />
         <ContactSection />
