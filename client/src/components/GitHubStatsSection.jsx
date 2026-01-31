@@ -18,11 +18,84 @@ export function GitHubStatsSection() {
   useEffect(() => {
     const fetchGitHubStats = async () => {
       try {
-        const response = await fetch("/api/github-stats");
-        if (!response.ok) throw new Error("Failed to fetch GitHub data");
-        const result = await response.json();
-        setData(result);
+        const username = "Gokul1111-cmd";
+
+        // Fetch user data
+        const userResponse = await fetch(`https://api.github.com/users/${username}`, {
+          headers: {
+            Accept: "application/vnd.github.v3+json",
+          },
+        });
+
+        if (!userResponse.ok) throw new Error(`HTTP ${userResponse.status}: Failed to fetch user data`);
+        const userData = await userResponse.json();
+
+        // Fetch repositories
+        const reposResponse = await fetch(
+          `https://api.github.com/users/${username}/repos?sort=stars&per_page=100`,
+          {
+            headers: {
+              Accept: "application/vnd.github.v3+json",
+            },
+          }
+        );
+
+        if (!reposResponse.ok) throw new Error(`HTTP ${reposResponse.status}: Failed to fetch repos`);
+        const repos = await reposResponse.json();
+
+        // Calculate statistics
+        const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+        const totalForks = repos.reduce((sum, repo) => sum + repo.forks_count, 0);
+        const languages = {};
+
+        repos.forEach((repo) => {
+          if (repo.language) {
+            languages[repo.language] = (languages[repo.language] || 0) + 1;
+          }
+        });
+
+        // Sort languages by frequency
+        const topLanguages = Object.entries(languages)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8)
+          .map(([lang]) => lang);
+
+        // Get top repositories
+        const topRepos = repos
+          .filter((repo) => !repo.fork)
+          .sort((a, b) => b.stargazers_count - a.stargazers_count)
+          .slice(0, 6)
+          .map((repo) => ({
+            name: repo.name,
+            description: repo.description,
+            url: repo.html_url,
+            stars: repo.stargazers_count,
+            forks: repo.forks_count,
+            language: repo.language,
+          }));
+
+        setData({
+          profile: {
+            name: userData.name,
+            avatar: userData.avatar_url,
+            bio: userData.bio,
+            location: userData.location,
+            followers: userData.followers,
+            following: userData.following,
+            publicRepos: userData.public_repos,
+            profileUrl: userData.html_url,
+          },
+          stats: {
+            totalRepos: repos.length,
+            totalStars,
+            totalForks,
+            topLanguages,
+            followers: userData.followers,
+          },
+          topRepos,
+        });
       } catch (err) {
+        console.error("GitHub Stats Error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -50,7 +123,18 @@ export function GitHubStatsSection() {
   }
 
   if (error || !data) {
-    return null;
+    return (
+      <section id="github" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-900 to-slate-800">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <Github className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+              <p className="text-slate-400">{error ? `Error: ${error}` : 'Unable to load GitHub stats'}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   const { profile, stats, topRepos } = data;
