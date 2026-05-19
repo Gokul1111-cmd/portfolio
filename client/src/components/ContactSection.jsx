@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { fetchStaticOrLive } from "../lib/staticData";
 
 const FORM_ENDPOINT =
-  import.meta.env.VITE_FORM_ENDPOINT || "https://formspree.io/f/xqezwjjr";
+  import.meta.env.VITE_FORM_ENDPOINT || "https://formspree.io/f/xaqknadb";
 
 export const ContactSection = () => {
   const { toast } = useToast();
